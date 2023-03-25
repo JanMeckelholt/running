@@ -1,0 +1,13 @@
+syntax = "proto3";
+package runner;
+import "google/protobuf/empty.proto";
+option go_package = "github.com/JanMeckelholt/running/grpc/runner";
+service Runner {
+  rpc CreateRunner (Request) returns (google.protobuf.Empty) {}
+}
+
+message Request {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
