@@ -1,0 +1,17 @@
+syntax = "proto3";
+package strava;
+import "google/protobuf/empty.proto";
+option go_package = "github.com/JanMeckelholt/running/grpc/strava";
+service Strava {
+  rpc Get (Request) returns (Response) {}
+}
+
+message Request {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message Response {
+  string something = 1;
+}

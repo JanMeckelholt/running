@@ -1,0 +1,17 @@
+services:
+  strava-service:
+    build:
+      context: .
+      dockerfile: ./strava-service/Dockerfile
+    ports:
+      - "666:666"
+    env_file:
+      - ./strava-service/.env
+  runner:
+    build:
+      context: .
+      dockerfile: ./runner/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - strava-service

@@ -2,27 +2,26 @@ package main
 
 import (
 	"context"
-	"github.com/caarlos0/env/v7"
-	"log"
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"time"
 
-	"running/common/health"
-	"running/runner/service"
-	"running/runner/service/config"
+	"github.com/JanMeckelholt/running/runner/service"
+	"github.com/JanMeckelholt/running/runner/service/mux"
 )
 
 func main() {
 	srv := &service.Service{}
-	srv.ServiceConfig = config.DefaultServiceConfig()
-	err := env.Parse(&srv.ServiceConfig)
+
+	err := srv.Clients.Dial()
 	if err != nil {
-		return
+		log.Errorf("could not Dial Clients!")
 	}
 	rootMux := http.NewServeMux()
-	rootMux.Handle("/health", health.Handler(health.Health{ServiceName: "runner"}))
-
+	rootMux.Handle("/health", mux.Handler("/health"))
+	rootMux.Handle("/athlet", mux.Handler("/athlet"))
 	server := &http.Server{
 		Addr:    ":80",
 		Handler: rootMux,
@@ -42,6 +41,7 @@ func main() {
 		}
 	}
 
+	fmt.Printf("Listening on localholst:80")
 	serveErr := server.Serve(lis)
 	defer func() {
 		teardown()

@@ -1,16 +1,11 @@
 package service
 
 import (
-	"google.golang.org/grpc"
-	"net/http"
-
-	"running/runner/service/config"
+	"github.com/JanMeckelholt/running/runner/service/clients"
 )
 
 type Service struct {
-	GrpcServer    *grpc.Server
-	HttpServer    *http.Server
-	ServiceConfig config.ServiceConfig
+	Clients clients.Clients
 }
 
 type RunnerConfig struct {
