@@ -29,3 +29,15 @@ func (c *Client) GetAthlet(ctx context.Context, token string) (*http.Response, e
 	resp, err := http.DefaultClient.Do(req)
 	return resp, nil
 }
+
+func (c *Client) GetActivities(ctx context.Context, token string) (*http.Response, error) {
+	log.Infof("Token: %s", token)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/athlete/activities", c.stravaURL.Host), nil)
+	req.Header.Set("content-type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	return resp, nil
+}

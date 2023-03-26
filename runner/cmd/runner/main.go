@@ -24,6 +24,7 @@ func main() {
 	rootMux := http.NewServeMux()
 	rootMux.Handle("/health", mux.Handler("/health", rs))
 	rootMux.Handle("/athlet", mux.Handler("/athlet", rs))
+	rootMux.Handle("/activities", mux.Handler("/activities", rs))
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner"].Port),
 		Handler: rootMux,

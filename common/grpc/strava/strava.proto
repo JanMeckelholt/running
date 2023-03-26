@@ -3,6 +3,7 @@ package strava;
 option go_package = "github.com/JanMeckelholt/running/grpc/strava";
 service Strava {
   rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
+  rpc GetActivities(RunnerRequest) returns (ActivitiesResponse) {}
 }
 
 message RunnerRequest {
@@ -38,4 +39,50 @@ message friend{
 
 message follower{
   string name = 1;
+}
+
+message ActivitiesResponse {
+  repeated Activity Activities= 1;
+}
+
+message Activity{
+  int64 resource_state =1;
+  athlete athlete = 2;
+  string name = 3;
+  double distance = 4;
+  int64 moving_time = 5;
+  int64 elapsed_time =6;
+  int64 total_elevation_gain =7;
+  string type = 8;
+  string sport_type = 9;
+  int64 id = 10;
+  string start_date = 11;
+  string start_date_locale = 12;
+  string timezone = 13;
+  double utc_offset=14;
+  string location_city =15;
+  string location_state =16;
+  string location_country =17;
+  int64 achievement_count=18;
+  int64 kudos_count=19;
+  int64 comment_count=20;
+  bool manual=21;
+  string visibility=22;
+  repeated double start_latlng =23;
+  repeated double end_latlng=24;
+  double average_speed=25;
+  double max_speed=26;
+  double average_heartrate=27;
+  double max_heartrate=28;
+  double elev_high=29;
+  double elev_low=30;
+}
+
+message athlete {
+  int64 id = 1;
+  int64 resource_state=2;
+}
+
+message coordinate {
+
 }

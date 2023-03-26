@@ -20,3 +20,7 @@ func NewRunnerServer(clients clients.Clients) (*RunnerServer, error) {
 func (rs RunnerServer) GetAthlet(ctx context.Context, request strava.RunnerRequest) (*strava.RunnerResponse, error) {
 	return rs.clients.Strava.GetRunner(ctx, &request)
 }
+
+func (rs RunnerServer) GetActivities(ctx context.Context, request strava.RunnerRequest) (*strava.ActivitiesResponse, error) {
+	return rs.clients.Strava.GetActivities(ctx, &request)
+}
