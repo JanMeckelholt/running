@@ -1,17 +1,41 @@
 syntax = "proto3";
 package strava;
-import "google/protobuf/empty.proto";
 option go_package = "github.com/JanMeckelholt/running/grpc/strava";
 service Strava {
-  rpc Get (Request) returns (Response) {}
+  rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
 }
 
-message Request {
+message RunnerRequest {
+  string token = 1;
+}
+
+message RunnerResponse{
+  int64  id = 1;
+  string username = 2;
+  int64 resource_state = 3;
+  string firstname = 4;
+  string lastname = 5;
+  string bio = 6;
+  string city = 7;
+  string state = 8;
+  string country = 9;
+  string sex = 10;
+  bool premium = 11;
+  bool summit = 12;
+  string created_at = 13;
+  string updated_at = 14;
+  int64 badge_type_id = 15;
+  double weight = 16;
+  string profile_medium = 17;
+  string profile = 18;
+  repeated friend friend = 19;
+  repeated follower follower = 20;
+}
+
+message friend{
   string name = 1;
-  string email = 2;
-  string password = 3;
 }
 
-message Response {
-  string something = 1;
+message follower{
+  string name = 1;
 }

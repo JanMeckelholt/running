@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
+	"net/url"
 
 	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
@@ -19,10 +20,12 @@ func main() {
 	if err != nil {
 		return
 	}
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
 	grpcServer := grpc.NewServer()
-
 	teardown := grpcServer.GracefulStop
+	stravaServer := server.NewServer(url.URL{Host: srv.ServiceConfig.StravaURL})
+	strava.RegisterStravaServer(grpcServer, stravaServer)
 
 	log.Infof("listening at :%d", dependencies.Configs["strava-service"].Port)
 	serveErr := grpcServer.Serve(lis)
@@ -33,6 +36,4 @@ func main() {
 		log.Fatal("Runner-Server: Serving Error!")
 	}
 
-	stravaServer := server.NewServer(srv.ServiceConfig.StravaURL, srv.ServiceConfig.StravaToken)
-	strava.RegisterStravaServer(grpcServer, stravaServer)
 }

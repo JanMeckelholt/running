@@ -10,3 +10,7 @@ type Service struct {
 
 type RunnerConfig struct {
 }
+
+type RunnerRequestBody struct {
+	Token string
+}
