@@ -1,5 +1,6 @@
 services:
   strava-service:
+    container_name: strava-service
     build:
       context: .
       dockerfile: ./strava-service/Dockerfile
@@ -8,10 +9,11 @@ services:
     env_file:
       - ./strava-service/.env
   runner:
+    container_name: runner
     build:
       context: .
       dockerfile: ./runner/Dockerfile
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - strava-service

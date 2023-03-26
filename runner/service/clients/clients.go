@@ -1,8 +1,10 @@
 package clients
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
@@ -13,12 +15,20 @@ type Clients struct {
 }
 
 func (c *Clients) Dial() error {
-	log.Infof("Dialing: %s", dependencies.Configs["strava-service"].Address)
-	conn, err := grpc.Dial(dependencies.Configs["strava-service"].Address)
-	log.Infof("Dialed strava-service %s", conn)
+	conn, err := dial("strava-service")
 	if err != nil {
 		return err
 	}
 	c.Strava = grpcStrava.NewStravaClient(conn)
 	return nil
+}
+
+func dial(serviceName string) (*grpc.ClientConn, error) {
+	log.Infof("Dialing: %s:%d", serviceName, dependencies.Configs["strava-service"].Port)
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%d", serviceName, dependencies.Configs["strava-service"].Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	log.Infof("Dialed  %s", conn.Target())
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

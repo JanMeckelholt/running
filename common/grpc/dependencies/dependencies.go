@@ -1,11 +1,10 @@
 package dependencies
 
-import "fmt"
-
 type Config struct {
-	Address string
+	Port int
 }
 
 var Configs = map[string]Config{
-	"strava-service": {Address: fmt.Sprintf("strava-service:%d", 666)},
+	"strava-service": {Port: 666},
+	"runner":         {Port: 80},
 }

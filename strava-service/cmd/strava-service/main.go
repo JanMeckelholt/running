@@ -19,11 +19,12 @@ func main() {
 	if err != nil {
 		return
 	}
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s", dependencies.Configs["strava-servcie"].Address))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
 	grpcServer := grpc.NewServer()
 
 	teardown := grpcServer.GracefulStop
 
+	log.Infof("listening at :%d", dependencies.Configs["strava-service"].Port)
 	serveErr := grpcServer.Serve(lis)
 	defer func() {
 		teardown()

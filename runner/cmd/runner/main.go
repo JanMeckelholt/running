@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	"github.com/JanMeckelholt/running/runner/service"
 	"github.com/JanMeckelholt/running/runner/service/mux"
 )
@@ -17,13 +18,13 @@ func main() {
 
 	err := srv.Clients.Dial()
 	if err != nil {
-		log.Errorf("could not Dial Clients!")
+		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
 	rootMux := http.NewServeMux()
 	rootMux.Handle("/health", mux.Handler("/health"))
 	rootMux.Handle("/athlet", mux.Handler("/athlet"))
 	server := &http.Server{
-		Addr:    ":80",
+		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner"].Port),
 		Handler: rootMux,
 	}
 	lis, err := net.Listen("tcp", server.Addr)
@@ -41,7 +42,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Listening on localholst:80")
+	log.Infof("Listening on :%d", dependencies.Configs["runner"].Port)
 	serveErr := server.Serve(lis)
 	defer func() {
 		teardown()
