@@ -2,6 +2,7 @@ package strava
 
 import (
 	"context"
+	"encoding/json"
 
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -11,6 +12,10 @@ import (
 
 type Client struct {
 	stravaURL url.URL
+}
+
+type tokenResp struct {
+	token string
 }
 
 func NewClient(starvaURL url.URL) *Client {
@@ -69,4 +74,19 @@ func (c *Client) GetActivities(ctx context.Context, token string, since int64) (
 		}
 	}
 	return resp, nil
+}
+
+func (c *Client) UseRefreshToken(ctx context.Context, clientId, clientSecret, refreshToken string) (string, error) {
+	log.Infof("Refreshing: %s", clientId)
+
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/oauth/token?client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s", c.stravaURL.Host, clientId, clientSecret, refreshToken), nil)
+	req.Header.Set("content-type", "application/json")
+	if err != nil {
+		return "", err
+	}
+	resp, err := http.DefaultClient.Do(req)
+
+	tokenResp := &tokenResp{}
+	err = json.NewDecoder(resp.Body).Decode(tokenResp)
+	return tokenResp.token, err
 }

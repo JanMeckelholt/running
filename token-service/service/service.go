@@ -7,12 +7,13 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/token-service/service/config"
 )
 
 var DB *gorm.DB
 
-type Athlete struct {
+type DBClient struct {
 	gorm.Model
 	ClientId     string
 	ClientSecret string
@@ -57,7 +58,7 @@ func (s *TokenStorer) AutoMigrate(object interface{}) error {
 
 func (s *TokenStorer) UpsertClient(clientId, clientSecret, token, refreshToken string) error {
 	log.Infof("Creating: %s %s %s %s", clientSecret, token, refreshToken, clientId)
-	result := DB.Create(&Athlete{ClientId: clientId, ClientSecret: clientSecret, Token: token, RefreshToken: refreshToken})
+	result := DB.Create(&DBClient{ClientId: clientId, ClientSecret: clientSecret, Token: token, RefreshToken: refreshToken})
 	if result.Error != nil {
 		log.Error("DB error: could not create object")
 		return result.Error
@@ -66,20 +67,45 @@ func (s *TokenStorer) UpsertClient(clientId, clientSecret, token, refreshToken s
 	return nil
 }
 
-func (s *TokenStorer) GetClient(clientId string) (*Athlete, error) {
+func (s *TokenStorer) UpdateClient(clientId string, kvPairs []*grpcToken.KvPair) (*grpcToken.Client, error) {
+	oldDBClient, err := s.GetDBClient(clientId)
+	if err != nil {
+		return nil, err
+	}
+	for _, kvPair := range kvPairs {
+		log.Infof("Updating: %s %s %s ", clientId, kvPair.Key, kvPair.Value)
+		result := DB.Model(oldDBClient).Update(kvPair.Key, kvPair.Value)
+		if result.Error != nil {
+			log.Errorf("DB error: could not update client: %s", result.Error)
+			return nil, result.Error
+		}
+	}
+	log.Tracef("Stored client: %s", oldDBClient)
+	return dbClientToClient(oldDBClient), nil
+}
+func (s *TokenStorer) GetDBClient(clientId string) (*DBClient, error) {
 	var (
-		result  *gorm.DB
-		athlete *Athlete
+		result   *gorm.DB
+		dbClient *DBClient
 	)
-	result = DB.First(athlete, clientId)
+	result = DB.First(dbClient, clientId)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		log.Infof("No record found with id %s", athlete)
+		log.Infof("No record found with id %s", dbClient)
 		return nil, nil
 	}
 	if result.Error != nil {
-		log.Errorf("DB error: could not get object by id %s", clientId)
+		log.Errorf("DB error: could not get object by id %s: %s", clientId, result.Error)
 		return nil, result.Error
 	}
 	log.Tracef("Retrieved object by id")
-	return athlete, nil
+	return dbClient, nil
+}
+
+func dbClientToClient(athlete *DBClient) *grpcToken.Client {
+	return &grpcToken.Client{
+		ClientId:     athlete.ClientId,
+		ClientSecret: athlete.ClientSecret,
+		Token:        athlete.Token,
+		RefreshToken: athlete.RefreshToken,
+	}
 }

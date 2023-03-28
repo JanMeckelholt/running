@@ -20,11 +20,15 @@ func main() {
 	if err != nil {
 		return
 	}
+	err = srv.Clients.Dial(srv.ServiceConfig)
+	if err != nil {
+		log.Errorf("could not Dial Clients! %s", err.Error())
+	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
 	grpcServer := grpc.NewServer()
 	teardown := grpcServer.GracefulStop
-	stravaServer := server.NewServer(url.URL{Host: srv.ServiceConfig.StravaURL})
+	stravaServer := server.NewStravaServer(url.URL{Host: srv.ServiceConfig.StravaURL}, srv.Clients)
 	strava.RegisterStravaServer(grpcServer, stravaServer)
 
 	log.Infof("listening at :%d", dependencies.Configs["strava-service"].Port)

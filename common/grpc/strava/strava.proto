@@ -4,10 +4,23 @@ option go_package = "github.com/JanMeckelholt/running/grpc/strava";
 service Strava {
   rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
   rpc GetActivities(ActivityRequest) returns (ActivitiesResponse) {}
+  rpc UseRefreshToken(RefreshRequest) returns (TokenResponse) {}
 }
 
 message RunnerRequest {
-  string token = 1;
+  string clientId = 1;
+  string token = 2;
+}
+
+message RefreshRequest {
+  string clientId = 1;
+  string clientSecret = 2;
+  string refresToken = 3;
+}
+
+message TokenResponse {
+  string clientId = 1;
+  string token = 2;
 }
 
 message RunnerResponse{
@@ -42,7 +55,8 @@ message follower{
 }
 
 message ActivityRequest {
-  string token = 1;
+  string clientId= 1;
+  string token = 2;
   int64  since = 3;
 }
 

@@ -24,12 +24,19 @@ func (s TokenServer) UpsertClient(ctx context.Context, req *grpcToken.Client) (*
 	return &emptypb.Empty{}, s.TokenStorer.UpsertClient(req.GetClientSecret(), req.GetToken(), req.GetRefreshToken(), req.GetClientId())
 }
 
+func (s TokenServer) UpdateClient(ctx context.Context, req *grpcToken.UpdateRequest) (*grpcToken.Client, error) {
+	return s.TokenStorer.UpdateClient(req.GetClientId(), req.GetKvPairs())
+}
+
 func (s TokenServer) GetClient(ctx context.Context, req *grpcToken.ClientId) (*grpcToken.Client, error) {
-	athlete, err := s.TokenStorer.GetClient(req.GetClientId())
+	athlete, err := s.TokenStorer.GetDBClient(req.GetClientId())
+	if err != nil {
+		return nil, err
+	}
 	return &grpcToken.Client{
 		ClientId:     athlete.ClientId,
 		ClientSecret: athlete.ClientSecret,
 		Token:        athlete.Token,
 		RefreshToken: athlete.RefreshToken,
-	}, err
+	}, nil
 }

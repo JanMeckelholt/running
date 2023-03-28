@@ -7,7 +7,7 @@ services:
     ports:
       - "666:666"
     env_file:
-      - ./strava-service/.env
+      - ./strava-service/.env.docker
   runner:
     container_name: runner
     build:

@@ -5,6 +5,7 @@ import "google/protobuf/empty.proto";
 
 service Token {
   rpc UpsertClient(Client) returns (google.protobuf.Empty) {}
+  rpc UpdateClient(UpdateRequest) returns (Client) {}
   rpc GetClient(ClientId) returns (Client) {}
 }
 
@@ -17,6 +18,16 @@ message Client {
   string clientSecret = 2;
   string token = 3;
   string refreshToken = 4;
+}
+
+message UpdateRequest {
+  string clientId=1;
+repeated kvPair kvPairs=2;
+}
+
+message kvPair {
+ string key = 1;
+ string value =2;
 }
 
 message TokenResponse {

@@ -27,7 +27,7 @@ func main() {
 		log.Errorf("could not init storage %s", err.Error())
 		return
 	}
-	err = storer.AutoMigrate(service.Athlete{})
+	err = storer.AutoMigrate(service.DBClient{})
 	if err != nil {
 		log.Errorf("could not automigrate storage %s", err.Error())
 		return
