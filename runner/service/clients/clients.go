@@ -8,28 +8,34 @@ import (
 
 	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/grpc/token"
+	"github.com/JanMeckelholt/running/runner/service/config"
 )
 
 type Clients struct {
-	Strava grpcStrava.StravaClient
+	StravaClient grpcStrava.StravaClient
+	TokenClient  token.TokenClient
 }
 
-func (c *Clients) Dial() error {
-	conn, err := dial("strava-service")
+func (c *Clients) Dial(config config.ServiceConfig) error {
+	conn, err := dial("strava-service", config.StravaServiceName)
 	if err != nil {
 		return err
 	}
-	c.Strava = grpcStrava.NewStravaClient(conn)
+	c.StravaClient = grpcStrava.NewStravaClient(conn)
+
+	conn, err = dial("token-service", config.TokenServiceName)
+	if err != nil {
+		return err
+	}
+	c.TokenClient = token.NewTokenClient(conn)
+
 	return nil
 }
 
-func dial(serviceName string) (*grpc.ClientConn, error) {
-	log.Infof("Dialing: %s:%d", serviceName, dependencies.Configs["strava-service"].Port)
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%d", serviceName, dependencies.Configs["strava-service"].Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-	//log.Infof("Dialing: :%d", dependencies.Configs["strava-service"].Port)
-	//conn, err := grpc.Dial(fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-
+func dial(serviceName, address string) (*grpc.ClientConn, error) {
+	log.Infof("Dialing: %s:%d", address, dependencies.Configs[serviceName].Port)
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%d", address, dependencies.Configs[serviceName].Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	log.Infof("Dialed  %s", conn.Target())
 	if err != nil {
 		return nil, err

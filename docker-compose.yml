@@ -15,5 +15,29 @@ services:
       dockerfile: ./runner/Dockerfile
     ports:
       - "80:80"
+    env_file:
+      - ./runner/.env.docker
     depends_on:
       - strava-service
+  token-service:
+    container_name: token-service
+    build:
+      context: .
+      dockerfile: ./token-service/Dockerfile
+    ports:
+      - "667:666"
+    env_file:
+      - .env.docker.postgres
+      - .env.docker.postgres.secret
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    # user: 100000:100000
+    #volumes:
+    #  - ./pgdata:/var/lib/postgresql/data
+    env_file:
+      - .env.docker.postgres
+      - .env.docker.postgres.secret

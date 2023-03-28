@@ -1,0 +1,53 @@
+package main
+
+import (
+	"fmt"
+	"github.com/caarlos0/env/v7"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"net"
+
+	"github.com/JanMeckelholt/running/common/grpc/dependencies"
+	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
+
+	"github.com/JanMeckelholt/running/token-service/service/server"
+
+	"github.com/JanMeckelholt/running/token-service/service"
+)
+
+func main() {
+	storer := &service.TokenStorer{}
+	err := env.Parse(&storer.StorerConfig)
+	if err != nil {
+		return
+	}
+	storer = service.NewStorer(storer.StorerConfig)
+	err = storer.InitStorage()
+	if err != nil {
+		log.Errorf("could not init storage %s", err.Error())
+		return
+	}
+	err = storer.AutoMigrate(service.Athlete{})
+	if err != nil {
+		log.Errorf("could not automigrate storage %s", err.Error())
+		return
+	}
+
+	tokenServer := server.NewServer(storer)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["token-service"].Port))
+	grpcServer := grpc.NewServer()
+	teardown := grpcServer.GracefulStop
+
+	grpcToken.RegisterTokenServer(grpcServer, tokenServer)
+
+	log.Infof("listening at :%d", dependencies.Configs["token-service"].Port)
+	serveErr := grpcServer.Serve(lis)
+	defer func() {
+		teardown()
+	}()
+	if serveErr != nil {
+		log.Fatal("Runner-Server: Serving Error!")
+	}
+
+}

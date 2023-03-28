@@ -2,6 +2,7 @@ package strava
 
 import (
 	"context"
+
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -27,17 +28,45 @@ func (c *Client) GetAthlet(ctx context.Context, token string) (*http.Response, e
 		return nil, err
 	}
 	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		// refreshTokenResp, err := c.refreshToken(clientId, clientSecret, refreshToken)
+		if err != nil {
+			return nil, err
+		}
+		//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", refreshTokenResp.Refresh_token))
+		resp, err = http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return resp, nil
 }
 
-func (c *Client) GetActivities(ctx context.Context, token string) (*http.Response, error) {
+func (c *Client) GetActivities(ctx context.Context, token string, since int64) (*http.Response, error) {
 	log.Infof("Token: %s", token)
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/athlete/activities", c.stravaURL.Host), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/athlete/activities?after=%d", c.stravaURL.Host, since), nil)
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	if err != nil {
 		return nil, err
 	}
 	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		//refreshTokenResp, err := c.refreshToken(clientId, clientSecret, refreshToken)
+		if err != nil {
+			return nil, err
+		}
+		//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", refreshTokenResp.Refresh_token))
+		resp, err = http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return resp, nil
 }

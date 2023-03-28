@@ -3,7 +3,7 @@ package strava;
 option go_package = "github.com/JanMeckelholt/running/grpc/strava";
 service Strava {
   rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
-  rpc GetActivities(RunnerRequest) returns (ActivitiesResponse) {}
+  rpc GetActivities(ActivityRequest) returns (ActivitiesResponse) {}
 }
 
 message RunnerRequest {
@@ -41,6 +41,11 @@ message follower{
   string name = 1;
 }
 
+message ActivityRequest {
+  string token = 1;
+  int64  since = 3;
+}
+
 message ActivitiesResponse {
   repeated Activity Activities= 1;
 }
@@ -52,7 +57,7 @@ message Activity{
   double distance = 4;
   int64 moving_time = 5;
   int64 elapsed_time =6;
-  int64 total_elevation_gain =7;
+  double total_elevation_gain =7;
   string type = 8;
   string sport_type = 9;
   int64 id = 10;

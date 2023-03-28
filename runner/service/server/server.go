@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/runner/service/clients"
 )
 
@@ -18,9 +19,14 @@ func NewRunnerServer(clients clients.Clients) (*RunnerServer, error) {
 }
 
 func (rs RunnerServer) GetAthlet(ctx context.Context, request strava.RunnerRequest) (*strava.RunnerResponse, error) {
-	return rs.clients.Strava.GetRunner(ctx, &request)
+	return rs.clients.StravaClient.GetRunner(ctx, &request)
 }
 
-func (rs RunnerServer) GetActivities(ctx context.Context, request strava.RunnerRequest) (*strava.ActivitiesResponse, error) {
-	return rs.clients.Strava.GetActivities(ctx, &request)
+func (rs RunnerServer) GetActivities(ctx context.Context, request strava.ActivityRequest) (*strava.ActivitiesResponse, error) {
+	return rs.clients.StravaClient.GetActivities(ctx, &request)
+}
+
+func (rs RunnerServer) CreateRunner(ctx context.Context, request token.Client) error {
+	_, err := rs.clients.TokenClient.UpsertClient(ctx, &request)
+	return err
 }

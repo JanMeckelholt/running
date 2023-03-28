@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/caarlos0/env/v7"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
@@ -16,15 +17,21 @@ import (
 
 func main() {
 	srv := &service.Service{}
-	err := srv.Clients.Dial()
+	err := env.Parse(&srv.Config)
+	if err != nil {
+		return
+	}
+	err = srv.Clients.Dial(srv.Config)
 	if err != nil {
 		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
 	rs, err := server.NewRunnerServer(srv.Clients)
 	rootMux := http.NewServeMux()
 	rootMux.Handle("/health", mux.Handler("/health", rs))
-	rootMux.Handle("/athlet", mux.Handler("/athlet", rs))
+	rootMux.Handle("/athlete", mux.Handler("/athlete", rs))
 	rootMux.Handle("/activities", mux.Handler("/activities", rs))
+	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
+	rootMux.Handle("/weeklyclimb", mux.Handler("/weeklyclimb", rs))
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner"].Port),
 		Handler: rootMux,

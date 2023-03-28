@@ -37,8 +37,8 @@ func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerReque
 	return res, nil
 }
 
-func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.RunnerRequest) (*grpcStrava.ActivitiesResponse, error) {
-	resp, err := s.stravaClient.GetActivities(ctx, req.GetToken())
+func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.ActivityRequest) (*grpcStrava.ActivitiesResponse, error) {
+	resp, err := s.stravaClient.GetActivities(ctx, req.GetToken(), req.GetSince())
 	if err != nil {
 		log.Errorf("Could not Get Activities")
 		return nil, err
@@ -62,6 +62,7 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.RunnerR
 			log.Errorf("Could not unmarshal Activity: %s", err.Error())
 			return nil, err
 		}
+		log.Infof("Climb: %f Date: %s", activity.GetTotalElevationGain(), activity.GetStartDate())
 		aR = append(aR, &activity)
 	}
 	_, err = dec.Token()
