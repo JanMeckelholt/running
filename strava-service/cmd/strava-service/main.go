@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/caarlos0/env/v7"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"net"
 	"net/url"
 
+	"github.com/caarlos0/env/v7"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+
+	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/strava-service/service"
@@ -26,7 +28,12 @@ func main() {
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
-	grpcServer := grpc.NewServer()
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("strava-service/certs/strava-service-server-cert.pem", "strava-service/certs/strava-service-server-key.pem")
+	if err != nil {
+		log.Fatal("cannot load TLS credentials: ", err)
+	}
+	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
+
 	teardown := grpcServer.GracefulStop
 	stravaServer := server.NewStravaServer(url.URL{Host: srv.ServiceConfig.StravaURL}, srv.Clients)
 	strava.RegisterStravaServer(grpcServer, stravaServer)

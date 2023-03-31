@@ -1,7 +1,7 @@
 PROTO_SRC_FILES := $(wildcard common/grpc/*/*.proto)
 PROTO_OBJ_FILES := $(patsubst %.proto, %.pb.go, $(PROTO_SRC_FILES))
 
-.PHONY: generate_protos clean_protos format-gorm
+.PHONY: generate_protos clean_protos generate_certs	
 generate_protos: clean_protos $(PROTO_OBJ_FILES)
 
 %.pb.go: %.proto
@@ -11,3 +11,6 @@ generate_protos: clean_protos $(PROTO_OBJ_FILES)
 clean_protos:
 	rm -f $(PROTO_OBJ_FILES)
 
+
+generate_certs:
+	cd certs; ./gen_certs.sh; cd ..;

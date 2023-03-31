@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
+
+	log "github.com/sirupsen/logrus"
 
 	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/strava-service/service/clients"
@@ -70,7 +71,7 @@ func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerReque
 		if err != nil {
 			return nil, err
 		}
-		resp, err = s.StravaClient.GetAthlet(ctx, req.GetToken())
+		resp, err = s.StravaClient.GetAthlet(ctx, client.GetToken())
 		if err != nil {
 			log.Errorf("Could not Get Athlet")
 			return nil, err
@@ -99,9 +100,11 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 	if resp.StatusCode == http.StatusUnauthorized {
 		client, err := s.GetClient(ctx, &grpcToken.ClientId{ClientId: req.GetClientId()})
 		if err != nil {
-			return nil, err
+			log.Errorf("could not get client with id %s.", req.GetClientId())
+			return nil, fmt.Errorf("could not get client with id %s", req.GetClientId())
 		}
 		newToken, err := s.StravaClient.UseRefreshToken(ctx, client.GetClientId(), client.GetClientSecret(), client.GetRefreshToken())
+		log.Infof("newToken: %s", newToken)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +121,7 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 		if err != nil {
 			return nil, err
 		}
-		resp, err = s.StravaClient.GetActivities(ctx, req.GetToken(), req.GetSince())
+		resp, err = s.StravaClient.GetActivities(ctx, client.GetToken(), req.GetSince())
 		if err != nil {
 			log.Errorf("Could not Get Activities")
 			return nil, err

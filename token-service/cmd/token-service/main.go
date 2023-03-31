@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 	"net"
 
+	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/grpc/dependencies"
 	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
 
@@ -36,7 +37,12 @@ func main() {
 	tokenServer := server.NewServer(storer)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["token-service"].Port))
-	grpcServer := grpc.NewServer()
+
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("token-service/certs/token-service-server-cert.pem", "token-service/certs/token-service-server-key.pem")
+	if err != nil {
+		log.Fatal("cannot load TLS credentials: ", err)
+	}
+	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
 	teardown := grpcServer.GracefulStop
 
 	grpcToken.RegisterTokenServer(grpcServer, tokenServer)

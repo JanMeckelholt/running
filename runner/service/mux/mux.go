@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/common/grpc/token"
@@ -82,7 +83,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodPost:
-				rB := service.RunnerRequestBody{}
+				rB := service.ActivitiesRequestBody{}
 				err := json.NewDecoder(req.Body).Decode(&rB)
 				if err != nil {
 					log.Errorf(err.Error())
@@ -108,17 +109,13 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodPost:
-				type RequestBody struct {
-					Token string
-					Since uint64
-				}
-				rB := RequestBody{}
+				rB := service.ActivitiesRequestBody{}
 				err := json.NewDecoder(req.Body).Decode(&rB)
 				if err != nil {
 					log.Errorf(err.Error())
 				}
 				startoOfWeek := logic.GetStartOfWeek()
-				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: startoOfWeek})
+				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: startoOfWeek, ClientId: rB.ClientId})
 				climb := logic.GetClimb(res)
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)

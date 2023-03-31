@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Client struct {
@@ -15,7 +16,7 @@ type Client struct {
 }
 
 type tokenResp struct {
-	token string
+	Access_token string
 }
 
 func NewClient(starvaURL url.URL) *Client {
@@ -85,8 +86,12 @@ func (c *Client) UseRefreshToken(ctx context.Context, clientId, clientSecret, re
 		return "", err
 	}
 	resp, err := http.DefaultClient.Do(req)
-
-	tokenResp := &tokenResp{}
-	err = json.NewDecoder(resp.Body).Decode(tokenResp)
-	return tokenResp.token, err
+	if err != nil {
+		return "", err
+	}
+	log.Info("RefreshToken-Response: %s", resp.StatusCode)
+	var tokenResp tokenResp
+	err = json.NewDecoder(resp.Body).Decode(&tokenResp)
+	log.Infof("tokenResp: %s %s", tokenResp, tokenResp.Access_token)
+	return tokenResp.Access_token, err
 }

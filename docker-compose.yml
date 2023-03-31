@@ -32,7 +32,7 @@ services:
   postgres:
     container_name: postgres
     image: postgres
-    restart: always
+    restart: unless-stopped
     ports:
       - "5432:5432"
     # user: 100000:100000

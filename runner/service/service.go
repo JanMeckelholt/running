@@ -17,10 +17,17 @@ type ClimbResponse struct {
 	Climb int64
 }
 
-type RunnerRequestBody struct {
+type ActivitiesRequestBody struct {
+	ClientId     string
 	Token        string
 	RefreshToken string `json:"RefreshToken,omitempty"`
 	Since        int64  `json:"since,omitempty"`
+}
+
+type RunnerRequestBody struct {
+	ClientId     string
+	Token        string
+	RefreshToken string `json:"RefreshToken,omitempty"`
 }
 
 type RefreshTokenResponse struct {
