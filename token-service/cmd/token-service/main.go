@@ -8,7 +8,7 @@ import (
 	"net"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
-	"github.com/JanMeckelholt/running/common/grpc/dependencies"
+	"github.com/JanMeckelholt/running/common/dependencies"
 	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
 
 	"github.com/JanMeckelholt/running/token-service/service/server"

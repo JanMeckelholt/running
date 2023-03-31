@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/JanMeckelholt/running/common/grpc/dependencies"
+	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/runner/service"
 	"github.com/JanMeckelholt/running/runner/service/mux"
 	"github.com/JanMeckelholt/running/runner/service/server"

@@ -1,0 +1,1 @@
+SELECT id,client_id FROM db_clients;

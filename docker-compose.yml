@@ -35,9 +35,9 @@ services:
     restart: unless-stopped
     ports:
       - "5432:5432"
-    # user: 100000:100000
-    #volumes:
-    #  - ./pgdata:/var/lib/postgresql/data
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    user: "1000:1000"
     env_file:
       - .env.docker.postgres
       - .env.docker.postgres.secret

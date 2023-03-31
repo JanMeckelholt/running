@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
-	"github.com/JanMeckelholt/running/common/grpc/dependencies"
+	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/strava-service/service/config"
 )
