@@ -8,8 +8,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
-	"github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/common/health"
 	"github.com/JanMeckelholt/running/runner/service"
 	"github.com/JanMeckelholt/running/runner/service/logic"
@@ -57,7 +57,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				err = rs.CreateRunner(context.Background(), token.Client{
+				err = rs.CreateRunner(context.Background(), database.Client{
 					ClientId:     rB.ClientId,
 					ClientSecret: rB.ClientSecret,
 					Token:        rB.Token,

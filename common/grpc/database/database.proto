@@ -1,9 +1,9 @@
 syntax = "proto3";
-package token;
-option go_package = "github.com/JanMeckelholt/running/grpc/token";
+package database;
+option go_package = "github.com/JanMeckelholt/running/grpc/database";
 import "google/protobuf/empty.proto";
 
-service Token {
+service Database {
   rpc UpsertClient(Client) returns (google.protobuf.Empty) {}
   rpc UpdateClient(UpdateRequest) returns (Client) {}
   rpc GetClient(ClientId) returns (Client) {}

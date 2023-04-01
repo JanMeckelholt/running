@@ -63,17 +63,6 @@ func (c *Client) GetActivities(ctx context.Context, token string, since int64) (
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode == http.StatusUnauthorized {
-		//refreshTokenResp, err := c.refreshToken(clientId, clientSecret, refreshToken)
-		if err != nil {
-			return nil, err
-		}
-		//req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", refreshTokenResp.Refresh_token))
-		resp, err = http.DefaultClient.Do(req)
-		if err != nil {
-			return nil, err
-		}
-	}
 	return resp, nil
 }
 

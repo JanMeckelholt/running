@@ -3,8 +3,8 @@ package server
 import (
 	"context"
 
+	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
-	"github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/runner/service/clients"
 )
 
@@ -26,7 +26,7 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request strava.Activit
 	return rs.clients.StravaClient.GetActivities(ctx, &request)
 }
 
-func (rs RunnerServer) CreateRunner(ctx context.Context, request token.Client) error {
-	_, err := rs.clients.TokenClient.UpsertClient(ctx, &request)
+func (rs RunnerServer) CreateRunner(ctx context.Context, request database.Client) error {
+	_, err := rs.clients.DatabaseClient.UpsertClient(ctx, &request)
 	return err
 }

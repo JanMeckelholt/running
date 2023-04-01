@@ -9,7 +9,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
+	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/strava-service/service/clients"
 	"github.com/JanMeckelholt/running/strava-service/service/strava"
 
@@ -30,8 +30,8 @@ func NewStravaServer(stravaURL url.URL, clients clients.Clients) *StravaServer {
 	}
 }
 
-func (s StravaServer) GetToken(ctx context.Context, id *grpcToken.ClientId) (string, error) {
-	resp, err := s.Clients.TokenClient.GetClient(ctx, id)
+func (s StravaServer) GetToken(ctx context.Context, id *grpcDB.ClientId) (string, error) {
+	resp, err := s.Clients.DatabaseClient.GetClient(ctx, id)
 	if err != nil {
 		log.Errorf("Could not Get Athlet")
 		return "", err
@@ -39,18 +39,27 @@ func (s StravaServer) GetToken(ctx context.Context, id *grpcToken.ClientId) (str
 	return resp.GetToken(), nil
 }
 
-func (s StravaServer) GetClient(ctx context.Context, id *grpcToken.ClientId) (*grpcToken.Client, error) {
-	return s.Clients.TokenClient.GetClient(ctx, id)
+func (s StravaServer) GetClient(ctx context.Context, id *grpcDB.ClientId) (*grpcDB.Client, error) {
+	return s.Clients.DatabaseClient.GetClient(ctx, id)
 }
 
 func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerRequest) (*grpcStrava.RunnerResponse, error) {
-	resp, err := s.StravaClient.GetAthlet(ctx, req.GetToken())
+	token := req.GetToken()
+	if token == "" {
+		client, err := s.GetClient(ctx, &grpcDB.ClientId{ClientId: req.GetClientId()})
+		if err != nil {
+			log.Errorf("could not get client with id %s.", req.GetClientId())
+			return nil, fmt.Errorf("could not get client with id %s", req.GetClientId())
+		}
+		token = client.GetToken()
+	}
+	resp, err := s.StravaClient.GetAthlet(ctx, token)
 	if err != nil {
 		log.Errorf("Could not Get Athlet")
 		return nil, err
 	}
 	if resp.StatusCode == http.StatusUnauthorized {
-		client, err := s.GetClient(ctx, &grpcToken.ClientId{ClientId: req.GetClientId()})
+		client, err := s.GetClient(ctx, &grpcDB.ClientId{ClientId: req.GetClientId()})
 		if err != nil {
 			return nil, err
 		}
@@ -58,16 +67,16 @@ func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerReque
 		if err != nil {
 			return nil, err
 		}
-		updateReq := grpcToken.UpdateRequest{
+		updateReq := grpcDB.UpdateRequest{
 			ClientId: req.ClientId,
-			KvPairs: []*grpcToken.KvPair{
+			KvPairs: []*grpcDB.KvPair{
 				{
 					Key:   "token",
 					Value: newToken,
 				},
 			},
 		}
-		client, err = s.Clients.TokenClient.UpdateClient(ctx, &updateReq)
+		client, err = s.Clients.DatabaseClient.UpdateClient(ctx, &updateReq)
 		if err != nil {
 			return nil, err
 		}
@@ -92,13 +101,22 @@ func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerReque
 }
 
 func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.ActivityRequest) (*grpcStrava.ActivitiesResponse, error) {
-	resp, err := s.StravaClient.GetActivities(ctx, req.GetToken(), req.GetSince())
+	token := req.GetToken()
+	if token == "" {
+		client, err := s.GetClient(ctx, &grpcDB.ClientId{ClientId: req.GetClientId()})
+		if err != nil {
+			log.Errorf("could not get client with id %s.", req.GetClientId())
+			return nil, fmt.Errorf("could not get client with id %s", req.GetClientId())
+		}
+		token = client.GetToken()
+	}
+	resp, err := s.StravaClient.GetActivities(ctx, token, req.GetSince())
 	if err != nil {
 		log.Errorf("Could not Get Activities")
 		return nil, err
 	}
 	if resp.StatusCode == http.StatusUnauthorized {
-		client, err := s.GetClient(ctx, &grpcToken.ClientId{ClientId: req.GetClientId()})
+		client, err := s.GetClient(ctx, &grpcDB.ClientId{ClientId: req.GetClientId()})
 		if err != nil {
 			log.Errorf("could not get client with id %s.", req.GetClientId())
 			return nil, fmt.Errorf("could not get client with id %s", req.GetClientId())
@@ -108,16 +126,16 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 		if err != nil {
 			return nil, err
 		}
-		updateReq := grpcToken.UpdateRequest{
+		updateReq := grpcDB.UpdateRequest{
 			ClientId: req.ClientId,
-			KvPairs: []*grpcToken.KvPair{
+			KvPairs: []*grpcDB.KvPair{
 				{
 					Key:   "token",
 					Value: newToken,
 				},
 			},
 		}
-		client, err = s.Clients.TokenClient.UpdateClient(ctx, &updateReq)
+		client, err = s.Clients.DatabaseClient.UpdateClient(ctx, &updateReq)
 		if err != nil {
 			return nil, err
 		}
@@ -133,7 +151,6 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 	}
 
 	var aR []*grpcStrava.Activity
-	var activity grpcStrava.Activity
 	dec := json.NewDecoder(resp.Body)
 	_, err = dec.Token()
 	if err != nil {
@@ -141,6 +158,7 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 		return nil, err
 	}
 	for dec.More() {
+		var activity grpcStrava.Activity
 		err = dec.Decode(&activity)
 		if err != nil {
 			log.Errorf("Could not unmarshal Activity: %s", err.Error())

@@ -2,22 +2,23 @@ package main
 
 import (
 	"fmt"
+	"net"
+
 	"github.com/caarlos0/env/v7"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"net"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/dependencies"
-	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
+	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
 
-	"github.com/JanMeckelholt/running/token-service/service/server"
+	"github.com/JanMeckelholt/running/database-service/service/server"
 
-	"github.com/JanMeckelholt/running/token-service/service"
+	"github.com/JanMeckelholt/running/database-service/service"
 )
 
 func main() {
-	storer := &service.TokenStorer{}
+	storer := &service.Storer{}
 	err := env.Parse(&storer.StorerConfig)
 	if err != nil {
 		return
@@ -34,20 +35,20 @@ func main() {
 		return
 	}
 
-	tokenServer := server.NewServer(storer)
+	dbServer := server.NewServer(storer)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["token-service"].Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["database-service"].Port))
 
-	tlsCredentials, err := certhandling.LoadTLSServerCredentials("token-service/certs/token-service-server-cert.pem", "token-service/certs/token-service-server-key.pem")
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("database-service/certs/database-service-server-cert.pem", "database-service/certs/database-service-server-key.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}
 	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
 	teardown := grpcServer.GracefulStop
 
-	grpcToken.RegisterTokenServer(grpcServer, tokenServer)
+	grpcDB.RegisterDatabaseServer(grpcServer, dbServer)
 
-	log.Infof("listening at :%d", dependencies.Configs["token-service"].Port)
+	log.Infof("listening at :%d", dependencies.Configs["database-service"].Port)
 	serveErr := grpcServer.Serve(lis)
 	defer func() {
 		teardown()

@@ -8,20 +8,20 @@ import (
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/dependencies"
-	"github.com/JanMeckelholt/running/common/grpc/token"
+	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/strava-service/service/config"
 )
 
 type Clients struct {
-	TokenClient token.TokenClient
+	DatabaseClient database.DatabaseClient
 }
 
 func (c *Clients) Dial(config config.ServiceConfig) error {
-	conn, err := dial("token-service", config.TokenServiceName)
+	conn, err := dial("database-service", config.DatabaseServiceName)
 	if err != nil {
 		return err
 	}
-	c.TokenClient = token.NewTokenClient(conn)
+	c.DatabaseClient = database.NewDatabaseClient(conn)
 
 	return nil
 }

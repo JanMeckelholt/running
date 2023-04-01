@@ -8,8 +8,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	grpcToken "github.com/JanMeckelholt/running/common/grpc/token"
-	"github.com/JanMeckelholt/running/token-service/service/config"
+	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
+	"github.com/JanMeckelholt/running/database-service/service/config"
 )
 
 var DB *gorm.DB
@@ -22,17 +22,17 @@ type DBClient struct {
 	RefreshToken *string
 }
 
-type TokenStorer struct {
+type Storer struct {
 	StorerConfig config.StorerConfig
 }
 
-func NewStorer(storerConfig config.StorerConfig) *TokenStorer {
-	return &TokenStorer{
+func NewStorer(storerConfig config.StorerConfig) *Storer {
+	return &Storer{
 		StorerConfig: storerConfig,
 	}
 }
 
-func (s *TokenStorer) InitStorage() error {
+func (s *Storer) InitStorage() error {
 	log.Infof("Using ConnString for DB: host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", s.StorerConfig.HOST, s.StorerConfig.PORT, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword)
 	var err error
 	db, err := gorm.Open(postgres.Open(fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", s.StorerConfig.HOST, s.StorerConfig.PORT, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword)), &gorm.Config{})
@@ -45,7 +45,7 @@ func (s *TokenStorer) InitStorage() error {
 	return nil
 }
 
-func (s *TokenStorer) AutoMigrate(object interface{}) error {
+func (s *Storer) AutoMigrate(object interface{}) error {
 	log.Info("Starting automatic migrations")
 
 	var err error
@@ -57,7 +57,7 @@ func (s *TokenStorer) AutoMigrate(object interface{}) error {
 	return nil
 }
 
-func (s *TokenStorer) UpsertClient(clientId, clientSecret, token, refreshToken string) error {
+func (s *Storer) UpsertClient(clientId, clientSecret, token, refreshToken string) error {
 	log.Infof("Creating: %s %s %s %s", clientId, clientSecret, token, refreshToken)
 	result := DB.Create(&DBClient{ClientId: &clientId, ClientSecret: &clientSecret, Token: &token, RefreshToken: &refreshToken})
 	if result.Error != nil {
@@ -68,7 +68,7 @@ func (s *TokenStorer) UpsertClient(clientId, clientSecret, token, refreshToken s
 	return nil
 }
 
-func (s *TokenStorer) UpdateClient(clientId string, kvPairs []*grpcToken.KvPair) (*grpcToken.Client, error) {
+func (s *Storer) UpdateClient(clientId string, kvPairs []*grpcDB.KvPair) (*grpcDB.Client, error) {
 	oldDBClient, err := s.GetDBClient(clientId)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (s *TokenStorer) UpdateClient(clientId string, kvPairs []*grpcToken.KvPair)
 	log.Info("Stored client: %s", oldDBClient)
 	return dbClientToClient(oldDBClient), nil
 }
-func (s *TokenStorer) GetDBClient(clientId string) (*DBClient, error) {
+func (s *Storer) GetDBClient(clientId string) (*DBClient, error) {
 	var (
 		result   *gorm.DB
 		dbClient DBClient
@@ -102,8 +102,8 @@ func (s *TokenStorer) GetDBClient(clientId string) (*DBClient, error) {
 	return &dbClient, nil
 }
 
-func dbClientToClient(dbClient *DBClient) *grpcToken.Client {
-	return &grpcToken.Client{
+func dbClientToClient(dbClient *DBClient) *grpcDB.Client {
+	return &grpcDB.Client{
 		ClientId:     *dbClient.ClientId,
 		ClientSecret: *dbClient.ClientSecret,
 		Token:        *dbClient.Token,

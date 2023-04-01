@@ -8,14 +8,14 @@ import (
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/dependencies"
+	"github.com/JanMeckelholt/running/common/grpc/database"
 	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
-	"github.com/JanMeckelholt/running/common/grpc/token"
 	"github.com/JanMeckelholt/running/runner/service/config"
 )
 
 type Clients struct {
-	StravaClient grpcStrava.StravaClient
-	TokenClient  token.TokenClient
+	StravaClient   grpcStrava.StravaClient
+	DatabaseClient database.DatabaseClient
 }
 
 func (c *Clients) Dial(config config.ServiceConfig) error {
@@ -25,11 +25,11 @@ func (c *Clients) Dial(config config.ServiceConfig) error {
 	}
 	c.StravaClient = grpcStrava.NewStravaClient(conn)
 
-	conn, err = dial("token-service", config.TokenServiceName)
+	conn, err = dial("database-service", config.DatabaseServiceName)
 	if err != nil {
 		return err
 	}
-	c.TokenClient = token.NewTokenClient(conn)
+	c.DatabaseClient = database.NewDatabaseClient(conn)
 
 	return nil
 }

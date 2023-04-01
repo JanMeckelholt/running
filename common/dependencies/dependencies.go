@@ -5,7 +5,7 @@ type Config struct {
 }
 
 var Configs = map[string]Config{
-	"strava-service": {Port: 666},
-	"token-service":  {Port: 666},
-	"runner":         {Port: 80},
+	"strava-service":   {Port: 666},
+	"database-service": {Port: 666},
+	"runner":           {Port: 80},
 }
