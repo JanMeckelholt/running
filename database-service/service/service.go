@@ -3,12 +3,14 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
+	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/database-service/service/config"
 )
 
@@ -20,6 +22,39 @@ type DBClient struct {
 	ClientSecret *string
 	Token        *string
 	RefreshToken *string
+	Activities   []DBActivity `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+}
+
+type DBActivity struct {
+	gorm.Model
+	DBClientID         uint
+	Name               string  `json:"name,omitempty"`
+	Distance           float64 `json:"distance,omitempty"`
+	MovingTime         int64   `json:"moving_time,omitempty"`
+	ElapsedTime        int64   `json:"elapsed_time,omitempty"`
+	TotalElevationGain float64 `json:"total_elevation_gain,omitempty"`
+	Type               string  `json:"type,omitempty"`
+	SportType          string  `json:"sport_type,omitempty"`
+	Id                 int64   `json:"id,omitempty"`
+	StartDate          string  `json:"start_date,omitempty"`
+	StartDateLocale    string  `json:"start_date_locale,omitempty"`
+	Timezone           string  `json:"timezone,omitempty"`
+	UtcOffset          float64 `json:"utc_offset,omitempty"`
+	LocationCity       string  `json:"location_city,omitempty"`
+	LocationState      string  `json:"location_state,omitempty"`
+	LocationCountry    string  `json:"location_country,omitempty"`
+	AchievementCount   int64   `json:"achievement_count,omitempty"`
+	KudosCount         int64   `json:"kudos_count,omitempty"`
+	CommentCount       int64   `json:"comment_count,omitempty"`
+	Manual             bool    `json:"manual,omitempty"`
+	Visibility         string  `json:"visibility,omitempty"`
+	AverageSpeed       float64 `json:"average_speed,omitempty"`
+	MaxSpeed           float64 `json:"max_speed,omitempty"`
+	AverageHeartrate   float64 `json:"average_heartrate,omitempty"`
+	MaxHeartrate       float64 `json:"max_heartrate,omitempty"`
+	ElevHigh           float64 `json:"elev_high,omitempty"`
+	ElevLow            float64 `json:"elev_low,omitempty"`
+	ResourceState      int64   `json:"resource_state,omitempty"`
 }
 
 type Storer struct {
@@ -108,5 +143,55 @@ func dbClientToClient(dbClient *DBClient) *grpcDB.Client {
 		ClientSecret: *dbClient.ClientSecret,
 		Token:        *dbClient.Token,
 		RefreshToken: *dbClient.RefreshToken,
+	}
+}
+
+func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
+	log.Infof("Creating: %s\n%s", req.GetName(), req.GetAthlete().String())
+	clientId := strconv.FormatInt(req.GetAthlete().GetId(), 10)
+	result := DB.Model(&DBClient{ClientId: &clientId}).Association("Activities").Append(DBActivity{
+		Name:               req.GetName(),
+		Distance:           req.GetDistance(),
+		ElapsedTime:        req.GetElapsedTime(),
+		AverageHeartrate:   req.GetAverageHeartrate(),
+		AverageSpeed:       req.GetAverageSpeed(),
+		TotalElevationGain: req.GetTotalElevationGain(),
+	})
+	if result != nil {
+		log.Errorf("DB error: could not add activity %s", result.Error())
+		return fmt.Errorf("DB error: could not add activity %s", result.Error())
+	}
+	log.Info("Added activity %s to client %s", req.GetName(), clientId)
+	return nil
+}
+
+func dbActivityToActivity(dbActivity *DBActivity) *grpcStrava.Activity {
+	return &grpcStrava.Activity{
+		ResourceState:      dbActivity.ResourceState,
+		Name:               dbActivity.Name,
+		Distance:           dbActivity.Distance,
+		MovingTime:         dbActivity.MovingTime,
+		ElapsedTime:        dbActivity.ElapsedTime,
+		TotalElevationGain: dbActivity.TotalElevationGain,
+		Type:               dbActivity.Type,
+		SportType:          dbActivity.SportType,
+		StartDate:          dbActivity.StartDate,
+		StartDateLocale:    dbActivity.StartDateLocale,
+		Timezone:           dbActivity.Timezone,
+		UtcOffset:          dbActivity.UtcOffset,
+		LocationCity:       dbActivity.LocationCity,
+		LocationState:      dbActivity.LocationState,
+		LocationCountry:    dbActivity.LocationCountry,
+		AchievementCount:   dbActivity.AchievementCount,
+		KudosCount:         dbActivity.KudosCount,
+		CommentCount:       dbActivity.CommentCount,
+		Manual:             dbActivity.Manual,
+		Visibility:         dbActivity.Visibility,
+		AverageSpeed:       dbActivity.AverageSpeed,
+		MaxSpeed:           dbActivity.MaxSpeed,
+		AverageHeartrate:   dbActivity.AverageHeartrate,
+		MaxHeartrate:       dbActivity.MaxHeartrate,
+		ElevHigh:           dbActivity.ElevHigh,
+		ElevLow:            dbActivity.ElevLow,
 	}
 }

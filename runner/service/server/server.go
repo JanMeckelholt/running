@@ -26,6 +26,11 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request strava.Activit
 	return rs.clients.StravaClient.GetActivities(ctx, &request)
 }
 
+func (rs RunnerServer) ActivitiesToDB(ctx context.Context, request strava.ActivityRequest) error {
+	_, err := rs.clients.StravaClient.ActivitiesToDB(ctx, &request)
+	return err
+}
+
 func (rs RunnerServer) CreateRunner(ctx context.Context, request database.Client) error {
 	_, err := rs.clients.DatabaseClient.UpsertClient(ctx, &request)
 	return err

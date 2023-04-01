@@ -1,16 +1,23 @@
 syntax = "proto3";
 package database;
-option go_package = "github.com/JanMeckelholt/running/grpc/database";
+option go_package = "github.com/JanMeckelholt/running/common/grpc/database";
 import "google/protobuf/empty.proto";
+import "strava/strava.proto";
 
 service Database {
   rpc UpsertClient(Client) returns (google.protobuf.Empty) {}
   rpc UpdateClient(UpdateRequest) returns (Client) {}
   rpc GetClient(ClientId) returns (Client) {}
+  rpc UpsertActivity(strava.Activity) returns (google.protobuf.Empty) {}
+  rpc GetActivity(ActivityId) returns (strava.Activity) {}
 }
 
 message ClientId {
   string clientId =1;
+}
+
+message ActivityId {
+  string ActivityId =1;
 }
 
 message Client {

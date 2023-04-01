@@ -1,0 +1,6 @@
+{
+    "protoc": {
+        "path": "common/grpc/",
+        "compile_on_save": false,
+    }
+}

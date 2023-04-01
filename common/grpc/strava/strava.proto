@@ -1,9 +1,11 @@
 syntax = "proto3";
 package strava;
-option go_package = "github.com/JanMeckelholt/running/grpc/strava";
+option go_package = "github.com/JanMeckelholt/running/common/grpc/strava";
+import "google/protobuf/empty.proto";
 service Strava {
   rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
   rpc GetActivities(ActivityRequest) returns (ActivitiesResponse) {}
+  rpc ActivitiesToDB(ActivityRequest) returns (google.protobuf.Empty) {}
   rpc UseRefreshToken(RefreshRequest) returns (TokenResponse) {}
 }
 

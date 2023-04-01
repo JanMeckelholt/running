@@ -31,17 +31,25 @@ func main() {
 	}
 	err = storer.AutoMigrate(service.DBClient{})
 	if err != nil {
-		log.Errorf("could not automigrate storage %s", err.Error())
+		log.Errorf("could not automigrate DBClient %s", err.Error())
+		return
+	}
+	err = storer.AutoMigrate(service.DBActivity{})
+	if err != nil {
+		log.Errorf("could not automigrate DBActivity %s", err.Error())
 		return
 	}
 
 	dbServer := server.NewServer(storer)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["database-service"].Port))
+	if err != nil {
+		log.Fatal("cannot setup tcp listener for database-service: ", err)
+	}
 
 	tlsCredentials, err := certhandling.LoadTLSServerCredentials("database-service/certs/database-service-server-cert.pem", "database-service/certs/database-service-server-key.pem")
 	if err != nil {
-		log.Fatal("cannot load TLS credentials: ", err)
+		log.Fatal("cannot load TLS credentials for database-service: ", err)
 	}
 	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
 	teardown := grpcServer.GracefulStop

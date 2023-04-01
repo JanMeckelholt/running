@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/strava-service/service/clients"
@@ -173,4 +174,21 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 		return nil, err
 	}
 	return &grpcStrava.ActivitiesResponse{Activities: aR}, nil
+}
+
+func (s StravaServer) ActivitiesToDB(ctx context.Context, req *grpcStrava.ActivityRequest) (*emptypb.Empty, error) {
+	activites, err := s.GetActivities(ctx, req)
+	if err != nil {
+		return &emptypb.Empty{}, err
+	}
+	if len(activites.GetActivities()) == 0 {
+		return &emptypb.Empty{}, nil
+	}
+	for _, activity := range activites.GetActivities() {
+		_, err = s.Clients.DatabaseClient.UpsertActivity(ctx, activity)
+		if err != nil {
+			return &emptypb.Empty{}, err
+		}
+	}
+	return &emptypb.Empty{}, nil
 }

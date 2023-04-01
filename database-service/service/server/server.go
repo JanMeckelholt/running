@@ -8,6 +8,7 @@ import (
 	"github.com/JanMeckelholt/running/database-service/service"
 
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
+	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
 )
 
 type DatabaseServer struct {
@@ -44,4 +45,8 @@ func (s DatabaseServer) GetClient(ctx context.Context, req *grpcDB.ClientId) (*g
 		Token:        *dbClient.Token,
 		RefreshToken: *dbClient.RefreshToken,
 	}, nil
+}
+
+func (s DatabaseServer) UpsertActivity(ctx context.Context, req *grpcStrava.Activity) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, s.Storer.UpsertActivity(req)
 }

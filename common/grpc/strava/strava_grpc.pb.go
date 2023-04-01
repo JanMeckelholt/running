@@ -8,6 +8,7 @@ package strava
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type StravaClient interface {
 	GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*RunnerResponse, error)
 	GetActivities(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
+	ActivitiesToDB(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	UseRefreshToken(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenResponse, error)
 }
 
@@ -53,6 +55,15 @@ func (c *stravaClient) GetActivities(ctx context.Context, in *ActivityRequest, o
 	return out, nil
 }
 
+func (c *stravaClient) ActivitiesToDB(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/strava.Strava/ActivitiesToDB", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *stravaClient) UseRefreshToken(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenResponse, error) {
 	out := new(TokenResponse)
 	err := c.cc.Invoke(ctx, "/strava.Strava/UseRefreshToken", in, out, opts...)
@@ -68,6 +79,7 @@ func (c *stravaClient) UseRefreshToken(ctx context.Context, in *RefreshRequest, 
 type StravaServer interface {
 	GetRunner(context.Context, *RunnerRequest) (*RunnerResponse, error)
 	GetActivities(context.Context, *ActivityRequest) (*ActivitiesResponse, error)
+	ActivitiesToDB(context.Context, *ActivityRequest) (*empty.Empty, error)
 	UseRefreshToken(context.Context, *RefreshRequest) (*TokenResponse, error)
 	mustEmbedUnimplementedStravaServer()
 }
@@ -81,6 +93,9 @@ func (UnimplementedStravaServer) GetRunner(context.Context, *RunnerRequest) (*Ru
 }
 func (UnimplementedStravaServer) GetActivities(context.Context, *ActivityRequest) (*ActivitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivities not implemented")
+}
+func (UnimplementedStravaServer) ActivitiesToDB(context.Context, *ActivityRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivitiesToDB not implemented")
 }
 func (UnimplementedStravaServer) UseRefreshToken(context.Context, *RefreshRequest) (*TokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UseRefreshToken not implemented")
@@ -134,6 +149,24 @@ func _Strava_GetActivities_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Strava_ActivitiesToDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StravaServer).ActivitiesToDB(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/strava.Strava/ActivitiesToDB",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StravaServer).ActivitiesToDB(ctx, req.(*ActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Strava_UseRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RefreshRequest)
 	if err := dec(in); err != nil {
@@ -166,6 +199,10 @@ var Strava_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActivities",
 			Handler:    _Strava_GetActivities_Handler,
+		},
+		{
+			MethodName: "ActivitiesToDB",
+			Handler:    _Strava_ActivitiesToDB_Handler,
 		},
 		{
 			MethodName: "UseRefreshToken",
