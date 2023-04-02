@@ -1,4 +1,4 @@
-.env.docker.postgres.secret
+*.secret
 *.pem
 db_clients.txt
 pgdata

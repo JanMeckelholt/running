@@ -41,3 +41,13 @@ services:
     env_file:
       - .env.docker.postgres
       - .env.docker.postgres.secret
+  populate-db:
+    container_name: populate-db
+    build:
+      context: .
+      dockerfile: ./populate-db/Dockerfile
+    ports:
+      - 678:666
+    env_file:
+      - ./populate-db/.env.docker
+      - ./populate-db/.env.docker.secret

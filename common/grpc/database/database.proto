@@ -25,6 +25,7 @@ message Client {
   string clientSecret = 2;
   string token = 3;
   string refreshToken = 4;
+  uint64 athleteId = 5;
 }
 
 message UpdateRequest {

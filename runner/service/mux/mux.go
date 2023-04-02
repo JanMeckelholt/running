@@ -57,11 +57,13 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
+				log.Infof("AthletId: %d", uint64(rB.AthletId))
 				err = rs.CreateRunner(context.Background(), database.Client{
 					ClientId:     rB.ClientId,
 					ClientSecret: rB.ClientSecret,
 					Token:        rB.Token,
 					RefreshToken: rB.RefreshToken,
+					AthleteId:    uint64(rB.AthletId),
 				})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +90,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since})
+				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
@@ -142,7 +144,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				err = rs.ActivitiesToDB(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since})
+				err = rs.ActivitiesToDB(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))

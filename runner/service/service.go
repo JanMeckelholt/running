@@ -39,4 +39,5 @@ type RunnerCreateBody struct {
 	RefreshToken string
 	ClientId     string
 	ClientSecret string
+	AthletId     uint64
 }

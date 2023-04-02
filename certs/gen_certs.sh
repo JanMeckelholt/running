@@ -4,12 +4,14 @@ rm *.pem
 rm ../database-service/certs/*.pem
 rm ../strava-service/certs/*.pem
 rm ../runner/certs/*.pem
+m ../populate-db/certs/*.pem
 
 # Generate CA's private key and self-signed certificate
 openssl req -x509 -newkey rsa:4096 -days 365 -nodes -keyout ca-key.pem -out ca-cert.pem -subj "/C=DE/ST=x/L=x/O=x/CN=www.janmeckelholt.de" 
 cp ca-cert.pem ../database-service/certs/
 cp ca-cert.pem ../strava-service/certs/
 cp ca-cert.pem ../runner/certs/
+cp ca-cert.pem ../populate-db/certs/
 
 # database-service
 # Generate database-service-server private key and certificate signing request (CSR)

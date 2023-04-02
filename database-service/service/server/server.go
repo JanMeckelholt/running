@@ -24,7 +24,7 @@ func NewServer(storer *service.Storer) *DatabaseServer {
 }
 
 func (s DatabaseServer) UpsertClient(ctx context.Context, req *grpcDB.Client) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.Storer.UpsertClient(req.GetClientId(), req.GetClientSecret(), req.GetToken(), req.GetRefreshToken())
+	return &emptypb.Empty{}, s.Storer.UpsertClient(req.GetClientId(), req.GetClientSecret(), req.GetToken(), req.GetRefreshToken(), uint64(req.GetAthleteId()))
 }
 
 func (s DatabaseServer) UpdateClient(ctx context.Context, req *grpcDB.UpdateRequest) (*grpcDB.Client, error) {
@@ -44,6 +44,7 @@ func (s DatabaseServer) GetClient(ctx context.Context, req *grpcDB.ClientId) (*g
 		ClientSecret: *dbClient.ClientSecret,
 		Token:        *dbClient.Token,
 		RefreshToken: *dbClient.RefreshToken,
+		AthleteId:    *dbClient.AthletId,
 	}, nil
 }
 

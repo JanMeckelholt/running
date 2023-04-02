@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -12,6 +11,8 @@ import (
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
 	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/database-service/service/config"
+
+	"github.com/jackc/pgx"
 )
 
 var DB *gorm.DB
@@ -23,6 +24,7 @@ type DBClient struct {
 	Token        *string
 	RefreshToken *string
 	Activities   []DBActivity `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	AthletId     *uint64      `gorm:"unique;not null"`
 }
 
 type DBActivity struct {
@@ -35,8 +37,8 @@ type DBActivity struct {
 	TotalElevationGain float64 `json:"total_elevation_gain,omitempty"`
 	Type               string  `json:"type,omitempty"`
 	SportType          string  `json:"sport_type,omitempty"`
-	Id                 int64   `json:"id,omitempty"`
-	StartDate          string  `json:"start_date,omitempty"`
+	Id                 int64   `gorm:"unique;not null" json:"id,omitempty"`
+	StartDate          string  `gorm:"unique;not null" json:"start_date,omitempty"`
 	StartDateLocale    string  `json:"start_date_locale,omitempty"`
 	Timezone           string  `json:"timezone,omitempty"`
 	UtcOffset          float64 `json:"utc_offset,omitempty"`
@@ -92,9 +94,9 @@ func (s *Storer) AutoMigrate(object interface{}) error {
 	return nil
 }
 
-func (s *Storer) UpsertClient(clientId, clientSecret, token, refreshToken string) error {
+func (s *Storer) UpsertClient(clientId, clientSecret, token, refreshToken string, athletId uint64) error {
 	log.Infof("Creating: %s %s %s %s", clientId, clientSecret, token, refreshToken)
-	result := DB.Create(&DBClient{ClientId: &clientId, ClientSecret: &clientSecret, Token: &token, RefreshToken: &refreshToken})
+	result := DB.Create(&DBClient{ClientId: &clientId, ClientSecret: &clientSecret, Token: &token, RefreshToken: &refreshToken, AthletId: &athletId})
 	if result.Error != nil {
 		log.Error("DB error: could not create object")
 		return result.Error
@@ -147,21 +149,26 @@ func dbClientToClient(dbClient *DBClient) *grpcDB.Client {
 }
 
 func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
-	log.Infof("Creating: %s\n%s", req.GetName(), req.GetAthlete().String())
-	clientId := strconv.FormatInt(req.GetAthlete().GetId(), 10)
-	result := DB.Model(&DBClient{ClientId: &clientId}).Association("Activities").Append(DBActivity{
-		Name:               req.GetName(),
-		Distance:           req.GetDistance(),
-		ElapsedTime:        req.GetElapsedTime(),
-		AverageHeartrate:   req.GetAverageHeartrate(),
-		AverageSpeed:       req.GetAverageSpeed(),
-		TotalElevationGain: req.GetTotalElevationGain(),
-	})
-	if result != nil {
-		log.Errorf("DB error: could not add activity %s", result.Error())
-		return fmt.Errorf("DB error: could not add activity %s", result.Error())
+	log.Infof("Creating: %s %s %s", req.GetName(), req.GetAthlete().GetId(), req.GetStartDate())
+	athletId := req.GetAthlete().GetId()
+	var dbClient DBClient
+	result := DB.Where(&DBClient{AthletId: &athletId}).First(&dbClient)
+	if result.Error != nil {
+		log.Errorf("DB error: could not get Client %s: %s", athletId, result.Error)
+		return fmt.Errorf("DB error: could not get Client %d: %s", athletId, result.Error)
 	}
-	log.Info("Added activity %s to client %s", req.GetName(), clientId)
+	err := DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req))
+	if isDuplicateKeyError(err) {
+		var duplicate DBActivity
+		DB.Where(&DBActivity{StartDate: req.GetStartDate()}).First(&duplicate)
+		err = DB.Model(&dbClient).Association("Activities").Delete(&duplicate)
+		err = DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req))
+	}
+	if err != nil {
+		log.Errorf("DB error: could not add activity %s", err.Error())
+		return fmt.Errorf("DB error: could not add activity %s", err.Error())
+	}
+	log.Info("Added activity %s to client %s", req.GetName(), athletId)
 	return nil
 }
 
@@ -194,4 +201,44 @@ func dbActivityToActivity(dbActivity *DBActivity) *grpcStrava.Activity {
 		ElevHigh:           dbActivity.ElevHigh,
 		ElevLow:            dbActivity.ElevLow,
 	}
+}
+
+func activityToDBActivity(activity *grpcStrava.Activity) *DBActivity {
+	return &DBActivity{
+		ResourceState:      activity.GetResourceState(),
+		Name:               activity.GetName(),
+		Distance:           activity.GetDistance(),
+		MovingTime:         activity.GetMovingTime(),
+		ElapsedTime:        activity.GetElapsedTime(),
+		TotalElevationGain: activity.GetTotalElevationGain(),
+		Type:               activity.GetType(),
+		SportType:          activity.GetSportType(),
+		StartDate:          activity.GetStartDate(),
+		StartDateLocale:    activity.GetStartDateLocale(),
+		Timezone:           activity.GetTimezone(),
+		UtcOffset:          activity.GetUtcOffset(),
+		LocationCity:       activity.GetLocationCity(),
+		LocationState:      activity.GetLocationState(),
+		LocationCountry:    activity.GetLocationCountry(),
+		AchievementCount:   activity.GetAchievementCount(),
+		KudosCount:         activity.GetKudosCount(),
+		CommentCount:       activity.GetCommentCount(),
+		Manual:             activity.GetManual(),
+		Visibility:         activity.GetVisibility(),
+		AverageSpeed:       activity.GetAverageSpeed(),
+		MaxSpeed:           activity.GetMaxSpeed(),
+		AverageHeartrate:   activity.GetAverageHeartrate(),
+		MaxHeartrate:       activity.GetMaxHeartrate(),
+		ElevHigh:           activity.GetElevLow(),
+	}
+}
+
+func isDuplicateKeyError(err error) bool {
+	pgErr, ok := err.(pgx.PgError)
+	if ok {
+		// unique_violation = 23505
+		return pgErr.Code == "23505"
+
+	}
+	return false
 }
