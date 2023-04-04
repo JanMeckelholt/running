@@ -16,7 +16,7 @@ import (
 func main() {
 	srv := &service.Service{}
 	err := env.Parse(&srv.ServiceConfig)
-	if err != nil {
+	if err != nil || !srv.ServiceConfig.Enabled {
 		return
 	}
 	err = srv.Clients.Dial(srv.ServiceConfig)
@@ -42,9 +42,9 @@ func main() {
 		elevHigh, _ := strconv.ParseFloat(records[i][23], 64)
 		elevLow, _ := strconv.ParseFloat(records[i][22], 64)
 
-		movingTime, _ := strconv.ParseInt(records[i][16], 10, 64)
-		elapsedTime, _ := strconv.ParseInt(records[i][5], 10, 64)
-		id, _ := strconv.ParseInt(records[i][0], 10, 64)
+		movingTime, _ := strconv.ParseUint(records[i][16], 10, 64)
+		elapsedTime, _ := strconv.ParseUint(records[i][5], 10, 64)
+		id, _ := strconv.ParseUint(records[i][0], 10, 64)
 
 		activity := strava.Activity{
 			Athlete: &strava.Athlete{

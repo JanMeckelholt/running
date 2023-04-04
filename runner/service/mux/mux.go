@@ -90,7 +90,8 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
+				res, err := rs.GetActivities(context.Background(), database.ActivitiesRequest{Since: rB.Since, ClientId: rB.ClientId})
+				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
@@ -117,7 +118,8 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 					log.Errorf(err.Error())
 				}
 				startoOfWeek := logic.GetStartOfWeek()
-				res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: startoOfWeek, ClientId: rB.ClientId})
+				res, err := rs.GetActivities(context.Background(), database.ActivitiesRequest{Since: startoOfWeek, ClientId: rB.ClientId})
+				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: startoOfWeek, ClientId: rB.ClientId})
 				climb := logic.GetClimb(res)
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -144,7 +146,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				err = rs.ActivitiesToDB(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
+				err = rs.ActivitiesToDB(context.Background(), strava.ActivitiesRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -18,45 +19,44 @@ import (
 var DB *gorm.DB
 
 type DBClient struct {
-	gorm.Model
-	ClientId     *string `gorm:"unique;not null"`
+	ClientId     *string `gorm:"primaryKey;not null"`
 	ClientSecret *string
 	Token        *string
 	RefreshToken *string
-	Activities   []DBActivity `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Activities   []DBActivity `gorm:"foreignKey:ClientId;references:ClientId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	AthletId     *uint64      `gorm:"unique;not null"`
 }
 
 type DBActivity struct {
-	gorm.Model
-	DBClientID         uint
-	Name               string  `json:"name,omitempty"`
-	Distance           float64 `json:"distance,omitempty"`
-	MovingTime         int64   `json:"moving_time,omitempty"`
-	ElapsedTime        int64   `json:"elapsed_time,omitempty"`
-	TotalElevationGain float64 `json:"total_elevation_gain,omitempty"`
-	Type               string  `json:"type,omitempty"`
-	SportType          string  `json:"sport_type,omitempty"`
-	Id                 int64   `gorm:"unique;not null" json:"id,omitempty"`
-	StartDate          string  `gorm:"unique;not null" json:"start_date,omitempty"`
-	StartDateLocale    string  `json:"start_date_locale,omitempty"`
-	Timezone           string  `json:"timezone,omitempty"`
-	UtcOffset          float64 `json:"utc_offset,omitempty"`
-	LocationCity       string  `json:"location_city,omitempty"`
-	LocationState      string  `json:"location_state,omitempty"`
-	LocationCountry    string  `json:"location_country,omitempty"`
-	AchievementCount   int64   `json:"achievement_count,omitempty"`
-	KudosCount         int64   `json:"kudos_count,omitempty"`
-	CommentCount       int64   `json:"comment_count,omitempty"`
-	Manual             bool    `json:"manual,omitempty"`
-	Visibility         string  `json:"visibility,omitempty"`
-	AverageSpeed       float64 `json:"average_speed,omitempty"`
-	MaxSpeed           float64 `json:"max_speed,omitempty"`
-	AverageHeartrate   float64 `json:"average_heartrate,omitempty"`
-	MaxHeartrate       float64 `json:"max_heartrate,omitempty"`
-	ElevHigh           float64 `json:"elev_high,omitempty"`
-	ElevLow            float64 `json:"elev_low,omitempty"`
-	ResourceState      int64   `json:"resource_state,omitempty"`
+	Id                 *uint64 `gorm:"primaryKey" json:"id"`
+	ClientId           *string
+	Name               *string  `json:"name,omitempty"`
+	Distance           *float64 `json:"distance,omitempty"`
+	MovingTime         *uint64  `json:"moving_time,omitempty"`
+	ElapsedTime        *uint64  `json:"elapsed_time,omitempty"`
+	TotalElevationGain *float64 `json:"total_elevation_gain,omitempty"`
+	Type               *string  `json:"type,omitempty"`
+	SportType          *string  `json:"sport_type,omitempty"`
+	StartDate          *string  `gorm:"unique;not null" json:"start_date,omitempty"`
+	StartDateLocale    *string  `json:"start_date_locale,omitempty"`
+	StartDateUnix      *uint64  `json:"start_date_unix,omitempty"`
+	Timezone           *string  `json:"timezone,omitempty"`
+	UtcOffset          *float64 `json:"utc_offset,omitempty"`
+	LocationCity       *string  `json:"location_city,omitempty"`
+	LocationState      *string  `json:"location_state,omitempty"`
+	LocationCountry    *string  `json:"location_country,omitempty"`
+	AchievementCount   *uint64  `json:"achievement_count,omitempty"`
+	KudosCount         *uint64  `json:"kudos_count,omitempty"`
+	CommentCount       *uint64  `json:"comment_count,omitempty"`
+	Manual             *bool    `json:"manual,omitempty"`
+	Visibility         *string  `json:"visibility,omitempty"`
+	AverageSpeed       *float64 `json:"average_speed,omitempty"`
+	MaxSpeed           *float64 `json:"max_speed,omitempty"`
+	AverageHeartrate   *float64 `json:"average_heartrate,omitempty"`
+	MaxHeartrate       *float64 `json:"max_heartrate,omitempty"`
+	ElevHigh           *float64 `json:"elev_high,omitempty"`
+	ElevLow            *float64 `json:"elev_low,omitempty"`
+	ResourceState      *uint64  `json:"resource_state,omitempty"`
 }
 
 type Storer struct {
@@ -135,7 +135,7 @@ func (s *Storer) GetDBClient(clientId string) (*DBClient, error) {
 		log.Errorf("DB error: could not get object by id %s: %s", clientId, result.Error)
 		return nil, result.Error
 	}
-	log.Infof("Retrieved client %s, %d, %s", *dbClient.ClientId, dbClient.ID, *dbClient.Token)
+	log.Infof("Retrieved client %s, %d, %s", *dbClient.ClientId, *dbClient.Token)
 	return &dbClient, nil
 }
 
@@ -157,12 +157,13 @@ func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
 		log.Errorf("DB error: could not get Client %s: %s", athletId, result.Error)
 		return fmt.Errorf("DB error: could not get Client %d: %s", athletId, result.Error)
 	}
-	err := DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req))
+	err := DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req, *dbClient.ClientId))
 	if isDuplicateKeyError(err) {
 		var duplicate DBActivity
-		DB.Where(&DBActivity{StartDate: req.GetStartDate()}).First(&duplicate)
+		startDate := req.GetStartDate()
+		DB.Where(&DBActivity{StartDate: &startDate}).First(&duplicate)
 		err = DB.Model(&dbClient).Association("Activities").Delete(&duplicate)
-		err = DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req))
+		err = DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req, *dbClient.ClientId))
 	}
 	if err != nil {
 		log.Errorf("DB error: could not add activity %s", err.Error())
@@ -172,64 +173,99 @@ func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
 	return nil
 }
 
+func (s *Storer) GetActivities(req *grpcDB.ActivitiesRequest) (*grpcDB.ActivitiesResponse, error) {
+
+	var (
+		dbActivities []*DBActivity
+		activities   []*grpcStrava.Activity
+		dbClient     DBClient
+		clientId     string
+	)
+	clientId = req.GetClientId()
+	result := DB.Model(DBClient{ClientId: &clientId}).First(&dbClient)
+	result = DB.Find(&dbActivities, "client_id == ? AND start_date_unix > ?", dbClient.ClientId, req.GetSince())
+	if result.Error != nil {
+		log.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
+		return nil, fmt.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
+	}
+	for _, a := range dbActivities {
+		sA := dbActivityToActivity(a)
+		activities = append(activities, sA)
+	}
+
+	log.Info("Got %d activities for %s since %d", len(dbActivities), req.GetClientId(), req.GetSince())
+	return &grpcDB.ActivitiesResponse{Activities: activities}, nil
+}
+
 func dbActivityToActivity(dbActivity *DBActivity) *grpcStrava.Activity {
 	return &grpcStrava.Activity{
-		ResourceState:      dbActivity.ResourceState,
-		Name:               dbActivity.Name,
-		Distance:           dbActivity.Distance,
-		MovingTime:         dbActivity.MovingTime,
-		ElapsedTime:        dbActivity.ElapsedTime,
-		TotalElevationGain: dbActivity.TotalElevationGain,
-		Type:               dbActivity.Type,
-		SportType:          dbActivity.SportType,
-		StartDate:          dbActivity.StartDate,
-		StartDateLocale:    dbActivity.StartDateLocale,
-		Timezone:           dbActivity.Timezone,
-		UtcOffset:          dbActivity.UtcOffset,
-		LocationCity:       dbActivity.LocationCity,
-		LocationState:      dbActivity.LocationState,
-		LocationCountry:    dbActivity.LocationCountry,
-		AchievementCount:   dbActivity.AchievementCount,
-		KudosCount:         dbActivity.KudosCount,
-		CommentCount:       dbActivity.CommentCount,
-		Manual:             dbActivity.Manual,
-		Visibility:         dbActivity.Visibility,
-		AverageSpeed:       dbActivity.AverageSpeed,
-		MaxSpeed:           dbActivity.MaxSpeed,
-		AverageHeartrate:   dbActivity.AverageHeartrate,
-		MaxHeartrate:       dbActivity.MaxHeartrate,
-		ElevHigh:           dbActivity.ElevHigh,
-		ElevLow:            dbActivity.ElevLow,
+		ResourceState:      *dbActivity.ResourceState,
+		Name:               *dbActivity.Name,
+		Distance:           *dbActivity.Distance,
+		MovingTime:         *dbActivity.MovingTime,
+		ElapsedTime:        *dbActivity.ElapsedTime,
+		TotalElevationGain: *dbActivity.TotalElevationGain,
+		Type:               *dbActivity.Type,
+		SportType:          *dbActivity.SportType,
+		StartDate:          *dbActivity.StartDate,
+		StartDateLocale:    *dbActivity.StartDateLocale,
+		Timezone:           *dbActivity.Timezone,
+		UtcOffset:          *dbActivity.UtcOffset,
+		LocationCity:       *dbActivity.LocationCity,
+		LocationState:      *dbActivity.LocationState,
+		LocationCountry:    *dbActivity.LocationCountry,
+		AchievementCount:   *dbActivity.AchievementCount,
+		KudosCount:         *dbActivity.KudosCount,
+		CommentCount:       *dbActivity.CommentCount,
+		Manual:             *dbActivity.Manual,
+		Visibility:         *dbActivity.Visibility,
+		AverageSpeed:       *dbActivity.AverageSpeed,
+		MaxSpeed:           *dbActivity.MaxSpeed,
+		AverageHeartrate:   *dbActivity.AverageHeartrate,
+		MaxHeartrate:       *dbActivity.MaxHeartrate,
+		ElevHigh:           *dbActivity.ElevHigh,
+		ElevLow:            *dbActivity.ElevLow,
 	}
 }
 
-func activityToDBActivity(activity *grpcStrava.Activity) *DBActivity {
+func ptr[T any](x T) *T {
+	return &x
+}
+
+func activityToDBActivity(activity *grpcStrava.Activity, clientId string) *DBActivity {
+	var startDateUnix uint64
+	layout := "18.09.2015, 04:18:52"
+	t, err := time.Parse(layout, activity.GetStartDate())
+	if err == nil {
+		startDateUnix = uint64(t.Unix())
+	}
 	return &DBActivity{
-		ResourceState:      activity.GetResourceState(),
-		Name:               activity.GetName(),
-		Distance:           activity.GetDistance(),
-		MovingTime:         activity.GetMovingTime(),
-		ElapsedTime:        activity.GetElapsedTime(),
-		TotalElevationGain: activity.GetTotalElevationGain(),
-		Type:               activity.GetType(),
-		SportType:          activity.GetSportType(),
-		StartDate:          activity.GetStartDate(),
-		StartDateLocale:    activity.GetStartDateLocale(),
-		Timezone:           activity.GetTimezone(),
-		UtcOffset:          activity.GetUtcOffset(),
-		LocationCity:       activity.GetLocationCity(),
-		LocationState:      activity.GetLocationState(),
-		LocationCountry:    activity.GetLocationCountry(),
-		AchievementCount:   activity.GetAchievementCount(),
-		KudosCount:         activity.GetKudosCount(),
-		CommentCount:       activity.GetCommentCount(),
-		Manual:             activity.GetManual(),
-		Visibility:         activity.GetVisibility(),
-		AverageSpeed:       activity.GetAverageSpeed(),
-		MaxSpeed:           activity.GetMaxSpeed(),
-		AverageHeartrate:   activity.GetAverageHeartrate(),
-		MaxHeartrate:       activity.GetMaxHeartrate(),
-		ElevHigh:           activity.GetElevLow(),
+		ResourceState:      ptr(activity.GetResourceState()),
+		Name:               ptr(activity.GetName()),
+		Distance:           ptr(activity.GetDistance()),
+		MovingTime:         ptr(activity.GetMovingTime()),
+		ElapsedTime:        ptr(activity.GetElapsedTime()),
+		TotalElevationGain: ptr(activity.GetTotalElevationGain()),
+		Type:               ptr(activity.GetType()),
+		SportType:          ptr(activity.GetSportType()),
+		StartDate:          ptr(activity.GetStartDate()),
+		StartDateUnix:      &startDateUnix,
+		StartDateLocale:    ptr(activity.GetStartDateLocale()),
+		Timezone:           ptr(activity.GetTimezone()),
+		UtcOffset:          ptr(activity.GetUtcOffset()),
+		LocationCity:       ptr(activity.GetLocationCity()),
+		LocationState:      ptr(activity.GetLocationState()),
+		LocationCountry:    ptr(activity.GetLocationCountry()),
+		AchievementCount:   ptr(activity.GetAchievementCount()),
+		KudosCount:         ptr(activity.GetKudosCount()),
+		CommentCount:       ptr(activity.GetCommentCount()),
+		Manual:             ptr(activity.GetManual()),
+		Visibility:         ptr(activity.GetVisibility()),
+		AverageSpeed:       ptr(activity.GetAverageSpeed()),
+		MaxSpeed:           ptr(activity.GetMaxSpeed()),
+		AverageHeartrate:   ptr(activity.GetAverageHeartrate()),
+		MaxHeartrate:       ptr(activity.GetMaxHeartrate()),
+		ElevHigh:           ptr(activity.GetElevLow()),
 	}
 }
 

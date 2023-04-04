@@ -101,7 +101,7 @@ func (s StravaServer) GetRunner(ctx context.Context, req *grpcStrava.RunnerReque
 	return res, nil
 }
 
-func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.ActivityRequest) (*grpcStrava.ActivitiesResponse, error) {
+func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.ActivitiesRequest) (*grpcStrava.ActivitiesResponse, error) {
 	token := req.GetToken()
 	if token == "" {
 		client, err := s.GetClient(ctx, &grpcDB.ClientId{ClientId: req.GetClientId()})
@@ -176,7 +176,7 @@ func (s StravaServer) GetActivities(ctx context.Context, req *grpcStrava.Activit
 	return &grpcStrava.ActivitiesResponse{Activities: aR}, nil
 }
 
-func (s StravaServer) ActivitiesToDB(ctx context.Context, req *grpcStrava.ActivityRequest) (*emptypb.Empty, error) {
+func (s StravaServer) ActivitiesToDB(ctx context.Context, req *grpcStrava.ActivitiesRequest) (*emptypb.Empty, error) {
 	activites, err := s.GetActivities(ctx, req)
 	if err != nil {
 		return &emptypb.Empty{}, err

@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StravaClient interface {
 	GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*RunnerResponse, error)
-	GetActivities(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
-	ActivitiesToDB(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
+	ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	UseRefreshToken(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenResponse, error)
 }
 
@@ -46,7 +46,7 @@ func (c *stravaClient) GetRunner(ctx context.Context, in *RunnerRequest, opts ..
 	return out, nil
 }
 
-func (c *stravaClient) GetActivities(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error) {
+func (c *stravaClient) GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error) {
 	out := new(ActivitiesResponse)
 	err := c.cc.Invoke(ctx, "/strava.Strava/GetActivities", in, out, opts...)
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *stravaClient) GetActivities(ctx context.Context, in *ActivityRequest, o
 	return out, nil
 }
 
-func (c *stravaClient) ActivitiesToDB(ctx context.Context, in *ActivityRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *stravaClient) ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/strava.Strava/ActivitiesToDB", in, out, opts...)
 	if err != nil {
@@ -78,8 +78,8 @@ func (c *stravaClient) UseRefreshToken(ctx context.Context, in *RefreshRequest, 
 // for forward compatibility
 type StravaServer interface {
 	GetRunner(context.Context, *RunnerRequest) (*RunnerResponse, error)
-	GetActivities(context.Context, *ActivityRequest) (*ActivitiesResponse, error)
-	ActivitiesToDB(context.Context, *ActivityRequest) (*empty.Empty, error)
+	GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error)
+	ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error)
 	UseRefreshToken(context.Context, *RefreshRequest) (*TokenResponse, error)
 	mustEmbedUnimplementedStravaServer()
 }
@@ -91,10 +91,10 @@ type UnimplementedStravaServer struct {
 func (UnimplementedStravaServer) GetRunner(context.Context, *RunnerRequest) (*RunnerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRunner not implemented")
 }
-func (UnimplementedStravaServer) GetActivities(context.Context, *ActivityRequest) (*ActivitiesResponse, error) {
+func (UnimplementedStravaServer) GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivities not implemented")
 }
-func (UnimplementedStravaServer) ActivitiesToDB(context.Context, *ActivityRequest) (*empty.Empty, error) {
+func (UnimplementedStravaServer) ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ActivitiesToDB not implemented")
 }
 func (UnimplementedStravaServer) UseRefreshToken(context.Context, *RefreshRequest) (*TokenResponse, error) {
@@ -132,7 +132,7 @@ func _Strava_GetRunner_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Strava_GetActivities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ActivityRequest)
+	in := new(ActivitiesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -144,13 +144,13 @@ func _Strava_GetActivities_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/strava.Strava/GetActivities",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StravaServer).GetActivities(ctx, req.(*ActivityRequest))
+		return srv.(StravaServer).GetActivities(ctx, req.(*ActivitiesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Strava_ActivitiesToDB_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ActivityRequest)
+	in := new(ActivitiesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func _Strava_ActivitiesToDB_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/strava.Strava/ActivitiesToDB",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StravaServer).ActivitiesToDB(ctx, req.(*ActivityRequest))
+		return srv.(StravaServer).ActivitiesToDB(ctx, req.(*ActivitiesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

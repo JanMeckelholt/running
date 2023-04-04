@@ -10,6 +10,16 @@ service Database {
   rpc GetClient(ClientId) returns (Client) {}
   rpc UpsertActivity(strava.Activity) returns (google.protobuf.Empty) {}
   rpc GetActivity(ActivityId) returns (strava.Activity) {}
+  rpc GetActivities(ActivitiesRequest) returns (ActivitiesResponse) {}
+}
+
+message ActivitiesRequest {
+  string ClientId = 1;
+  uint64 Since = 2;
+}
+
+message ActivitiesResponse {
+  repeated strava.Activity Activities = 1;
 }
 
 message ClientId {

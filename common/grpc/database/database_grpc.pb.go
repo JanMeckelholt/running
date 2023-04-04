@@ -29,6 +29,7 @@ type DatabaseClient interface {
 	GetClient(ctx context.Context, in *ClientId, opts ...grpc.CallOption) (*Client, error)
 	UpsertActivity(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetActivity(ctx context.Context, in *ActivityId, opts ...grpc.CallOption) (*strava.Activity, error)
+	GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
 }
 
 type databaseClient struct {
@@ -84,6 +85,15 @@ func (c *databaseClient) GetActivity(ctx context.Context, in *ActivityId, opts .
 	return out, nil
 }
 
+func (c *databaseClient) GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error) {
+	out := new(ActivitiesResponse)
+	err := c.cc.Invoke(ctx, "/database.Database/GetActivities", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DatabaseServer is the server API for Database service.
 // All implementations must embed UnimplementedDatabaseServer
 // for forward compatibility
@@ -93,6 +103,7 @@ type DatabaseServer interface {
 	GetClient(context.Context, *ClientId) (*Client, error)
 	UpsertActivity(context.Context, *strava.Activity) (*empty.Empty, error)
 	GetActivity(context.Context, *ActivityId) (*strava.Activity, error)
+	GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error)
 	mustEmbedUnimplementedDatabaseServer()
 }
 
@@ -114,6 +125,9 @@ func (UnimplementedDatabaseServer) UpsertActivity(context.Context, *strava.Activ
 }
 func (UnimplementedDatabaseServer) GetActivity(context.Context, *ActivityId) (*strava.Activity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivity not implemented")
+}
+func (UnimplementedDatabaseServer) GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActivities not implemented")
 }
 func (UnimplementedDatabaseServer) mustEmbedUnimplementedDatabaseServer() {}
 
@@ -218,6 +232,24 @@ func _Database_GetActivity_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Database_GetActivities_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivitiesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServer).GetActivities(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/database.Database/GetActivities",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServer).GetActivities(ctx, req.(*ActivitiesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Database_ServiceDesc is the grpc.ServiceDesc for Database service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -244,6 +276,10 @@ var Database_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActivity",
 			Handler:    _Database_GetActivity_Handler,
+		},
+		{
+			MethodName: "GetActivities",
+			Handler:    _Database_GetActivities_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

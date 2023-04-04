@@ -29,14 +29,14 @@ func main() {
 		log.Errorf("could not init storage %s", err.Error())
 		return
 	}
-	err = storer.AutoMigrate(service.DBClient{})
-	if err != nil {
-		log.Errorf("could not automigrate DBClient %s", err.Error())
-		return
-	}
 	err = storer.AutoMigrate(service.DBActivity{})
 	if err != nil {
 		log.Errorf("could not automigrate DBActivity %s", err.Error())
+		return
+	}
+	err = storer.AutoMigrate(service.DBClient{})
+	if err != nil {
+		log.Errorf("could not automigrate DBClient %s", err.Error())
 		return
 	}
 

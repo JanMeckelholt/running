@@ -14,14 +14,14 @@ type RunnerConfig struct {
 }
 
 type ClimbResponse struct {
-	Climb int64
+	Climb uint64
 }
 
 type ActivitiesRequestBody struct {
 	ClientId     string
 	Token        string
 	RefreshToken string `json:"RefreshToken,omitempty"`
-	Since        int64  `json:"since,omitempty"`
+	Since        uint64 `json:"since,omitempty"`
 }
 
 type RunnerRequestBody struct {

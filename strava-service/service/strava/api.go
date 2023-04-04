@@ -51,7 +51,7 @@ func (c *Client) GetAthlet(ctx context.Context, token string) (*http.Response, e
 	return resp, nil
 }
 
-func (c *Client) GetActivities(ctx context.Context, token string, since int64) (*http.Response, error) {
+func (c *Client) GetActivities(ctx context.Context, token string, since uint64) (*http.Response, error) {
 	log.Infof("Token: %s", token)
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/athlete/activities?after=%d", c.stravaURL.Host, since), nil)
 	req.Header.Set("content-type", "application/json")

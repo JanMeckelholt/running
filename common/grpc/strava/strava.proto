@@ -4,8 +4,8 @@ option go_package = "github.com/JanMeckelholt/running/common/grpc/strava";
 import "google/protobuf/empty.proto";
 service Strava {
   rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
-  rpc GetActivities(ActivityRequest) returns (ActivitiesResponse) {}
-  rpc ActivitiesToDB(ActivityRequest) returns (google.protobuf.Empty) {}
+  rpc GetActivities(ActivitiesRequest) returns (ActivitiesResponse) {}
+  rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}
   rpc UseRefreshToken(RefreshRequest) returns (TokenResponse) {}
 }
 
@@ -26,9 +26,9 @@ message TokenResponse {
 }
 
 message RunnerResponse{
-  int64  id = 1;
+  uint64  id = 1;
   string username = 2;
-  int64 resource_state = 3;
+  uint64 resource_state = 3;
   string firstname = 4;
   string lastname = 5;
   string bio = 6;
@@ -40,7 +40,7 @@ message RunnerResponse{
   bool summit = 12;
   string created_at = 13;
   string updated_at = 14;
-  int64 badge_type_id = 15;
+  uint64 badge_type_id = 15;
   double weight = 16;
   string profile_medium = 17;
   string profile = 18;
@@ -59,7 +59,12 @@ message follower{
 message ActivityRequest {
   string clientId= 1;
   string token = 2;
-  int64  since = 3;
+}
+
+message ActivitiesRequest {
+  string clientId= 1;
+  string token = 2;
+  uint64  since = 3;
 }
 
 message ActivitiesResponse {
@@ -67,16 +72,16 @@ message ActivitiesResponse {
 }
 
 message Activity{
-  int64 resource_state =1;
+  uint64 resource_state =1;
   athlete athlete = 2;
   string name = 3;
   double distance = 4;
-  int64 moving_time = 5;
-  int64 elapsed_time =6;
+  uint64 moving_time = 5;
+  uint64 elapsed_time =6;
   double total_elevation_gain =7;
   string type = 8;
   string sport_type = 9;
-  int64 id = 10;
+  uint64 id = 10;
   string start_date = 11;
   string start_date_locale = 12;
   string timezone = 13;
@@ -84,9 +89,9 @@ message Activity{
   string location_city =15;
   string location_state =16;
   string location_country =17;
-  int64 achievement_count=18;
-  int64 kudos_count=19;
-  int64 comment_count=20;
+  uint64 achievement_count=18;
+  uint64 kudos_count=19;
+  uint64 comment_count=20;
   bool manual=21;
   string visibility=22;
   repeated double start_latlng =23;
