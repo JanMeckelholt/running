@@ -27,8 +27,17 @@ func (rs RunnerServer) GetActivitiesFromStrava(ctx context.Context, request stra
 }
 
 func (rs RunnerServer) ActivitiesToDB(ctx context.Context, request strava.ActivitiesRequest) error {
-	_, err := rs.clients.StravaClient.ActivitiesToDB(ctx, &request)
-	return err
+	activitiesResp, err := rs.clients.StravaClient.GetActivities(ctx, &request)
+	if err != nil {
+		return err
+	}
+	for _, activity := range activitiesResp.GetActivities() {
+		_, err := rs.clients.DatabaseClient.UpsertActivity(ctx, activity)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (rs RunnerServer) CreateRunner(ctx context.Context, request database.Client) error {
@@ -38,4 +47,9 @@ func (rs RunnerServer) CreateRunner(ctx context.Context, request database.Client
 
 func (rs RunnerServer) GetActivities(ctx context.Context, request database.ActivitiesRequest) (*database.ActivitiesResponse, error) {
 	return rs.clients.DatabaseClient.GetActivities(ctx, &request)
+}
+
+func (rs RunnerServer) StravaActivitiesToDB(ctx context.Context, request strava.ActivitiesRequest) error {
+	_, err := rs.clients.StravaClient.ActivitiesToDB(ctx, &request)
+	return err
 }

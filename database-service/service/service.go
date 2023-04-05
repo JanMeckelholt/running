@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -12,8 +13,6 @@ import (
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
 	grpcStrava "github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/database-service/service/config"
-
-	"github.com/jackc/pgx"
 )
 
 var DB *gorm.DB
@@ -28,8 +27,8 @@ type DBClient struct {
 }
 
 type DBActivity struct {
-	Id                 *uint64 `gorm:"primaryKey" json:"id"`
-	ClientId           *string
+	Id                 *uint64  `gorm:"primaryKey" json:"id"`
+	ClientId           *string  `gorm:"not null"`
 	Name               *string  `json:"name,omitempty"`
 	Distance           *float64 `json:"distance,omitempty"`
 	MovingTime         *uint64  `json:"moving_time,omitempty"`
@@ -37,9 +36,9 @@ type DBActivity struct {
 	TotalElevationGain *float64 `json:"total_elevation_gain,omitempty"`
 	Type               *string  `json:"type,omitempty"`
 	SportType          *string  `json:"sport_type,omitempty"`
-	StartDate          *string  `gorm:"unique;not null" json:"start_date,omitempty"`
+	StartDate          *string  `json:"start_date,omitempty"`
 	StartDateLocale    *string  `json:"start_date_locale,omitempty"`
-	StartDateUnix      *uint64  `json:"start_date_unix,omitempty"`
+	StartDateUnix      *uint64  `gorm:"unique;not null" json:"start_date_unix,omitempty"`
 	Timezone           *string  `json:"timezone,omitempty"`
 	UtcOffset          *float64 `json:"utc_offset,omitempty"`
 	LocationCity       *string  `json:"location_city,omitempty"`
@@ -101,7 +100,7 @@ func (s *Storer) UpsertClient(clientId, clientSecret, token, refreshToken string
 		log.Error("DB error: could not create object")
 		return result.Error
 	}
-	log.Info("Stored client: %s", result.RowsAffected)
+	log.Infof("Stored client: %s", result.RowsAffected)
 	return nil
 }
 
@@ -118,7 +117,7 @@ func (s *Storer) UpdateClient(clientId string, kvPairs []*grpcDB.KvPair) (*grpcD
 			return nil, result.Error
 		}
 	}
-	log.Info("Stored client: %s", oldDBClient)
+	log.Infof("Stored client: %s", oldDBClient)
 	return dbClientToClient(oldDBClient), nil
 }
 func (s *Storer) GetDBClient(clientId string) (*DBClient, error) {
@@ -135,7 +134,7 @@ func (s *Storer) GetDBClient(clientId string) (*DBClient, error) {
 		log.Errorf("DB error: could not get object by id %s: %s", clientId, result.Error)
 		return nil, result.Error
 	}
-	log.Infof("Retrieved client %s, %d, %s", *dbClient.ClientId, *dbClient.Token)
+	log.Infof("Retrieved client %s, %d, %s", *dbClient.ClientId, dbClient.AthletId, *dbClient.Token)
 	return &dbClient, nil
 }
 
@@ -148,8 +147,8 @@ func dbClientToClient(dbClient *DBClient) *grpcDB.Client {
 	}
 }
 
-func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
-	log.Infof("Creating: %s %s %s", req.GetName(), req.GetAthlete().GetId(), req.GetStartDate())
+func (s *Storer) UpsertActivity(req *grpcStrava.Activity, fromCSV bool) error {
+	log.Infof("Creating: %s %d %s", req.GetName(), req.GetAthlete().GetId(), req.GetStartDate())
 	athletId := req.GetAthlete().GetId()
 	var dbClient DBClient
 	result := DB.Where(&DBClient{AthletId: &athletId}).First(&dbClient)
@@ -157,19 +156,27 @@ func (s *Storer) UpsertActivity(req *grpcStrava.Activity) error {
 		log.Errorf("DB error: could not get Client %s: %s", athletId, result.Error)
 		return fmt.Errorf("DB error: could not get Client %d: %s", athletId, result.Error)
 	}
-	err := DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req, *dbClient.ClientId))
+	dbActivity := activityToDBActivity(req, *dbClient.ClientId, fromCSV)
+	err := DB.Model(&dbClient).Association("Activities").Append(dbActivity)
 	if isDuplicateKeyError(err) {
-		var duplicate DBActivity
-		startDate := req.GetStartDate()
-		DB.Where(&DBActivity{StartDate: &startDate}).First(&duplicate)
-		err = DB.Model(&dbClient).Association("Activities").Delete(&duplicate)
-		err = DB.Model(&dbClient).Association("Activities").Append(activityToDBActivity(req, *dbClient.ClientId))
+		var duplicates []DBActivity
+		startDate := dbActivity.StartDateUnix
+		result := DB.Where(&DBActivity{StartDateUnix: startDate}).Find(&duplicates)
+		log.Infof("found %d duplicates. Deleting...", len(duplicates))
+		result = DB.Unscoped().Delete(&duplicates)
+		log.Infof("Deleted %d", result.RowsAffected)
+		err = DB.Model(&dbClient).Association("Activities").Append(dbActivity)
+	}
+	if isDuplicateKeyError(err) {
+		log.Infof("Error after updated: %s", err)
+		return nil
 	}
 	if err != nil {
-		log.Errorf("DB error: could not add activity %s", err.Error())
+		log.Infof("Error: %s", err)
+		log.Errorf("DB error: could not add activity: %s", err.Error())
 		return fmt.Errorf("DB error: could not add activity %s", err.Error())
 	}
-	log.Info("Added activity %s to client %s", req.GetName(), athletId)
+	log.Infof("Added activity %s to athlet %d", req.GetName(), athletId)
 	return nil
 }
 
@@ -178,12 +185,9 @@ func (s *Storer) GetActivities(req *grpcDB.ActivitiesRequest) (*grpcDB.Activitie
 	var (
 		dbActivities []*DBActivity
 		activities   []*grpcStrava.Activity
-		dbClient     DBClient
-		clientId     string
 	)
-	clientId = req.GetClientId()
-	result := DB.Model(DBClient{ClientId: &clientId}).First(&dbClient)
-	result = DB.Find(&dbActivities, "client_id == ? AND start_date_unix > ?", dbClient.ClientId, req.GetSince())
+
+	result := DB.Where("client_id = ? AND start_date_unix > ?", req.GetClientId(), req.GetSince()).Find(&dbActivities)
 	if result.Error != nil {
 		log.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
 		return nil, fmt.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
@@ -193,52 +197,43 @@ func (s *Storer) GetActivities(req *grpcDB.ActivitiesRequest) (*grpcDB.Activitie
 		activities = append(activities, sA)
 	}
 
-	log.Info("Got %d activities for %s since %d", len(dbActivities), req.GetClientId(), req.GetSince())
+	log.Infof("Got %d activities for %s since %d", len(dbActivities), req.GetClientId(), req.GetSince())
 	return &grpcDB.ActivitiesResponse{Activities: activities}, nil
 }
 
-func dbActivityToActivity(dbActivity *DBActivity) *grpcStrava.Activity {
-	return &grpcStrava.Activity{
-		ResourceState:      *dbActivity.ResourceState,
-		Name:               *dbActivity.Name,
-		Distance:           *dbActivity.Distance,
-		MovingTime:         *dbActivity.MovingTime,
-		ElapsedTime:        *dbActivity.ElapsedTime,
-		TotalElevationGain: *dbActivity.TotalElevationGain,
-		Type:               *dbActivity.Type,
-		SportType:          *dbActivity.SportType,
-		StartDate:          *dbActivity.StartDate,
-		StartDateLocale:    *dbActivity.StartDateLocale,
-		Timezone:           *dbActivity.Timezone,
-		UtcOffset:          *dbActivity.UtcOffset,
-		LocationCity:       *dbActivity.LocationCity,
-		LocationState:      *dbActivity.LocationState,
-		LocationCountry:    *dbActivity.LocationCountry,
-		AchievementCount:   *dbActivity.AchievementCount,
-		KudosCount:         *dbActivity.KudosCount,
-		CommentCount:       *dbActivity.CommentCount,
-		Manual:             *dbActivity.Manual,
-		Visibility:         *dbActivity.Visibility,
-		AverageSpeed:       *dbActivity.AverageSpeed,
-		MaxSpeed:           *dbActivity.MaxSpeed,
-		AverageHeartrate:   *dbActivity.AverageHeartrate,
-		MaxHeartrate:       *dbActivity.MaxHeartrate,
-		ElevHigh:           *dbActivity.ElevHigh,
-		ElevLow:            *dbActivity.ElevLow,
+func dbActivityToActivity(dbActivity *DBActivity) (res *grpcStrava.Activity) {
+	b, err := json.Marshal(dbActivity)
+	if err != nil {
+		fmt.Println(err)
+		return nil
 	}
+	json.Unmarshal(b, &res)
+	return res
 }
 
 func ptr[T any](x T) *T {
 	return &x
 }
 
-func activityToDBActivity(activity *grpcStrava.Activity, clientId string) *DBActivity {
-	var startDateUnix uint64
-	layout := "18.09.2015, 04:18:52"
-	t, err := time.Parse(layout, activity.GetStartDate())
-	if err == nil {
-		startDateUnix = uint64(t.Unix())
+func activityToDBActivity(activity *grpcStrava.Activity, clientId string, fromCSV bool) *DBActivity {
+	var (
+		startDateUnix uint64
+		layout        string
+	)
+	layoutCSV := "02.01.2006, 15:04:05"
+	layoutStravaAPI := "2006-01-02T15:04:05Z"
+
+	if fromCSV {
+		layout = layoutCSV
+	} else {
+		layout = layoutStravaAPI
 	}
+	t, err := time.Parse(layout, activity.GetStartDate())
+	if err != nil {
+		log.Errorf("could nor parse %s", activity.GetStartDate())
+	}
+	startDateUnix = uint64(t.Unix())
+
 	return &DBActivity{
 		ResourceState:      ptr(activity.GetResourceState()),
 		Name:               ptr(activity.GetName()),
@@ -270,11 +265,11 @@ func activityToDBActivity(activity *grpcStrava.Activity, clientId string) *DBAct
 }
 
 func isDuplicateKeyError(err error) bool {
-	pgErr, ok := err.(pgx.PgError)
-	if ok {
-		// unique_violation = 23505
-		return pgErr.Code == "23505"
-
+	if err == nil {
+		return false
+	}
+	if err.Error() == "duplicated key not allowed" {
+		return true
 	}
 	return false
 }

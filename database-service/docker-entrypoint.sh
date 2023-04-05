@@ -3,6 +3,6 @@
 # Wait for strava-service
 
  /go/src/running/database-service/wait-for-it.sh "postgres:5432" -t 300
-
+sleep 2
  # Run the main container command.
 exec "$@"

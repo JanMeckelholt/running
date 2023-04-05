@@ -49,9 +49,13 @@ func (s DatabaseServer) GetClient(ctx context.Context, req *grpcDB.ClientId) (*g
 }
 
 func (s DatabaseServer) UpsertActivity(ctx context.Context, req *grpcStrava.Activity) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, s.Storer.UpsertActivity(req)
+	return &emptypb.Empty{}, s.Storer.UpsertActivity(req, false)
 }
 
 func (s DatabaseServer) GetActivities(ctx context.Context, req *grpcDB.ActivitiesRequest) (*grpcDB.ActivitiesResponse, error) {
 	return s.Storer.GetActivities(req)
+}
+
+func (s DatabaseServer) UpsertActivityFromCSV(ctx context.Context, req *grpcStrava.Activity) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, s.Storer.UpsertActivity(req, true)
 }

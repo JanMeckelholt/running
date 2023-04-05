@@ -28,6 +28,7 @@ type DatabaseClient interface {
 	UpdateClient(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*Client, error)
 	GetClient(ctx context.Context, in *ClientId, opts ...grpc.CallOption) (*Client, error)
 	UpsertActivity(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error)
+	UpsertActivityFromCSV(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetActivity(ctx context.Context, in *ActivityId, opts ...grpc.CallOption) (*strava.Activity, error)
 	GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
 }
@@ -76,6 +77,15 @@ func (c *databaseClient) UpsertActivity(ctx context.Context, in *strava.Activity
 	return out, nil
 }
 
+func (c *databaseClient) UpsertActivityFromCSV(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/database.Database/UpsertActivityFromCSV", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *databaseClient) GetActivity(ctx context.Context, in *ActivityId, opts ...grpc.CallOption) (*strava.Activity, error) {
 	out := new(strava.Activity)
 	err := c.cc.Invoke(ctx, "/database.Database/GetActivity", in, out, opts...)
@@ -102,6 +112,7 @@ type DatabaseServer interface {
 	UpdateClient(context.Context, *UpdateRequest) (*Client, error)
 	GetClient(context.Context, *ClientId) (*Client, error)
 	UpsertActivity(context.Context, *strava.Activity) (*empty.Empty, error)
+	UpsertActivityFromCSV(context.Context, *strava.Activity) (*empty.Empty, error)
 	GetActivity(context.Context, *ActivityId) (*strava.Activity, error)
 	GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error)
 	mustEmbedUnimplementedDatabaseServer()
@@ -122,6 +133,9 @@ func (UnimplementedDatabaseServer) GetClient(context.Context, *ClientId) (*Clien
 }
 func (UnimplementedDatabaseServer) UpsertActivity(context.Context, *strava.Activity) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertActivity not implemented")
+}
+func (UnimplementedDatabaseServer) UpsertActivityFromCSV(context.Context, *strava.Activity) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertActivityFromCSV not implemented")
 }
 func (UnimplementedDatabaseServer) GetActivity(context.Context, *ActivityId) (*strava.Activity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivity not implemented")
@@ -214,6 +228,24 @@ func _Database_UpsertActivity_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Database_UpsertActivityFromCSV_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(strava.Activity)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServer).UpsertActivityFromCSV(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/database.Database/UpsertActivityFromCSV",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServer).UpsertActivityFromCSV(ctx, req.(*strava.Activity))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Database_GetActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ActivityId)
 	if err := dec(in); err != nil {
@@ -272,6 +304,10 @@ var Database_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpsertActivity",
 			Handler:    _Database_UpsertActivity_Handler,
+		},
+		{
+			MethodName: "UpsertActivityFromCSV",
+			Handler:    _Database_UpsertActivityFromCSV_Handler,
 		},
 		{
 			MethodName: "GetActivity",

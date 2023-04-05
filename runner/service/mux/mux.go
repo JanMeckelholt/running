@@ -90,6 +90,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
+				log.Infof("Getting activities for client %s since %d", rB.ClientId, rB.Since)
 				res, err := rs.GetActivities(context.Background(), database.ActivitiesRequest{Since: rB.Since, ClientId: rB.ClientId})
 				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
@@ -98,7 +99,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 					return
 				}
 				rw.WriteHeader(http.StatusOK)
-				_ = json.NewEncoder(rw).Encode(res)
+				_ = json.NewEncoder(rw).Encode(res.GetActivities())
 			case http.MethodOptions:
 				rw.Header().Set("Allow", "OPTIONS, POST")
 				rw.Header().Set("Cache-Control", "max-age=604800")
@@ -136,7 +137,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				rw.WriteHeader(http.StatusMethodNotAllowed)
 			}
 		})
-	case "/stravaActivitiesToDB":
+	case "/activitiesToDB":
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
@@ -147,6 +148,32 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 					log.Errorf(err.Error())
 				}
 				err = rs.ActivitiesToDB(context.Background(), strava.ActivitiesRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
+				if err != nil {
+					rw.WriteHeader(http.StatusInternalServerError)
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
+					return
+				}
+				rw.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(rw).Encode("Added Activities to DB")
+			case http.MethodOptions:
+				rw.Header().Set("Allow", "OPTIONS, POST")
+				rw.Header().Set("Cache-Control", "max-age=604800")
+				rw.WriteHeader(http.StatusOK)
+			default:
+				rw.WriteHeader(http.StatusMethodNotAllowed)
+			}
+		})
+	case "/stravaActivitiesToDB":
+		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			switch req.Method {
+			case http.MethodPost:
+				rB := service.ActivitiesRequestBody{}
+				err := json.NewDecoder(req.Body).Decode(&rB)
+				if err != nil {
+					log.Errorf(err.Error())
+				}
+				err = rs.StravaActivitiesToDB(context.Background(), strava.ActivitiesRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))

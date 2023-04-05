@@ -32,6 +32,7 @@ func main() {
 	rootMux.Handle("/activities", mux.Handler("/activities", rs))
 	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
 	rootMux.Handle("/weeklyclimb", mux.Handler("/weeklyclimb", rs))
+	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 	rootMux.Handle("/stravaActivitiesToDB", mux.Handler("/stravaActivitiesToDB", rs))
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner"].Port),

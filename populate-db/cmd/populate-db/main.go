@@ -66,7 +66,7 @@ func main() {
 			ElevLow:            elevLow,
 		}
 
-		srv.Clients.DatabaseClient.UpsertActivity(context.Background(), &activity)
+		srv.Clients.DatabaseClient.UpsertActivityFromCSV(context.Background(), &activity)
 
 	}
 }
