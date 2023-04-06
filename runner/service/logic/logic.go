@@ -55,11 +55,12 @@ func GetWeekSummarryResponse(activities *database.ActivitiesResponse, start uint
 		}
 		week := service.WeekSummary{
 			Distance:       &distance,
-			Time:           &elapsedTime,
+			TimeUnix:       &elapsedTime,
 			NumberOfRuns:   &NumberOfRuns,
 			Climb:          &totalClimb,
 			NumberOfOthers: &numberOfOthers,
 		}
+		week.SetTimeStr()
 		weeks = append(weeks, &week)
 		startOfWeek += 7 * 24 * 60 * 60
 	}
