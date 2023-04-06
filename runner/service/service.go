@@ -41,3 +41,15 @@ type RunnerCreateBody struct {
 	ClientSecret string
 	AthletId     uint64
 }
+
+type WeekSummary struct {
+	Distance       *uint64
+	Time           *uint64
+	NumberOfRuns   *uint64
+	Climb          *uint64
+	NumberOfOthers *uint64
+}
+
+type WeekSummaryResponse struct {
+	WeekSummaries []*WeekSummary
+}

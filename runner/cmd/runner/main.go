@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/caarlos0/env/v7"
-	log "github.com/sirupsen/logrus"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/caarlos0/env/v7"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/runner/service"
@@ -31,6 +32,7 @@ func main() {
 	rootMux.Handle("/athlete", mux.Handler("/athlete", rs))
 	rootMux.Handle("/activities", mux.Handler("/activities", rs))
 	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
+	rootMux.Handle("/weeksummary", mux.Handler("/weeksummary", rs))
 	rootMux.Handle("/weeklyclimb", mux.Handler("/weeklyclimb", rs))
 	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 	rootMux.Handle("/stravaActivitiesToDB", mux.Handler("/stravaActivitiesToDB", rs))

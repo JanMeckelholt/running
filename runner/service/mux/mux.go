@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 
@@ -108,6 +109,36 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				rw.WriteHeader(http.StatusMethodNotAllowed)
 			}
 		})
+	case "/weeksummary":
+		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			switch req.Method {
+			case http.MethodGet:
+				client := req.URL.Query().Get("client")
+				weeksStr := req.URL.Query().Get("weeks")
+				weeks, err := strconv.ParseUint(weeksStr, 10, 64)
+				if err != nil {
+					weeks = 0
+				}
+				startOfFirstWeek := logic.GetStartOfFirstWeek(weeks)
+				res, err := rs.GetActivities(context.Background(), database.ActivitiesRequest{Since: startOfFirstWeek, ClientId: client})
+				if err != nil {
+					rw.WriteHeader(http.StatusInternalServerError)
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
+					return
+				}
+				weeksummarryResponse := logic.GetWeekSummarryResponse(res, startOfFirstWeek)
+				rw.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(rw).Encode(weeksummarryResponse)
+			case http.MethodOptions:
+				rw.Header().Set("Allow", "OPTIONS, GET")
+				rw.Header().Set("Cache-Control", "max-age=604800")
+				rw.WriteHeader(http.StatusOK)
+			default:
+				rw.WriteHeader(http.StatusMethodNotAllowed)
+			}
+		})
+
 	case "/weeklyclimb":
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Add("Content-Type", "application/json")
@@ -118,7 +149,7 @@ func Handler(uri string, rs *server.RunnerServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				startoOfWeek := logic.GetStartOfWeek()
+				startoOfWeek := logic.GetStartOfFirstWeek(0)
 				res, err := rs.GetActivities(context.Background(), database.ActivitiesRequest{Since: startoOfWeek, ClientId: rB.ClientId})
 				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: startoOfWeek, ClientId: rB.ClientId})
 				climb := logic.GetClimb(res)
