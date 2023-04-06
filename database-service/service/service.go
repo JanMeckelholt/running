@@ -22,8 +22,8 @@ type DBClient struct {
 	ClientSecret *string
 	Token        *string
 	RefreshToken *string
-	Activities   []DBActivity `gorm:"foreignKey:ClientId;references:ClientId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	AthletId     *uint64      `gorm:"unique;not null"`
+	Activities   []*DBActivity `gorm:"foreignKey:ClientId;references:ClientId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	AthletId     *uint64       `gorm:"unique;not null"`
 }
 
 type DBActivity struct {
@@ -160,16 +160,17 @@ func (s *Storer) UpsertActivity(req *grpcStrava.Activity, fromCSV bool) error {
 	err := DB.Model(&dbClient).Association("Activities").Append(dbActivity)
 	if isDuplicateKeyError(err) {
 		var duplicates []DBActivity
-		startDate := dbActivity.StartDateUnix
-		result := DB.Where(&DBActivity{StartDateUnix: startDate}).Find(&duplicates)
-		log.Infof("found %d duplicates. Deleting...", len(duplicates))
+		startDateUnix := dbActivity.StartDateUnix
+		_ = DB.Where(&DBActivity{ClientId: dbClient.ClientId, StartDateUnix: startDateUnix}).Find(&duplicates)
+		log.Infof("found %d duplicates. Deleting..", len(duplicates))
 		result = DB.Unscoped().Delete(&duplicates)
+		if result.Error != nil {
+			log.Errorf("Could not delete duplicates: %s", result.Error)
+			return err
+		}
 		log.Infof("Deleted %d", result.RowsAffected)
-		err = DB.Model(&dbClient).Association("Activities").Append(dbActivity)
-	}
-	if isDuplicateKeyError(err) {
-		log.Infof("Error after updated: %s", err)
-		return nil
+		result = DB.Create(&dbActivity)
+		err = result.Error
 	}
 	if err != nil {
 		log.Infof("Error: %s", err)
@@ -235,6 +236,7 @@ func activityToDBActivity(activity *grpcStrava.Activity, clientId string, fromCS
 	startDateUnix = uint64(t.Unix())
 
 	return &DBActivity{
+		ClientId:           &clientId,
 		ResourceState:      ptr(activity.GetResourceState()),
 		Name:               ptr(activity.GetName()),
 		Distance:           ptr(activity.GetDistance()),
