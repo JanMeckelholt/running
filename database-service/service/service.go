@@ -69,9 +69,9 @@ func NewStorer(storerConfig config.StorerConfig) *Storer {
 }
 
 func (s *Storer) InitStorage() error {
-	log.Infof("Using ConnString for DB: host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", s.StorerConfig.HOST, s.StorerConfig.PORT, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword)
+	log.Infof("Using ConnString for DB: host=%s port=%d dbname=%s user=%s password=%s sslmode=%s sslrootcert=database-service/certs/ca-cert.pem sslkey=database-service/certs/postgres-key.pem sslcert=database-service/certs/postgres-cert.pem", s.StorerConfig.PostgresHost, s.StorerConfig.PostgresPort, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword, s.StorerConfig.PostgresSSLMode)
 	var err error
-	db, err := gorm.Open(postgres.Open(fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable", s.StorerConfig.HOST, s.StorerConfig.PORT, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword)), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=%s sslrootcert=database-service/certs/ca-cert.pem sslkey=database-service/certs/postgres-key.pem sslcert=database-service/certs/postgres-cert.pem", s.StorerConfig.PostgresHost, s.StorerConfig.PostgresPort, s.StorerConfig.PostgresDB, s.StorerConfig.PostgresUser, s.StorerConfig.PostgresPassword, s.StorerConfig.PostgresSSLMode)), &gorm.Config{})
 	if err != nil {
 		log.Error("DB error: could not open sql connection")
 		panic("failed to connect to database")

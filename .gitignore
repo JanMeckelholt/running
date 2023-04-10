@@ -1,5 +1,7 @@
 *.secret
 *.pem
+*.key
+*.crt
 db_clients.txt
 pgdata
 

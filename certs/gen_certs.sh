@@ -3,13 +3,15 @@
 rm *.pem
 rm ../database-service/certs/*.pem
 rm ../strava-service/certs/*.pem
+rm ../postgres/certs/*.pem
 rm ../runner/certs/*.pem
-m ../populate-db/certs/*.pem
+rm ../populate-db/certs/*.pem
 
 # Generate CA's private key and self-signed certificate
 openssl req -x509 -newkey rsa:4096 -days 365 -nodes -keyout ca-key.pem -out ca-cert.pem -subj "/C=DE/ST=x/L=x/O=x/CN=www.janmeckelholt.de" 
 cp ca-cert.pem ../database-service/certs/
 cp ca-cert.pem ../strava-service/certs/
+cp ca-cert.pem ../postgres/certs/root.crt
 cp ca-cert.pem ../runner/certs/
 cp ca-cert.pem ../populate-db/certs/
 
@@ -29,3 +31,14 @@ openssl x509 -req -in strava-service-server-req.pem -days 365 -CA ca-cert.pem -C
 mv strava-service-server-cert.pem ../strava-service/certs/
 mv strava-service-server-key.pem ../strava-service/certs/
 
+# postgres
+# Generate postgres-server private key and certificate signing request (CSR)
+openssl req -newkey rsa:4096 -nodes -keyout postgres-key.pem -out postgres-req.pem -subj "/C=DE/ST=x/L=x/O=x/CN=postgres"
+# Use CA's private key to sign postgres' CSR and get back the signed certificate
+openssl x509 -req -in postgres-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out postgres-cert.pem -extfile ./altNames_postgres.cnf
+cp postgres-cert.pem ../database-service/certs/postgres-cert.pem
+cp postgres-key.pem ../database-service/certs/postgres-key.pem
+chown 70:70 postgres-key.pem
+chmod 600 postgres-key.pem
+mv postgres-cert.pem ../postgres/certs/postgres-cert.pem
+mv postgres-key.pem ../postgres/certs/postgres-key.pem 

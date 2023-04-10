@@ -31,12 +31,15 @@ services:
       - .env.docker.postgres.secret
   postgres:
     container_name: postgres
-    image: postgres
+    image: postgres    
+    command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/certs/postgres-cert.pem -c ssl_key_file=/var/lib/postgresql/certs/postgres-key.pem
     restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+     # - ./postgres:/docker-entrypoint-initdb.d/
+      - ./postgres/certs/:/var/lib/postgresql/certs/
     user: "1000:1000"
     env_file:
       - .env.docker.postgres
