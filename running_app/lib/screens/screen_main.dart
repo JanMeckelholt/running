@@ -23,26 +23,21 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
-  int _counter = 0;
-  String _someText = "test";
-  late Future<RunningResponse> futureRunningResponse;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _callApi();
   }
+
+  int _climb = 0;
+  late Future<RunningResponse> futureRunningResponse;
 
   Future<void> _callApi() async {
     futureRunningResponse = fetchRunningResponse();
-    String abc = await futureRunningResponse.then((value) => value.weeklyClimb);
+    int climbResponse =
+        await futureRunningResponse.then((value) => value.weeklyClimb);
     setState(() {
-      _someText = abc;
+      _climb = climbResponse;
     });
   }
 
@@ -81,24 +76,19 @@ class _MainState extends State<Main> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'Weekly climb since start of the week: ',
             ),
             Text(
-              '$_counter',
+              '$_climb m',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Text(
-              _someText,
-              style: Theme.of(context).textTheme.headlineMedium,
+            ElevatedButton(
+              onPressed: _callApi,
+              child: const Icon(Icons.refresh),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _callApi,
-        tooltip: 'update',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

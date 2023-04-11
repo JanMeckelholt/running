@@ -1,13 +1,13 @@
 class RunningResponse {
-  final String weeklyClimb;
+  final int weeklyClimb;
 
   const RunningResponse({
     required this.weeklyClimb,
   });
 
-  factory RunningResponse.fromJson(List<dynamic> json) {
+  factory RunningResponse.fromJson(Map<String, List<dynamic>> json) {
     return RunningResponse(
-      weeklyClimb: json[0]['text'],
+      weeklyClimb: json['WeekSummaries']?[0]['Climb'],
     );
   }
 }
