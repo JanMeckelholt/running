@@ -54,3 +54,11 @@ services:
     env_file:
       - ./populate-db/.env.docker
       - ./populate-db/.env.docker.secret
+  running_app:
+    container_name: running_app
+    build:  
+      context: .
+      dockerfile: ./running_app/Dockerfile
+    ports:
+      - "8001:5000"
+    restart: unless-stopped
