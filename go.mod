@@ -11,7 +11,11 @@ require (
 	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
 )
 
-require github.com/pkg/errors v0.9.1 // indirect
+require (
+	github.com/fullstorydev/grpcurl v1.8.7 // indirect
+	github.com/jhump/protoreflect v1.12.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+)
 
 require (
 	github.com/golang/protobuf v1.5.2 // indirect

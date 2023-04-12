@@ -27,9 +27,11 @@ class _MainState extends State<Main> {
   void initState() {
     super.initState();
     _callApi();
+    _callApiGrpc();
   }
 
   int _climb = 0;
+  int _climbGrpc = 0;
   late Future<RunningResponse> futureRunningResponse;
 
   Future<void> _callApi() async {
@@ -38,6 +40,15 @@ class _MainState extends State<Main> {
         await futureRunningResponse.then((value) => value.weeklyClimb);
     setState(() {
       _climb = climbResponse;
+    });
+  }
+
+  Future<void> _callApiGrpc() async {
+    futureRunningResponse = fetchRunningResponseGrpc();
+    int climbResponse =
+        await futureRunningResponse.then((value) => value.weeklyClimb);
+    setState(() {
+      _climbGrpc = climbResponse;
     });
   }
 
@@ -84,6 +95,14 @@ class _MainState extends State<Main> {
             ),
             ElevatedButton(
               onPressed: _callApi,
+              child: const Icon(Icons.refresh),
+            ),
+            Text(
+              'Grpc: $_climbGrpc m',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            ElevatedButton(
+              onPressed: _callApiGrpc,
               child: const Icon(Icons.refresh),
             ),
           ],

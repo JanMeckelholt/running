@@ -5,14 +5,12 @@
 // @dart = 2.12
 // ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../strava/strava.pb.dart' as $0;
-import '../google/protobuf/empty.pb.dart' as $1;
 
 class ActivitiesRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ActivitiesRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'database'), createEmptyInstance: create)
@@ -601,39 +599,5 @@ class ErrorResponse extends $pb.GeneratedMessage {
   $core.bool hasError() => $_has(0);
   @$pb.TagNumber(1)
   void clearError() => clearField(1);
-}
-
-class DatabaseApi {
-  $pb.RpcClient _client;
-  DatabaseApi(this._client);
-
-  $async.Future<$1.Empty> upsertClient($pb.ClientContext? ctx, Client request) {
-    var emptyResponse = $1.Empty();
-    return _client.invoke<$1.Empty>(ctx, 'Database', 'UpsertClient', request, emptyResponse);
-  }
-  $async.Future<Client> updateClient($pb.ClientContext? ctx, UpdateRequest request) {
-    var emptyResponse = Client();
-    return _client.invoke<Client>(ctx, 'Database', 'UpdateClient', request, emptyResponse);
-  }
-  $async.Future<Client> getClient($pb.ClientContext? ctx, ClientId request) {
-    var emptyResponse = Client();
-    return _client.invoke<Client>(ctx, 'Database', 'GetClient', request, emptyResponse);
-  }
-  $async.Future<$1.Empty> upsertActivity($pb.ClientContext? ctx, $0.Activity request) {
-    var emptyResponse = $1.Empty();
-    return _client.invoke<$1.Empty>(ctx, 'Database', 'UpsertActivity', request, emptyResponse);
-  }
-  $async.Future<$1.Empty> upsertActivityFromCSV($pb.ClientContext? ctx, $0.Activity request) {
-    var emptyResponse = $1.Empty();
-    return _client.invoke<$1.Empty>(ctx, 'Database', 'UpsertActivityFromCSV', request, emptyResponse);
-  }
-  $async.Future<$0.Activity> getActivity($pb.ClientContext? ctx, ActivityId request) {
-    var emptyResponse = $0.Activity();
-    return _client.invoke<$0.Activity>(ctx, 'Database', 'GetActivity', request, emptyResponse);
-  }
-  $async.Future<ActivitiesResponse> getActivities($pb.ClientContext? ctx, ActivitiesRequest request) {
-    var emptyResponse = ActivitiesResponse();
-    return _client.invoke<ActivitiesResponse>(ctx, 'Database', 'GetActivities', request, emptyResponse);
-  }
 }
 

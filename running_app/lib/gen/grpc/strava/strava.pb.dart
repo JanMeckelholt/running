@@ -5,13 +5,10 @@
 // @dart = 2.12
 // ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
-import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
-
-import '../google/protobuf/empty.pb.dart' as $0;
 
 class RunnerRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RunnerRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
@@ -210,6 +207,96 @@ class TokenResponse extends $pb.GeneratedMessage {
   void clearToken() => clearField(2);
 }
 
+class athleteType extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'athleteType', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
+    ..a<$fixnum.Int64>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'resourceState')
+    ..hasRequiredFields = false
+  ;
+
+  athleteType._() : super();
+  factory athleteType({
+    $fixnum.Int64? id,
+    $fixnum.Int64? resourceState,
+  }) {
+    final _result = create();
+    if (id != null) {
+      _result.id = id;
+    }
+    if (resourceState != null) {
+      _result.resourceState = resourceState;
+    }
+    return _result;
+  }
+  factory athleteType.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory athleteType.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  athleteType clone() => athleteType()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  athleteType copyWith(void Function(athleteType) updates) => super.copyWith((message) => updates(message as athleteType)) as athleteType; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static athleteType create() => athleteType._();
+  athleteType createEmptyInstance() => create();
+  static $pb.PbList<athleteType> createRepeated() => $pb.PbList<athleteType>();
+  @$core.pragma('dart2js:noInline')
+  static athleteType getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<athleteType>(create);
+  static athleteType? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $fixnum.Int64 get id => $_getI64(0);
+  @$pb.TagNumber(1)
+  set id($fixnum.Int64 v) { $_setInt64(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get resourceState => $_getI64(1);
+  @$pb.TagNumber(2)
+  set resourceState($fixnum.Int64 v) { $_setInt64(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasResourceState() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearResourceState() => clearField(2);
+}
+
+class coordinate extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'coordinate', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  coordinate._() : super();
+  factory coordinate() => create();
+  factory coordinate.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory coordinate.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  coordinate clone() => coordinate()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  coordinate copyWith(void Function(coordinate) updates) => super.copyWith((message) => updates(message as coordinate)) as coordinate; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static coordinate create() => coordinate._();
+  coordinate createEmptyInstance() => create();
+  static $pb.PbList<coordinate> createRepeated() => $pb.PbList<coordinate>();
+  @$core.pragma('dart2js:noInline')
+  static coordinate getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<coordinate>(create);
+  static coordinate? _defaultInstance;
+}
+
 class RunnerResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RunnerResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
     ..a<$fixnum.Int64>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
@@ -230,8 +317,6 @@ class RunnerResponse extends $pb.GeneratedMessage {
     ..a<$core.double>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'weight', $pb.PbFieldType.OD)
     ..aOS(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'profileMedium')
     ..aOS(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'profile')
-    ..pc<friend>(19, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'friend', $pb.PbFieldType.PM, subBuilder: friend.create)
-    ..pc<follower>(20, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'follower', $pb.PbFieldType.PM, subBuilder: follower.create)
     ..hasRequiredFields = false
   ;
 
@@ -255,8 +340,6 @@ class RunnerResponse extends $pb.GeneratedMessage {
     $core.double? weight,
     $core.String? profileMedium,
     $core.String? profile,
-    $core.Iterable<friend>? friend,
-    $core.Iterable<follower>? follower,
   }) {
     final _result = create();
     if (id != null) {
@@ -312,12 +395,6 @@ class RunnerResponse extends $pb.GeneratedMessage {
     }
     if (profile != null) {
       _result.profile = profile;
-    }
-    if (friend != null) {
-      _result.friend.addAll(friend);
-    }
-    if (follower != null) {
-      _result.follower.addAll(follower);
     }
     return _result;
   }
@@ -503,106 +580,6 @@ class RunnerResponse extends $pb.GeneratedMessage {
   $core.bool hasProfile() => $_has(17);
   @$pb.TagNumber(18)
   void clearProfile() => clearField(18);
-
-  @$pb.TagNumber(19)
-  $core.List<friend> get friend => $_getList(18);
-
-  @$pb.TagNumber(20)
-  $core.List<follower> get follower => $_getList(19);
-}
-
-class friend extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'friend', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
-    ..hasRequiredFields = false
-  ;
-
-  friend._() : super();
-  factory friend({
-    $core.String? name,
-  }) {
-    final _result = create();
-    if (name != null) {
-      _result.name = name;
-    }
-    return _result;
-  }
-  factory friend.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory friend.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  friend clone() => friend()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  friend copyWith(void Function(friend) updates) => super.copyWith((message) => updates(message as friend)) as friend; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static friend create() => friend._();
-  friend createEmptyInstance() => create();
-  static $pb.PbList<friend> createRepeated() => $pb.PbList<friend>();
-  @$core.pragma('dart2js:noInline')
-  static friend getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<friend>(create);
-  static friend? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get name => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set name($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasName() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearName() => clearField(1);
-}
-
-class follower extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'follower', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
-    ..hasRequiredFields = false
-  ;
-
-  follower._() : super();
-  factory follower({
-    $core.String? name,
-  }) {
-    final _result = create();
-    if (name != null) {
-      _result.name = name;
-    }
-    return _result;
-  }
-  factory follower.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory follower.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  follower clone() => follower()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  follower copyWith(void Function(follower) updates) => super.copyWith((message) => updates(message as follower)) as follower; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static follower create() => follower._();
-  follower createEmptyInstance() => create();
-  static $pb.PbList<follower> createRepeated() => $pb.PbList<follower>();
-  @$core.pragma('dart2js:noInline')
-  static follower getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<follower>(create);
-  static follower? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get name => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set name($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasName() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearName() => clearField(1);
 }
 
 class ActivityRequest extends $pb.GeneratedMessage {
@@ -785,7 +762,7 @@ class ActivitiesResponse extends $pb.GeneratedMessage {
 class Activity extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Activity', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
     ..a<$fixnum.Int64>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'resourceState', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..aOM<athlete>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'athlete', subBuilder: athlete.create)
+    ..aOM<athleteType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'athlete', subBuilder: athleteType.create)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..a<$core.double>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'distance', $pb.PbFieldType.OD)
     ..a<$fixnum.Int64>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'movingTime', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
@@ -821,7 +798,7 @@ class Activity extends $pb.GeneratedMessage {
   Activity._() : super();
   factory Activity({
     $fixnum.Int64? resourceState,
-    athlete? athlete,
+    athleteType? athlete,
     $core.String? name,
     $core.double? distance,
     $fixnum.Int64? movingTime,
@@ -979,15 +956,15 @@ class Activity extends $pb.GeneratedMessage {
   void clearResourceState() => clearField(1);
 
   @$pb.TagNumber(2)
-  athlete get athlete => $_getN(1);
+  athleteType get athlete => $_getN(1);
   @$pb.TagNumber(2)
-  set athlete(athlete v) { setField(2, v); }
+  set athlete(athleteType v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasAthlete() => $_has(1);
   @$pb.TagNumber(2)
   void clearAthlete() => clearField(2);
   @$pb.TagNumber(2)
-  athlete ensureAthlete() => $_ensure(1);
+  athleteType ensureAthlete() => $_ensure(1);
 
   @$pb.TagNumber(3)
   $core.String get name => $_getSZ(2);
@@ -1237,117 +1214,5 @@ class Activity extends $pb.GeneratedMessage {
   $core.bool hasStartDateUnix() => $_has(30);
   @$pb.TagNumber(40)
   void clearStartDateUnix() => clearField(40);
-}
-
-class athlete extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'athlete', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
-    ..a<$fixnum.Int64>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
-    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'resourceState')
-    ..hasRequiredFields = false
-  ;
-
-  athlete._() : super();
-  factory athlete({
-    $fixnum.Int64? id,
-    $fixnum.Int64? resourceState,
-  }) {
-    final _result = create();
-    if (id != null) {
-      _result.id = id;
-    }
-    if (resourceState != null) {
-      _result.resourceState = resourceState;
-    }
-    return _result;
-  }
-  factory athlete.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory athlete.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  athlete clone() => athlete()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  athlete copyWith(void Function(athlete) updates) => super.copyWith((message) => updates(message as athlete)) as athlete; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static athlete create() => athlete._();
-  athlete createEmptyInstance() => create();
-  static $pb.PbList<athlete> createRepeated() => $pb.PbList<athlete>();
-  @$core.pragma('dart2js:noInline')
-  static athlete getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<athlete>(create);
-  static athlete? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $fixnum.Int64 get id => $_getI64(0);
-  @$pb.TagNumber(1)
-  set id($fixnum.Int64 v) { $_setInt64(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $fixnum.Int64 get resourceState => $_getI64(1);
-  @$pb.TagNumber(2)
-  set resourceState($fixnum.Int64 v) { $_setInt64(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasResourceState() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearResourceState() => clearField(2);
-}
-
-class coordinate extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'coordinate', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'strava'), createEmptyInstance: create)
-    ..hasRequiredFields = false
-  ;
-
-  coordinate._() : super();
-  factory coordinate() => create();
-  factory coordinate.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory coordinate.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  coordinate clone() => coordinate()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  coordinate copyWith(void Function(coordinate) updates) => super.copyWith((message) => updates(message as coordinate)) as coordinate; // ignore: deprecated_member_use
-  $pb.BuilderInfo get info_ => _i;
-  @$core.pragma('dart2js:noInline')
-  static coordinate create() => coordinate._();
-  coordinate createEmptyInstance() => create();
-  static $pb.PbList<coordinate> createRepeated() => $pb.PbList<coordinate>();
-  @$core.pragma('dart2js:noInline')
-  static coordinate getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<coordinate>(create);
-  static coordinate? _defaultInstance;
-}
-
-class StravaApi {
-  $pb.RpcClient _client;
-  StravaApi(this._client);
-
-  $async.Future<RunnerResponse> getRunner($pb.ClientContext? ctx, RunnerRequest request) {
-    var emptyResponse = RunnerResponse();
-    return _client.invoke<RunnerResponse>(ctx, 'Strava', 'GetRunner', request, emptyResponse);
-  }
-  $async.Future<ActivitiesResponse> getActivities($pb.ClientContext? ctx, ActivitiesRequest request) {
-    var emptyResponse = ActivitiesResponse();
-    return _client.invoke<ActivitiesResponse>(ctx, 'Strava', 'GetActivities', request, emptyResponse);
-  }
-  $async.Future<$0.Empty> activitiesToDB($pb.ClientContext? ctx, ActivitiesRequest request) {
-    var emptyResponse = $0.Empty();
-    return _client.invoke<$0.Empty>(ctx, 'Strava', 'ActivitiesToDB', request, emptyResponse);
-  }
-  $async.Future<TokenResponse> useRefreshToken($pb.ClientContext? ctx, RefreshRequest request) {
-    var emptyResponse = TokenResponse();
-    return _client.invoke<TokenResponse>(ctx, 'Strava', 'UseRefreshToken', request, emptyResponse);
-  }
 }
 

@@ -1,0 +1,40 @@
+syntax = "proto3";
+package runner;
+option go_package = "github.com/JanMeckelholt/running/common/grpc/runner";
+import "google/protobuf/empty.proto";
+import "database/database.proto";
+import "strava/strava.proto";
+service Runner {
+  rpc GetRunner(strava.RunnerRequest) returns (strava.RunnerResponse) {}
+  rpc CreateClient(database.Client) returns (google.protobuf.Empty) {}
+  rpc GetActivities(database.ActivitiesRequest) returns (database.ActivitiesResponse) {}
+  rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}
+  rpc GetWeekSummaries(WeekSummariesRequest) returns (WeekSummariesResponse) {}
+}
+
+message RunnerRequest {
+  string clientId = 1;
+}
+
+message ActivitiesRequest {
+    string clientId= 1;
+    uint64  since = 2;
+  }
+
+  message WeekSummariesRequest {
+    string clientId= 1;
+    uint64  weeks = 2;
+  }
+
+message WeekSummary {
+  uint64 distance = 1;
+  uint64 timeUnix = 2;
+  string timeStr = 3;
+  uint64 climb = 4;
+  uint64 numberOfRuns = 5;
+  uint64 numberOfOthers = 6;
+}
+
+message WeekSummariesResponse {
+  repeated WeekSummary weeksummaries = 1;
+}

@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: ./strava-service/Dockerfile
     ports:
-      - "666:666"
+      - "669:666"
     env_file:
       - ./strava-service/.env.docker
   runner:
@@ -14,11 +14,24 @@ services:
       context: .
       dockerfile: ./runner/Dockerfile
     ports:
-      - "80:80"
+      - "666:666"
     env_file:
       - ./runner/.env.docker
     depends_on:
       - strava-service
+      - database-service
+  http_gateway:
+    container_name: http_gateway
+    build:
+      context: .
+      dockerfile: ./httpGateway/Dockerfile
+    ports:
+      - "80:80"
+    env_file:
+      - ./httpGateway/.env.docker
+      - .env
+    depends_on:
+      - runner
   database-service:
     container_name: database-service
     build:
@@ -60,5 +73,5 @@ services:
       context: .
       dockerfile: ./running_app/Dockerfile
     ports:
-      - "8001:5000"
+      - "${RUNNING_APP_PORT}:5000"
     restart: unless-stopped

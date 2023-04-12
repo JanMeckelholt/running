@@ -47,7 +47,7 @@ func main() {
 		id, _ := strconv.ParseUint(records[i][0], 10, 64)
 
 		activity := strava.Activity{
-			Athlete: &strava.Athlete{
+			Athlete: &strava.AthleteType{
 				Id: 7845894,
 			},
 			Name:               records[i][2],

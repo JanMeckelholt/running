@@ -44,7 +44,7 @@ func main() {
 		teardown()
 	}()
 	if serveErr != nil {
-		log.Fatal("Runner-Server: Serving Error!")
+		log.Fatal("Strava-Server: Serving Error!")
 	}
 
 }

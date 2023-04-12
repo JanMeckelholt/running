@@ -8,9 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-import '../google/protobuf/empty.pbjson.dart' as $1;
-import '../strava/strava.pbjson.dart' as $0;
-
 @$core.Deprecated('Use activitiesRequestDescriptor instead')
 const ActivitiesRequest$json = const {
   '1': 'ActivitiesRequest',
@@ -122,32 +119,3 @@ const ErrorResponse$json = const {
 
 /// Descriptor for `ErrorResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List errorResponseDescriptor = $convert.base64Decode('Cg1FcnJvclJlc3BvbnNlEhQKBWVycm9yGAEgASgJUgVlcnJvcg==');
-const $core.Map<$core.String, $core.dynamic> DatabaseServiceBase$json = const {
-  '1': 'Database',
-  '2': const [
-    const {'1': 'UpsertClient', '2': '.database.Client', '3': '.google.protobuf.Empty', '4': const {}},
-    const {'1': 'UpdateClient', '2': '.database.UpdateRequest', '3': '.database.Client', '4': const {}},
-    const {'1': 'GetClient', '2': '.database.ClientId', '3': '.database.Client', '4': const {}},
-    const {'1': 'UpsertActivity', '2': '.strava.Activity', '3': '.google.protobuf.Empty', '4': const {}},
-    const {'1': 'UpsertActivityFromCSV', '2': '.strava.Activity', '3': '.google.protobuf.Empty', '4': const {}},
-    const {'1': 'GetActivity', '2': '.database.ActivityId', '3': '.strava.Activity', '4': const {}},
-    const {'1': 'GetActivities', '2': '.database.ActivitiesRequest', '3': '.database.ActivitiesResponse', '4': const {}},
-  ],
-};
-
-@$core.Deprecated('Use databaseServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>> DatabaseServiceBase$messageJson = const {
-  '.database.Client': Client$json,
-  '.google.protobuf.Empty': $1.Empty$json,
-  '.database.UpdateRequest': UpdateRequest$json,
-  '.database.kvPair': kvPair$json,
-  '.database.ClientId': ClientId$json,
-  '.strava.Activity': $0.Activity$json,
-  '.strava.athlete': $0.athlete$json,
-  '.database.ActivityId': ActivityId$json,
-  '.database.ActivitiesRequest': ActivitiesRequest$json,
-  '.database.ActivitiesResponse': ActivitiesResponse$json,
-};
-
-/// Descriptor for `Database`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List databaseServiceDescriptor = $convert.base64Decode('CghEYXRhYmFzZRI6CgxVcHNlcnRDbGllbnQSEC5kYXRhYmFzZS5DbGllbnQaFi5nb29nbGUucHJvdG9idWYuRW1wdHkiABI7CgxVcGRhdGVDbGllbnQSFy5kYXRhYmFzZS5VcGRhdGVSZXF1ZXN0GhAuZGF0YWJhc2UuQ2xpZW50IgASMwoJR2V0Q2xpZW50EhIuZGF0YWJhc2UuQ2xpZW50SWQaEC5kYXRhYmFzZS5DbGllbnQiABI8Cg5VcHNlcnRBY3Rpdml0eRIQLnN0cmF2YS5BY3Rpdml0eRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEkMKFVVwc2VydEFjdGl2aXR5RnJvbUNTVhIQLnN0cmF2YS5BY3Rpdml0eRoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSIAEjcKC0dldEFjdGl2aXR5EhQuZGF0YWJhc2UuQWN0aXZpdHlJZBoQLnN0cmF2YS5BY3Rpdml0eSIAEkwKDUdldEFjdGl2aXRpZXMSGy5kYXRhYmFzZS5BY3Rpdml0aWVzUmVxdWVzdBocLmRhdGFiYXNlLkFjdGl2aXRpZXNSZXNwb25zZSIA');

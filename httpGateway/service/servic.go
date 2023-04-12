@@ -1,16 +1,15 @@
 package service
 
 import (
-	"github.com/JanMeckelholt/running/runner/service/clients"
-	"github.com/JanMeckelholt/running/runner/service/config"
+	"time"
+
+	"github.com/JanMeckelholt/running/httpGateway/service/clients"
+	"github.com/JanMeckelholt/running/httpGateway/service/config"
 )
 
 type Service struct {
 	Clients clients.Clients
 	Config  config.ServiceConfig
-}
-
-type RunnerConfig struct {
 }
 
 type ClimbResponse struct {
@@ -49,6 +48,12 @@ type WeekSummary struct {
 	NumberOfRuns   *uint64
 	Climb          *uint64
 	NumberOfOthers *uint64
+}
+
+func (ws *WeekSummary) SetTimeStr() {
+	t := time.Duration(*ws.TimeUnix * uint64(time.Second))
+	timeStr := t.String()
+	ws.TimeStr = &timeStr
 }
 
 type WeekSummaryResponse struct {

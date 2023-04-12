@@ -6,8 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/JanMeckelholt/running/common/grpc/database"
+	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
-	"github.com/JanMeckelholt/running/runner/service"
 )
 
 const startOFWeek = time.Monday
@@ -29,9 +29,9 @@ func GetClimb(activities *database.ActivitiesResponse) uint64 {
 	return totalClimb
 }
 
-func GetWeekSummarryResponse(activities *database.ActivitiesResponse, start uint64) service.WeekSummaryResponse {
+func GetWeekSummarryResponse(activities *database.ActivitiesResponse, start uint64) runner.WeekSummariesResponse {
 
-	weeks := make([]*service.WeekSummary, 0)
+	weeks := make([]*runner.WeekSummary, 0)
 	startOfWeek := start
 	now := uint64(time.Now().Unix())
 	log.Infof("now: %d", now)
@@ -53,18 +53,20 @@ func GetWeekSummarryResponse(activities *database.ActivitiesResponse, start uint
 				numberOfOthers++
 			}
 		}
-		week := service.WeekSummary{
-			Distance:       &distance,
-			TimeUnix:       &elapsedTime,
-			NumberOfRuns:   &NumberOfRuns,
-			Climb:          &totalClimb,
-			NumberOfOthers: &numberOfOthers,
+		week := runner.WeekSummary{
+			Distance:       distance,
+			TimeUnix:       elapsedTime,
+			NumberOfRuns:   NumberOfRuns,
+			Climb:          totalClimb,
+			NumberOfOthers: numberOfOthers,
 		}
-		week.SetTimeStr()
+		t := time.Duration(week.TimeUnix * uint64(time.Second))
+		timeStr := t.String()
+		week.TimeStr = timeStr
 		weeks = append(weeks, &week)
 		startOfWeek += 7 * 24 * 60 * 60
 	}
-	return service.WeekSummaryResponse{WeekSummaries: weeks}
+	return runner.WeekSummariesResponse{Weeksummaries: weeks}
 }
 
 func GetClimbFromStravaResponse(activities *strava.ActivitiesResponse) uint64 {

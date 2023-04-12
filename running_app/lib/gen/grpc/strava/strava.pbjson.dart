@@ -8,8 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-import '../google/protobuf/empty.pbjson.dart' as $0;
-
 @$core.Deprecated('Use runnerRequestDescriptor instead')
 const RunnerRequest$json = const {
   '1': 'RunnerRequest',
@@ -44,6 +42,24 @@ const TokenResponse$json = const {
 
 /// Descriptor for `TokenResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List tokenResponseDescriptor = $convert.base64Decode('Cg1Ub2tlblJlc3BvbnNlEhoKCGNsaWVudElkGAEgASgJUghjbGllbnRJZBIUCgV0b2tlbhgCIAEoCVIFdG9rZW4=');
+@$core.Deprecated('Use athleteTypeDescriptor instead')
+const athleteType$json = const {
+  '1': 'athleteType',
+  '2': const [
+    const {'1': 'id', '3': 1, '4': 1, '5': 4, '10': 'id'},
+    const {'1': 'resource_state', '3': 2, '4': 1, '5': 3, '10': 'resourceState'},
+  ],
+};
+
+/// Descriptor for `athleteType`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List athleteTypeDescriptor = $convert.base64Decode('CgthdGhsZXRlVHlwZRIOCgJpZBgBIAEoBFICaWQSJQoOcmVzb3VyY2Vfc3RhdGUYAiABKANSDXJlc291cmNlU3RhdGU=');
+@$core.Deprecated('Use coordinateDescriptor instead')
+const coordinate$json = const {
+  '1': 'coordinate',
+};
+
+/// Descriptor for `coordinate`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List coordinateDescriptor = $convert.base64Decode('Cgpjb29yZGluYXRl');
 @$core.Deprecated('Use runnerResponseDescriptor instead')
 const RunnerResponse$json = const {
   '1': 'RunnerResponse',
@@ -66,33 +82,11 @@ const RunnerResponse$json = const {
     const {'1': 'weight', '3': 16, '4': 1, '5': 1, '10': 'weight'},
     const {'1': 'profile_medium', '3': 17, '4': 1, '5': 9, '10': 'profileMedium'},
     const {'1': 'profile', '3': 18, '4': 1, '5': 9, '10': 'profile'},
-    const {'1': 'friend', '3': 19, '4': 3, '5': 11, '6': '.strava.friend', '10': 'friend'},
-    const {'1': 'follower', '3': 20, '4': 3, '5': 11, '6': '.strava.follower', '10': 'follower'},
   ],
 };
 
 /// Descriptor for `RunnerResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List runnerResponseDescriptor = $convert.base64Decode('Cg5SdW5uZXJSZXNwb25zZRIOCgJpZBgBIAEoBFICaWQSGgoIdXNlcm5hbWUYAiABKAlSCHVzZXJuYW1lEiUKDnJlc291cmNlX3N0YXRlGAMgASgEUg1yZXNvdXJjZVN0YXRlEhwKCWZpcnN0bmFtZRgEIAEoCVIJZmlyc3RuYW1lEhoKCGxhc3RuYW1lGAUgASgJUghsYXN0bmFtZRIQCgNiaW8YBiABKAlSA2JpbxISCgRjaXR5GAcgASgJUgRjaXR5EhQKBXN0YXRlGAggASgJUgVzdGF0ZRIYCgdjb3VudHJ5GAkgASgJUgdjb3VudHJ5EhAKA3NleBgKIAEoCVIDc2V4EhgKB3ByZW1pdW0YCyABKAhSB3ByZW1pdW0SFgoGc3VtbWl0GAwgASgIUgZzdW1taXQSHQoKY3JlYXRlZF9hdBgNIAEoCVIJY3JlYXRlZEF0Eh0KCnVwZGF0ZWRfYXQYDiABKAlSCXVwZGF0ZWRBdBIiCg1iYWRnZV90eXBlX2lkGA8gASgEUgtiYWRnZVR5cGVJZBIWCgZ3ZWlnaHQYECABKAFSBndlaWdodBIlCg5wcm9maWxlX21lZGl1bRgRIAEoCVINcHJvZmlsZU1lZGl1bRIYCgdwcm9maWxlGBIgASgJUgdwcm9maWxlEiYKBmZyaWVuZBgTIAMoCzIOLnN0cmF2YS5mcmllbmRSBmZyaWVuZBIsCghmb2xsb3dlchgUIAMoCzIQLnN0cmF2YS5mb2xsb3dlclIIZm9sbG93ZXI=');
-@$core.Deprecated('Use friendDescriptor instead')
-const friend$json = const {
-  '1': 'friend',
-  '2': const [
-    const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
-  ],
-};
-
-/// Descriptor for `friend`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List friendDescriptor = $convert.base64Decode('CgZmcmllbmQSEgoEbmFtZRgBIAEoCVIEbmFtZQ==');
-@$core.Deprecated('Use followerDescriptor instead')
-const follower$json = const {
-  '1': 'follower',
-  '2': const [
-    const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
-  ],
-};
-
-/// Descriptor for `follower`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List followerDescriptor = $convert.base64Decode('Cghmb2xsb3dlchISCgRuYW1lGAEgASgJUgRuYW1l');
+final $typed_data.Uint8List runnerResponseDescriptor = $convert.base64Decode('Cg5SdW5uZXJSZXNwb25zZRIOCgJpZBgBIAEoBFICaWQSGgoIdXNlcm5hbWUYAiABKAlSCHVzZXJuYW1lEiUKDnJlc291cmNlX3N0YXRlGAMgASgEUg1yZXNvdXJjZVN0YXRlEhwKCWZpcnN0bmFtZRgEIAEoCVIJZmlyc3RuYW1lEhoKCGxhc3RuYW1lGAUgASgJUghsYXN0bmFtZRIQCgNiaW8YBiABKAlSA2JpbxISCgRjaXR5GAcgASgJUgRjaXR5EhQKBXN0YXRlGAggASgJUgVzdGF0ZRIYCgdjb3VudHJ5GAkgASgJUgdjb3VudHJ5EhAKA3NleBgKIAEoCVIDc2V4EhgKB3ByZW1pdW0YCyABKAhSB3ByZW1pdW0SFgoGc3VtbWl0GAwgASgIUgZzdW1taXQSHQoKY3JlYXRlZF9hdBgNIAEoCVIJY3JlYXRlZEF0Eh0KCnVwZGF0ZWRfYXQYDiABKAlSCXVwZGF0ZWRBdBIiCg1iYWRnZV90eXBlX2lkGA8gASgEUgtiYWRnZVR5cGVJZBIWCgZ3ZWlnaHQYECABKAFSBndlaWdodBIlCg5wcm9maWxlX21lZGl1bRgRIAEoCVINcHJvZmlsZU1lZGl1bRIYCgdwcm9maWxlGBIgASgJUgdwcm9maWxl');
 @$core.Deprecated('Use activityRequestDescriptor instead')
 const ActivityRequest$json = const {
   '1': 'ActivityRequest',
@@ -131,7 +125,7 @@ const Activity$json = const {
   '1': 'Activity',
   '2': const [
     const {'1': 'resource_state', '3': 1, '4': 1, '5': 4, '10': 'resourceState'},
-    const {'1': 'athlete', '3': 2, '4': 1, '5': 11, '6': '.strava.athlete', '10': 'athlete'},
+    const {'1': 'athlete', '3': 2, '4': 1, '5': 11, '6': '.strava.athleteType', '10': 'athlete'},
     const {'1': 'name', '3': 3, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'distance', '3': 4, '4': 1, '5': 1, '10': 'distance'},
     const {'1': 'moving_time', '3': 5, '4': 1, '5': 4, '10': 'movingTime'},
@@ -165,49 +159,4 @@ const Activity$json = const {
 };
 
 /// Descriptor for `Activity`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List activityDescriptor = $convert.base64Decode('CghBY3Rpdml0eRIlCg5yZXNvdXJjZV9zdGF0ZRgBIAEoBFINcmVzb3VyY2VTdGF0ZRIpCgdhdGhsZXRlGAIgASgLMg8uc3RyYXZhLmF0aGxldGVSB2F0aGxldGUSEgoEbmFtZRgDIAEoCVIEbmFtZRIaCghkaXN0YW5jZRgEIAEoAVIIZGlzdGFuY2USHwoLbW92aW5nX3RpbWUYBSABKARSCm1vdmluZ1RpbWUSIQoMZWxhcHNlZF90aW1lGAYgASgEUgtlbGFwc2VkVGltZRIwChR0b3RhbF9lbGV2YXRpb25fZ2FpbhgHIAEoAVISdG90YWxFbGV2YXRpb25HYWluEhIKBHR5cGUYCCABKAlSBHR5cGUSHQoKc3BvcnRfdHlwZRgJIAEoCVIJc3BvcnRUeXBlEg4KAmlkGAogASgEUgJpZBIdCgpzdGFydF9kYXRlGAsgASgJUglzdGFydERhdGUSKgoRc3RhcnRfZGF0ZV9sb2NhbGUYDCABKAlSD3N0YXJ0RGF0ZUxvY2FsZRIaCgh0aW1lem9uZRgNIAEoCVIIdGltZXpvbmUSHQoKdXRjX29mZnNldBgOIAEoAVIJdXRjT2Zmc2V0EiMKDWxvY2F0aW9uX2NpdHkYDyABKAlSDGxvY2F0aW9uQ2l0eRIlCg5sb2NhdGlvbl9zdGF0ZRgQIAEoCVINbG9jYXRpb25TdGF0ZRIpChBsb2NhdGlvbl9jb3VudHJ5GBEgASgJUg9sb2NhdGlvbkNvdW50cnkSKwoRYWNoaWV2ZW1lbnRfY291bnQYEiABKARSEGFjaGlldmVtZW50Q291bnQSHwoLa3Vkb3NfY291bnQYEyABKARSCmt1ZG9zQ291bnQSIwoNY29tbWVudF9jb3VudBgUIAEoBFIMY29tbWVudENvdW50EhYKBm1hbnVhbBgVIAEoCFIGbWFudWFsEh4KCnZpc2liaWxpdHkYFiABKAlSCnZpc2liaWxpdHkSIQoMc3RhcnRfbGF0bG5nGBcgAygBUgtzdGFydExhdGxuZxIdCgplbmRfbGF0bG5nGBggAygBUgllbmRMYXRsbmcSIwoNYXZlcmFnZV9zcGVlZBgZIAEoAVIMYXZlcmFnZVNwZWVkEhsKCW1heF9zcGVlZBgaIAEoAVIIbWF4U3BlZWQSKwoRYXZlcmFnZV9oZWFydHJhdGUYGyABKAFSEGF2ZXJhZ2VIZWFydHJhdGUSIwoNbWF4X2hlYXJ0cmF0ZRgcIAEoAVIMbWF4SGVhcnRyYXRlEhsKCWVsZXZfaGlnaBgdIAEoAVIIZWxldkhpZ2gSGQoIZWxldl9sb3cYHiABKAFSB2VsZXZMb3cSJgoPc3RhcnRfZGF0ZV91bml4GCggASgEUg1zdGFydERhdGVVbml4');
-@$core.Deprecated('Use athleteDescriptor instead')
-const athlete$json = const {
-  '1': 'athlete',
-  '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 4, '10': 'id'},
-    const {'1': 'resource_state', '3': 2, '4': 1, '5': 3, '10': 'resourceState'},
-  ],
-};
-
-/// Descriptor for `athlete`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List athleteDescriptor = $convert.base64Decode('CgdhdGhsZXRlEg4KAmlkGAEgASgEUgJpZBIlCg5yZXNvdXJjZV9zdGF0ZRgCIAEoA1INcmVzb3VyY2VTdGF0ZQ==');
-@$core.Deprecated('Use coordinateDescriptor instead')
-const coordinate$json = const {
-  '1': 'coordinate',
-};
-
-/// Descriptor for `coordinate`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List coordinateDescriptor = $convert.base64Decode('Cgpjb29yZGluYXRl');
-const $core.Map<$core.String, $core.dynamic> StravaServiceBase$json = const {
-  '1': 'Strava',
-  '2': const [
-    const {'1': 'GetRunner', '2': '.strava.RunnerRequest', '3': '.strava.RunnerResponse', '4': const {}},
-    const {'1': 'GetActivities', '2': '.strava.ActivitiesRequest', '3': '.strava.ActivitiesResponse', '4': const {}},
-    const {'1': 'ActivitiesToDB', '2': '.strava.ActivitiesRequest', '3': '.google.protobuf.Empty', '4': const {}},
-    const {'1': 'UseRefreshToken', '2': '.strava.RefreshRequest', '3': '.strava.TokenResponse', '4': const {}},
-  ],
-};
-
-@$core.Deprecated('Use stravaServiceDescriptor instead')
-const $core.Map<$core.String, $core.Map<$core.String, $core.dynamic>> StravaServiceBase$messageJson = const {
-  '.strava.RunnerRequest': RunnerRequest$json,
-  '.strava.RunnerResponse': RunnerResponse$json,
-  '.strava.friend': friend$json,
-  '.strava.follower': follower$json,
-  '.strava.ActivitiesRequest': ActivitiesRequest$json,
-  '.strava.ActivitiesResponse': ActivitiesResponse$json,
-  '.strava.Activity': Activity$json,
-  '.strava.athlete': athlete$json,
-  '.google.protobuf.Empty': $0.Empty$json,
-  '.strava.RefreshRequest': RefreshRequest$json,
-  '.strava.TokenResponse': TokenResponse$json,
-};
-
-/// Descriptor for `Strava`. Decode as a `google.protobuf.ServiceDescriptorProto`.
-final $typed_data.Uint8List stravaServiceDescriptor = $convert.base64Decode('CgZTdHJhdmESPAoJR2V0UnVubmVyEhUuc3RyYXZhLlJ1bm5lclJlcXVlc3QaFi5zdHJhdmEuUnVubmVyUmVzcG9uc2UiABJICg1HZXRBY3Rpdml0aWVzEhkuc3RyYXZhLkFjdGl2aXRpZXNSZXF1ZXN0Ghouc3RyYXZhLkFjdGl2aXRpZXNSZXNwb25zZSIAEkUKDkFjdGl2aXRpZXNUb0RCEhkuc3RyYXZhLkFjdGl2aXRpZXNSZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVtcHR5IgASQgoPVXNlUmVmcmVzaFRva2VuEhYuc3RyYXZhLlJlZnJlc2hSZXF1ZXN0GhUuc3RyYXZhLlRva2VuUmVzcG9uc2UiAA==');
+final $typed_data.Uint8List activityDescriptor = $convert.base64Decode('CghBY3Rpdml0eRIlCg5yZXNvdXJjZV9zdGF0ZRgBIAEoBFINcmVzb3VyY2VTdGF0ZRItCgdhdGhsZXRlGAIgASgLMhMuc3RyYXZhLmF0aGxldGVUeXBlUgdhdGhsZXRlEhIKBG5hbWUYAyABKAlSBG5hbWUSGgoIZGlzdGFuY2UYBCABKAFSCGRpc3RhbmNlEh8KC21vdmluZ190aW1lGAUgASgEUgptb3ZpbmdUaW1lEiEKDGVsYXBzZWRfdGltZRgGIAEoBFILZWxhcHNlZFRpbWUSMAoUdG90YWxfZWxldmF0aW9uX2dhaW4YByABKAFSEnRvdGFsRWxldmF0aW9uR2FpbhISCgR0eXBlGAggASgJUgR0eXBlEh0KCnNwb3J0X3R5cGUYCSABKAlSCXNwb3J0VHlwZRIOCgJpZBgKIAEoBFICaWQSHQoKc3RhcnRfZGF0ZRgLIAEoCVIJc3RhcnREYXRlEioKEXN0YXJ0X2RhdGVfbG9jYWxlGAwgASgJUg9zdGFydERhdGVMb2NhbGUSGgoIdGltZXpvbmUYDSABKAlSCHRpbWV6b25lEh0KCnV0Y19vZmZzZXQYDiABKAFSCXV0Y09mZnNldBIjCg1sb2NhdGlvbl9jaXR5GA8gASgJUgxsb2NhdGlvbkNpdHkSJQoObG9jYXRpb25fc3RhdGUYECABKAlSDWxvY2F0aW9uU3RhdGUSKQoQbG9jYXRpb25fY291bnRyeRgRIAEoCVIPbG9jYXRpb25Db3VudHJ5EisKEWFjaGlldmVtZW50X2NvdW50GBIgASgEUhBhY2hpZXZlbWVudENvdW50Eh8KC2t1ZG9zX2NvdW50GBMgASgEUgprdWRvc0NvdW50EiMKDWNvbW1lbnRfY291bnQYFCABKARSDGNvbW1lbnRDb3VudBIWCgZtYW51YWwYFSABKAhSBm1hbnVhbBIeCgp2aXNpYmlsaXR5GBYgASgJUgp2aXNpYmlsaXR5EiEKDHN0YXJ0X2xhdGxuZxgXIAMoAVILc3RhcnRMYXRsbmcSHQoKZW5kX2xhdGxuZxgYIAMoAVIJZW5kTGF0bG5nEiMKDWF2ZXJhZ2Vfc3BlZWQYGSABKAFSDGF2ZXJhZ2VTcGVlZBIbCgltYXhfc3BlZWQYGiABKAFSCG1heFNwZWVkEisKEWF2ZXJhZ2VfaGVhcnRyYXRlGBsgASgBUhBhdmVyYWdlSGVhcnRyYXRlEiMKDW1heF9oZWFydHJhdGUYHCABKAFSDG1heEhlYXJ0cmF0ZRIbCgllbGV2X2hpZ2gYHSABKAFSCGVsZXZIaWdoEhkKCGVsZXZfbG93GB4gASgBUgdlbGV2TG93EiYKD3N0YXJ0X2RhdGVfdW5peBgoIAEoBFINc3RhcnREYXRlVW5peA==');
