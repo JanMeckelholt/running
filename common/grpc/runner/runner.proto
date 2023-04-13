@@ -10,6 +10,11 @@ service Runner {
   rpc GetActivities(database.ActivitiesRequest) returns (database.ActivitiesResponse) {}
   rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}
   rpc GetWeekSummaries(WeekSummariesRequest) returns (WeekSummariesResponse) {}
+  rpc Health(HealthMessage) returns (HealthMessage) {}
+}
+
+message HealthMessage {
+  string Health = 1;
 }
 
 message RunnerRequest {

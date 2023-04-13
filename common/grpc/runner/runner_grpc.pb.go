@@ -30,6 +30,7 @@ type RunnerClient interface {
 	GetActivities(ctx context.Context, in *database.ActivitiesRequest, opts ...grpc.CallOption) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetWeekSummaries(ctx context.Context, in *WeekSummariesRequest, opts ...grpc.CallOption) (*WeekSummariesResponse, error)
+	Health(ctx context.Context, in *HealthMessage, opts ...grpc.CallOption) (*HealthMessage, error)
 }
 
 type runnerClient struct {
@@ -85,6 +86,15 @@ func (c *runnerClient) GetWeekSummaries(ctx context.Context, in *WeekSummariesRe
 	return out, nil
 }
 
+func (c *runnerClient) Health(ctx context.Context, in *HealthMessage, opts ...grpc.CallOption) (*HealthMessage, error) {
+	out := new(HealthMessage)
+	err := c.cc.Invoke(ctx, "/runner.Runner/Health", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RunnerServer is the server API for Runner service.
 // All implementations must embed UnimplementedRunnerServer
 // for forward compatibility
@@ -94,6 +104,7 @@ type RunnerServer interface {
 	GetActivities(context.Context, *database.ActivitiesRequest) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error)
 	GetWeekSummaries(context.Context, *WeekSummariesRequest) (*WeekSummariesResponse, error)
+	Health(context.Context, *HealthMessage) (*HealthMessage, error)
 	mustEmbedUnimplementedRunnerServer()
 }
 
@@ -115,6 +126,9 @@ func (UnimplementedRunnerServer) ActivitiesToDB(context.Context, *ActivitiesRequ
 }
 func (UnimplementedRunnerServer) GetWeekSummaries(context.Context, *WeekSummariesRequest) (*WeekSummariesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWeekSummaries not implemented")
+}
+func (UnimplementedRunnerServer) Health(context.Context, *HealthMessage) (*HealthMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
 }
 func (UnimplementedRunnerServer) mustEmbedUnimplementedRunnerServer() {}
 
@@ -219,6 +233,24 @@ func _Runner_GetWeekSummaries_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Runner_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunnerServer).Health(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/runner.Runner/Health",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).Health(ctx, req.(*HealthMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Runner_ServiceDesc is the grpc.ServiceDesc for Runner service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -245,6 +277,10 @@ var Runner_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWeekSummaries",
 			Handler:    _Runner_GetWeekSummaries_Handler,
+		},
+		{
+			MethodName: "Health",
+			Handler:    _Runner_Health_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

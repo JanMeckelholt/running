@@ -8,6 +8,16 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use healthMessageDescriptor instead')
+const HealthMessage$json = const {
+  '1': 'HealthMessage',
+  '2': const [
+    const {'1': 'Health', '3': 1, '4': 1, '5': 9, '10': 'Health'},
+  ],
+};
+
+/// Descriptor for `HealthMessage`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List healthMessageDescriptor = $convert.base64Decode('Cg1IZWFsdGhNZXNzYWdlEhYKBkhlYWx0aBgBIAEoCVIGSGVhbHRo');
 @$core.Deprecated('Use runnerRequestDescriptor instead')
 const RunnerRequest$json = const {
   '1': 'RunnerRequest',

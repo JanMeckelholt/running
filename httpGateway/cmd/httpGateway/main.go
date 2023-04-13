@@ -8,15 +8,16 @@ import (
 	"time"
 
 	"github.com/JanMeckelholt/running/common/dependencies"
-	"github.com/JanMeckelholt/running/httpGateway/server"
 	"github.com/JanMeckelholt/running/httpGateway/service"
 	"github.com/JanMeckelholt/running/httpGateway/service/mux"
+	"github.com/JanMeckelholt/running/httpGateway/service/server"
 
 	"github.com/caarlos0/env/v7"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	var allowOrignStr string
 	srv := &service.Service{}
 	err := env.Parse(&srv.Config)
 	if err != nil {
@@ -29,17 +30,21 @@ func main() {
 	rs, err := server.NewHTTPGatewayServer(srv.Clients)
 
 	rootMux := http.NewServeMux()
-	rootMux.Handle("/health", server.CorsMiddleware(mux.Handler("/health", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/athlete", server.CorsMiddleware(mux.Handler("/athlete", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/activities", server.CorsMiddleware(mux.Handler("/activities", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/athlete/create", server.CorsMiddleware(mux.Handler("/athlete/create", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/weeksummary", server.CorsMiddleware(mux.Handler("/weeksummary", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/weeklyclimb", server.CorsMiddleware(mux.Handler("/weeklyclimb", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/activitiesToDB", server.CorsMiddleware(mux.Handler("/activitiesToDB", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
-	rootMux.Handle("/stravaActivitiesToDB", server.CorsMiddleware(mux.Handler("/stravaActivitiesToDB", rs), fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)))
+	allowOrignStr = fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)
+	if srv.Config.IsDev {
+		allowOrignStr = "*"
+	}
+	rootMux.Handle("/health", server.CorsMiddleware(mux.Handler("/health", rs), allowOrignStr))
+	rootMux.Handle("/athlete", server.CorsMiddleware(mux.Handler("/athlete", rs), allowOrignStr))
+	rootMux.Handle("/activities", server.CorsMiddleware(mux.Handler("/activities", rs), allowOrignStr))
+	rootMux.Handle("/athlete/create", server.CorsMiddleware(mux.Handler("/athlete/create", rs), allowOrignStr))
+	rootMux.Handle("/weeksummary", server.CorsMiddleware(mux.Handler("/weeksummary", rs), allowOrignStr))
+	rootMux.Handle("/weeklyclimb", server.CorsMiddleware(mux.Handler("/weeklyclimb", rs), allowOrignStr))
+	rootMux.Handle("/activitiesToDB", server.CorsMiddleware(mux.Handler("/activitiesToDB", rs), allowOrignStr))
+	rootMux.Handle("/stravaActivitiesToDB", server.CorsMiddleware(mux.Handler("/stravaActivitiesToDB", rs), allowOrignStr))
 
 	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner-http"].Port),
+		Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGateway"].Port),
 		Handler: rootMux,
 	}
 	lis, err := net.Listen("tcp", s.Addr)
@@ -57,7 +62,7 @@ func main() {
 		}
 	}
 
-	log.Infof("Listening on :%d", dependencies.Configs["runner-http"].Port)
+	log.Infof("Listening on :%d", dependencies.Configs["httpGateway"].Port)
 	serveErr := s.Serve(lis)
 	defer func() {
 		teardown()

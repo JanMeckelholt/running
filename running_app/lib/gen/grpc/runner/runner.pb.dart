@@ -10,6 +10,53 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class HealthMessage extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'HealthMessage', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'runner'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Health', protoName: 'Health')
+    ..hasRequiredFields = false
+  ;
+
+  HealthMessage._() : super();
+  factory HealthMessage({
+    $core.String? health,
+  }) {
+    final _result = create();
+    if (health != null) {
+      _result.health = health;
+    }
+    return _result;
+  }
+  factory HealthMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory HealthMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  HealthMessage clone() => HealthMessage()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  HealthMessage copyWith(void Function(HealthMessage) updates) => super.copyWith((message) => updates(message as HealthMessage)) as HealthMessage; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static HealthMessage create() => HealthMessage._();
+  HealthMessage createEmptyInstance() => create();
+  static $pb.PbList<HealthMessage> createRepeated() => $pb.PbList<HealthMessage>();
+  @$core.pragma('dart2js:noInline')
+  static HealthMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<HealthMessage>(create);
+  static HealthMessage? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get health => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set health($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasHealth() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearHealth() => clearField(1);
+}
+
 class RunnerRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RunnerRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'runner'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clientId', protoName: 'clientId')

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
@@ -10,6 +9,8 @@ import (
 	"github.com/JanMeckelholt/running/runner/service/clients"
 	"github.com/JanMeckelholt/running/runner/service/logic"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type RunnerServer struct {
@@ -74,9 +75,7 @@ func (rs RunnerServer) StravaActivitiesToDB(ctx context.Context, request strava.
 	return err
 }
 
-func CorsMiddleware(next http.Handler, allowOrigin string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
-		next.ServeHTTP(w, r)
-	})
+func (rs RunnerServer) Health(ctx context.Context, _ *runner.HealthMessage) (*runner.HealthMessage, error) {
+	log.Info("Calling Health :-)")
+	return &runner.HealthMessage{Health: "OK"}, nil
 }

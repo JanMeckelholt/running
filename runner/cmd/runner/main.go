@@ -26,7 +26,7 @@ func main() {
 		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["runner-grpc"].Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["runner"].Port))
 	tlsCredentials, err := certhandling.LoadTLSServerCredentials("runner/certs/runner-server-cert.pem", "runner/certs/runner-server-key.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
@@ -37,7 +37,7 @@ func main() {
 	runnerServer, err := server.NewRunnerServer(srv.Clients)
 	runner.RegisterRunnerServer(grpcServer, runnerServer)
 
-	log.Infof("listening at :%d", dependencies.Configs["runner-grpc"].Port)
+	log.Infof("listening at :%d", dependencies.Configs["runner"].Port)
 	serveErr := grpcServer.Serve(lis)
 	defer func() {
 		teardownGrpc()

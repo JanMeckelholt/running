@@ -19,7 +19,7 @@ type Clients struct {
 }
 
 func (c *Clients) Dial(config config.ServiceConfig) error {
-	conn, err := dial(config.RunnerGrpcName, config.RunnerName)
+	conn, err := dial(config.RunnerName, "runner")
 	if err != nil {
 		return err
 	}

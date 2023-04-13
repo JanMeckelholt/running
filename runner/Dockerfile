@@ -10,4 +10,4 @@ RUN go install ./runner/cmd/runner/
 RUN chmod +x ./runner/wait-for-it.sh ./runner/docker-entrypoint.sh
 ENTRYPOINT ["./runner/docker-entrypoint.sh"]
 CMD ["runner"]
-EXPOSE 80
+EXPOSE 666

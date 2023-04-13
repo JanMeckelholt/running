@@ -13,8 +13,8 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/common/health"
-	"github.com/JanMeckelholt/running/httpGateway/server"
 	"github.com/JanMeckelholt/running/httpGateway/service"
+	"github.com/JanMeckelholt/running/httpGateway/service/server"
 )
 
 func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
@@ -114,7 +114,7 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodGet:
-
+				log.Info("get weeksummary")
 				client := req.URL.Query().Get("client")
 				weeksStr := req.URL.Query().Get("weeks")
 				weeks, err := strconv.ParseUint(weeksStr, 10, 64)
