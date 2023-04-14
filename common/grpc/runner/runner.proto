@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 import "database/database.proto";
 import "strava/strava.proto";
 service Runner {
-  rpc GetRunner(strava.RunnerRequest) returns (strava.RunnerResponse) {}
+  rpc GetRunner(RunnerRequest) returns (strava.RunnerResponse) {}
   rpc CreateClient(database.Client) returns (google.protobuf.Empty) {}
   rpc GetActivities(database.ActivitiesRequest) returns (database.ActivitiesResponse) {}
   rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}

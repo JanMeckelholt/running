@@ -25,7 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RunnerClient interface {
-	GetRunner(ctx context.Context, in *strava.RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error)
+	GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error)
 	CreateClient(ctx context.Context, in *database.Client, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetActivities(ctx context.Context, in *database.ActivitiesRequest, opts ...grpc.CallOption) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error)
@@ -41,7 +41,7 @@ func NewRunnerClient(cc grpc.ClientConnInterface) RunnerClient {
 	return &runnerClient{cc}
 }
 
-func (c *runnerClient) GetRunner(ctx context.Context, in *strava.RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error) {
+func (c *runnerClient) GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error) {
 	out := new(strava.RunnerResponse)
 	err := c.cc.Invoke(ctx, "/runner.Runner/GetRunner", in, out, opts...)
 	if err != nil {
@@ -99,7 +99,7 @@ func (c *runnerClient) Health(ctx context.Context, in *HealthMessage, opts ...gr
 // All implementations must embed UnimplementedRunnerServer
 // for forward compatibility
 type RunnerServer interface {
-	GetRunner(context.Context, *strava.RunnerRequest) (*strava.RunnerResponse, error)
+	GetRunner(context.Context, *RunnerRequest) (*strava.RunnerResponse, error)
 	CreateClient(context.Context, *database.Client) (*empty.Empty, error)
 	GetActivities(context.Context, *database.ActivitiesRequest) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error)
@@ -112,7 +112,7 @@ type RunnerServer interface {
 type UnimplementedRunnerServer struct {
 }
 
-func (UnimplementedRunnerServer) GetRunner(context.Context, *strava.RunnerRequest) (*strava.RunnerResponse, error) {
+func (UnimplementedRunnerServer) GetRunner(context.Context, *RunnerRequest) (*strava.RunnerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRunner not implemented")
 }
 func (UnimplementedRunnerServer) CreateClient(context.Context, *database.Client) (*empty.Empty, error) {
@@ -144,7 +144,7 @@ func RegisterRunnerServer(s grpc.ServiceRegistrar, srv RunnerServer) {
 }
 
 func _Runner_GetRunner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(strava.RunnerRequest)
+	in := new(RunnerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func _Runner_GetRunner_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/runner.Runner/GetRunner",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RunnerServer).GetRunner(ctx, req.(*strava.RunnerRequest))
+		return srv.(RunnerServer).GetRunner(ctx, req.(*RunnerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

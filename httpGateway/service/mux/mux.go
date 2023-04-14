@@ -11,14 +11,16 @@ import (
 
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
-	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/common/health"
 	"github.com/JanMeckelholt/running/httpGateway/service"
+	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/server"
 )
 
 func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 	switch uri {
+	case service.LoginRoute:
+		return auth.LoginHandler()
 	case "/health":
 		return health.Handler(health.Health{ServiceName: "runner"})
 
@@ -32,7 +34,7 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				res, err := s.GetRunner(context.Background(), strava.RunnerRequest{Token: rB.Token})
+				res, err := s.GetRunner(context.Background(), runner.RunnerRequest{ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
@@ -150,7 +152,7 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
-					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error adding Activites to DB %s", err.Error()))
 					return
 				}
 				rw.WriteHeader(http.StatusOK)

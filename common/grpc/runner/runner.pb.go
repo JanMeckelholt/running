@@ -404,7 +404,7 @@ var file_runner_runner_proto_rawDesc = []byte{
 	0x6b, 0x53, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x52, 0x0d, 0x77, 0x65, 0x65, 0x6b, 0x73, 0x75,
 	0x6d, 0x6d, 0x61, 0x72, 0x69, 0x65, 0x73, 0x32, 0xa4, 0x03, 0x0a, 0x06, 0x52, 0x75, 0x6e, 0x6e,
 	0x65, 0x72, 0x12, 0x3c, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x52, 0x75, 0x6e, 0x6e, 0x65, 0x72, 0x12,
-	0x15, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x76, 0x61, 0x2e, 0x52, 0x75, 0x6e, 0x6e, 0x65, 0x72, 0x52,
+	0x15, 0x2e, 0x72, 0x75, 0x6e, 0x6e, 0x65, 0x72, 0x2e, 0x52, 0x75, 0x6e, 0x6e, 0x65, 0x72, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x73, 0x74, 0x72, 0x61, 0x76, 0x61, 0x2e,
 	0x52, 0x75, 0x6e, 0x6e, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
 	0x12, 0x3a, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74,
@@ -455,25 +455,24 @@ var file_runner_runner_proto_goTypes = []interface{}{
 	(*WeekSummariesRequest)(nil),        // 3: runner.WeekSummariesRequest
 	(*WeekSummary)(nil),                 // 4: runner.WeekSummary
 	(*WeekSummariesResponse)(nil),       // 5: runner.WeekSummariesResponse
-	(*strava.RunnerRequest)(nil),        // 6: strava.RunnerRequest
-	(*database.Client)(nil),             // 7: database.Client
-	(*database.ActivitiesRequest)(nil),  // 8: database.ActivitiesRequest
-	(*strava.RunnerResponse)(nil),       // 9: strava.RunnerResponse
-	(*empty.Empty)(nil),                 // 10: google.protobuf.Empty
-	(*database.ActivitiesResponse)(nil), // 11: database.ActivitiesResponse
+	(*database.Client)(nil),             // 6: database.Client
+	(*database.ActivitiesRequest)(nil),  // 7: database.ActivitiesRequest
+	(*strava.RunnerResponse)(nil),       // 8: strava.RunnerResponse
+	(*empty.Empty)(nil),                 // 9: google.protobuf.Empty
+	(*database.ActivitiesResponse)(nil), // 10: database.ActivitiesResponse
 }
 var file_runner_runner_proto_depIdxs = []int32{
 	4,  // 0: runner.WeekSummariesResponse.weeksummaries:type_name -> runner.WeekSummary
-	6,  // 1: runner.Runner.GetRunner:input_type -> strava.RunnerRequest
-	7,  // 2: runner.Runner.CreateClient:input_type -> database.Client
-	8,  // 3: runner.Runner.GetActivities:input_type -> database.ActivitiesRequest
+	1,  // 1: runner.Runner.GetRunner:input_type -> runner.RunnerRequest
+	6,  // 2: runner.Runner.CreateClient:input_type -> database.Client
+	7,  // 3: runner.Runner.GetActivities:input_type -> database.ActivitiesRequest
 	2,  // 4: runner.Runner.ActivitiesToDB:input_type -> runner.ActivitiesRequest
 	3,  // 5: runner.Runner.GetWeekSummaries:input_type -> runner.WeekSummariesRequest
 	0,  // 6: runner.Runner.Health:input_type -> runner.HealthMessage
-	9,  // 7: runner.Runner.GetRunner:output_type -> strava.RunnerResponse
-	10, // 8: runner.Runner.CreateClient:output_type -> google.protobuf.Empty
-	11, // 9: runner.Runner.GetActivities:output_type -> database.ActivitiesResponse
-	10, // 10: runner.Runner.ActivitiesToDB:output_type -> google.protobuf.Empty
+	8,  // 7: runner.Runner.GetRunner:output_type -> strava.RunnerResponse
+	9,  // 8: runner.Runner.CreateClient:output_type -> google.protobuf.Empty
+	10, // 9: runner.Runner.GetActivities:output_type -> database.ActivitiesResponse
+	9,  // 10: runner.Runner.ActivitiesToDB:output_type -> google.protobuf.Empty
 	5,  // 11: runner.Runner.GetWeekSummaries:output_type -> runner.WeekSummariesResponse
 	0,  // 12: runner.Runner.Health:output_type -> runner.HealthMessage
 	7,  // [7:13] is the sub-list for method output_type

@@ -24,8 +24,8 @@ func NewRunnerServer(clients clients.Clients) (*RunnerServer, error) {
 	}, nil
 }
 
-func (rs RunnerServer) GetRunner(ctx context.Context, request *strava.RunnerRequest) (*strava.RunnerResponse, error) {
-	return rs.clients.StravaClient.GetRunner(ctx, request)
+func (rs RunnerServer) GetRunner(ctx context.Context, request *runner.RunnerRequest) (*strava.RunnerResponse, error) {
+	return rs.clients.StravaClient.GetRunner(ctx, &strava.RunnerRequest{ClientId: request.GetClientId()})
 }
 
 func (rs RunnerServer) GetActivitiesFromStrava(ctx context.Context, request strava.ActivitiesRequest) (*strava.ActivitiesResponse, error) {
@@ -42,13 +42,15 @@ func (rs RunnerServer) ActivitiesToDB(ctx context.Context, request *runner.Activ
 	if err != nil {
 		return nil, err
 	}
-	for _, activity := range activitiesResp.GetActivities() {
+	log.Infof("got %d activities from Strava", len(activitiesResp.GetActivities()))
+	for i, activity := range activitiesResp.GetActivities() {
+		log.Infof("activity %d: %s", i, activity.GetName())
 		_, err := rs.clients.DatabaseClient.UpsertActivity(ctx, activity)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return nil, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (rs RunnerServer) CreateClient(ctx context.Context, request *database.Client) (*emptypb.Empty, error) {

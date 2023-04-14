@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:running_app/constants.dart';
 import 'package:running_app/screens/screen_main.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env.docker.running_app.secret");
+  Credentials.runningAppPassword = dotenv.env['RUNNING_APP_PASSWORD'];
   runApp(const MyApp());
 }
 

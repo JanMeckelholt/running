@@ -9,6 +9,7 @@ import (
 
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/httpGateway/service"
+	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/mux"
 	"github.com/JanMeckelholt/running/httpGateway/service/server"
 
@@ -17,12 +18,26 @@ import (
 )
 
 func main() {
-	var allowOrignStr string
+	var allowOriginStr string
 	srv := &service.Service{}
 	err := env.Parse(&srv.Config)
 	if err != nil {
 		return
 	}
+	if len(srv.Config.JWTKey) < 8 {
+		log.Fatal("JWT not valid")
+	}
+	auth.JwtKey = []byte(srv.Config.JWTKey)
+
+	err = auth.UpsertHttpClients(auth.RunningAppHttpClient, srv.Config.RunningAppPassword)
+	if err != nil {
+		log.Errorf("Could not setup password for HTTP-Client %s", auth.RunningAppHttpClient)
+	}
+	err = auth.UpsertHttpClients(auth.MasterHttpClient, srv.Config.MasterPassword)
+	if err != nil {
+		log.Errorf("Could not setup password for HTTP-Client %s", auth.MasterHttpClient)
+	}
+
 	err = srv.Clients.Dial(srv.Config)
 	if err != nil {
 		log.Errorf("could not Dial Clients! %s", err.Error())
@@ -30,22 +45,27 @@ func main() {
 	rs, err := server.NewHTTPGatewayServer(srv.Clients)
 
 	rootMux := http.NewServeMux()
-	allowOrignStr = fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)
+	allowOriginStr = fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)
 	if srv.Config.IsDev {
-		allowOrignStr = "*"
+		allowOriginStr = "*"
 	}
-	rootMux.Handle("/health", server.CorsMiddleware(mux.Handler("/health", rs), allowOrignStr))
-	rootMux.Handle("/athlete", server.CorsMiddleware(mux.Handler("/athlete", rs), allowOrignStr))
-	rootMux.Handle("/activities", server.CorsMiddleware(mux.Handler("/activities", rs), allowOrignStr))
-	rootMux.Handle("/athlete/create", server.CorsMiddleware(mux.Handler("/athlete/create", rs), allowOrignStr))
-	rootMux.Handle("/weeksummary", server.CorsMiddleware(mux.Handler("/weeksummary", rs), allowOrignStr))
-	rootMux.Handle("/weeklyclimb", server.CorsMiddleware(mux.Handler("/weeklyclimb", rs), allowOrignStr))
-	rootMux.Handle("/activitiesToDB", server.CorsMiddleware(mux.Handler("/activitiesToDB", rs), allowOrignStr))
-	rootMux.Handle("/stravaActivitiesToDB", server.CorsMiddleware(mux.Handler("/stravaActivitiesToDB", rs), allowOrignStr))
+	log.Infof("allowOrigin: %s", allowOriginStr)
+
+	rootMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
+	rootMux.Handle("/health", mux.Handler("/health", rs))
+	rootMux.Handle("/athlete", mux.Handler("/athlete", rs))
+	rootMux.Handle("/activities", mux.Handler("/activities", rs))
+	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
+	rootMux.Handle("/weeksummary", mux.Handler("/weeksummary", rs))
+	rootMux.Handle("/weeklyclimb", mux.Handler("/weeklyclimb", rs))
+	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
+
+	handlerWithAuth := server.AuthMiddleware(rootMux)
+	handlerWithCors := server.CorsMiddleware(handlerWithAuth, allowOriginStr)
 
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGateway"].Port),
-		Handler: rootMux,
+		Handler: handlerWithCors,
 	}
 	lis, err := net.Listen("tcp", s.Addr)
 	if err != nil {

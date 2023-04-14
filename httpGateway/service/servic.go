@@ -7,6 +7,8 @@ import (
 	"github.com/JanMeckelholt/running/httpGateway/service/config"
 )
 
+const LoginRoute = "/login"
+
 type Service struct {
 	Clients clients.Clients
 	Config  config.ServiceConfig
@@ -17,20 +19,12 @@ type ClimbResponse struct {
 }
 
 type ActivitiesRequestBody struct {
-	ClientId     string
-	Token        string
-	RefreshToken string `json:"RefreshToken,omitempty"`
-	Since        uint64 `json:"since,omitempty"`
+	ClientId string
+	Since    uint64 `json:"since,omitempty"`
 }
 
 type RunnerRequestBody struct {
-	ClientId     string
-	Token        string
-	RefreshToken string `json:"RefreshToken,omitempty"`
-}
-
-type RefreshTokenResponse struct {
-	Refresh_token string
+	ClientId string
 }
 
 type RunnerCreateBody struct {

@@ -10,17 +10,17 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
+import 'runner.pb.dart' as $3;
 import '../strava/strava.pb.dart' as $0;
 import '../database/database.pb.dart' as $2;
 import '../google/protobuf/empty.pb.dart' as $1;
-import 'runner.pb.dart' as $3;
 export 'runner.pb.dart';
 
 class RunnerClient extends $grpc.Client {
   static final _$getRunner =
-      $grpc.ClientMethod<$0.RunnerRequest, $0.RunnerResponse>(
+      $grpc.ClientMethod<$3.RunnerRequest, $0.RunnerResponse>(
           '/runner.Runner/GetRunner',
-          ($0.RunnerRequest value) => value.writeToBuffer(),
+          ($3.RunnerRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) => $0.RunnerResponse.fromBuffer(value));
   static final _$createClient = $grpc.ClientMethod<$2.Client, $1.Empty>(
       '/runner.Runner/CreateClient',
@@ -54,7 +54,7 @@ class RunnerClient extends $grpc.Client {
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseFuture<$0.RunnerResponse> getRunner($0.RunnerRequest request,
+  $grpc.ResponseFuture<$0.RunnerResponse> getRunner($3.RunnerRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getRunner, request, options: options);
   }
@@ -91,12 +91,12 @@ abstract class RunnerServiceBase extends $grpc.Service {
   $core.String get $name => 'runner.Runner';
 
   RunnerServiceBase() {
-    $addMethod($grpc.ServiceMethod<$0.RunnerRequest, $0.RunnerResponse>(
+    $addMethod($grpc.ServiceMethod<$3.RunnerRequest, $0.RunnerResponse>(
         'GetRunner',
         getRunner_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $0.RunnerRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $3.RunnerRequest.fromBuffer(value),
         ($0.RunnerResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$2.Client, $1.Empty>(
         'CreateClient',
@@ -138,7 +138,7 @@ abstract class RunnerServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.RunnerResponse> getRunner_Pre(
-      $grpc.ServiceCall call, $async.Future<$0.RunnerRequest> request) async {
+      $grpc.ServiceCall call, $async.Future<$3.RunnerRequest> request) async {
     return getRunner(call, await request);
   }
 
@@ -169,7 +169,7 @@ abstract class RunnerServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.RunnerResponse> getRunner(
-      $grpc.ServiceCall call, $0.RunnerRequest request);
+      $grpc.ServiceCall call, $3.RunnerRequest request);
   $async.Future<$1.Empty> createClient(
       $grpc.ServiceCall call, $2.Client request);
   $async.Future<$2.ActivitiesResponse> getActivities(
