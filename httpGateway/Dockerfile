@@ -8,4 +8,4 @@ COPY ./common/ ./common/
 RUN go mod tidy
 RUN go install ./httpGateway/cmd/httpGateway/
 CMD ["httpGateway"]
-EXPOSE 80
+EXPOSE 443

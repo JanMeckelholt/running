@@ -7,13 +7,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:running_app/domain/services/service_api.dart';
 
 import 'package:running_app/main.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    final client = http.Client();
+    final apiService = RunningApiService(client);
+    await tester.pumpWidget(MyApp(apiService: apiService));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

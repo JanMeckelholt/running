@@ -3,7 +3,7 @@
 rm *.pem
 rm ../database-service/certs/*.pem
 rm ../strava-service/certs/*.pem
-rm ../postgres/certs/*.pem
+rm ../volumes-data/postgres/certs/*.pem
 rm ../runner/certs/*.pem
 rm ../populate-db/certs/*.pem
 rm ../httpGateway/certs/*.pem
@@ -13,7 +13,7 @@ rm ../running_app/certs/*.pem
 openssl req -x509 -newkey rsa:4096 -days 365 -nodes -keyout ca-key.pem -out ca-cert.pem -subj "/C=DE/ST=x/L=x/O=x/CN=www.janmeckelholt.de" 
 cp ca-cert.pem ../database-service/certs/
 cp ca-cert.pem ../strava-service/certs/
-cp ca-cert.pem ../postgres/certs/root.crt
+cp ca-cert.pem ../volumes-data/postgres/certs/root.crt
 cp ca-cert.pem ../runner/certs/
 cp ca-cert.pem ../populate-db/certs/
 cp ca-cert.pem ../httpGateway/certs/
@@ -52,8 +52,8 @@ cp postgres-cert.pem ../database-service/certs/postgres-cert.pem
 cp postgres-key.pem ../database-service/certs/postgres-key.pem
 chown 70:70 postgres-key.pem
 chmod 600 postgres-key.pem
-mv postgres-cert.pem ../postgres/certs/postgres-cert.pem
-mv postgres-key.pem ../postgres/certs/postgres-key.pem 
+mv postgres-cert.pem ../volumes-data/postgres/certs/postgres-cert.pem
+mv postgres-key.pem ../volumes-data/postgres/certs/postgres-key.pem 
 
 # running_app
 # Generate running_app private key and certificate signing request (CSR)
@@ -62,3 +62,11 @@ openssl req -newkey rsa:4096 -nodes -keyout running_app-key.pem -out running_app
 openssl x509 -req -in running_app-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out running_app-cert.pem -extfile ./altNames_running_app.cnf
 mv running_app-cert.pem ../running_app/certs/
 mv running_app-key.pem ../running_app/certs/
+
+# http
+# Generate http_gateway-server private key and certificate signing request (CSR)
+openssl req -newkey rsa:4096 -nodes -keyout http_gateway-server-key.pem -out http_gateway-server-req.pem -subj "/C=DE/ST=x/L=x/O=x/CN=http_gateway"
+# Use CA's private key to sign http_gateway-server's CSR and get back the signed certificate
+openssl x509 -req -in http_gateway-server-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out http_gateway-server-cert.pem -extfile ./altNames_http_gateway.cnf
+mv http_gateway-server-cert.pem ../httpGateway/certs/
+mv http_gateway-server-key.pem ../httpGateway/certs/

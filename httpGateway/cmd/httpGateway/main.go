@@ -63,6 +63,36 @@ func main() {
 	handlerWithAuth := server.AuthMiddleware(rootMux)
 	handlerWithCors := server.CorsMiddleware(handlerWithAuth, allowOriginStr)
 
+	go func() {
+		sTLS := &http.Server{
+			Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGatewayTLS"].Port),
+			Handler: handlerWithCors,
+		}
+		lis, err := net.Listen("tcp", sTLS.Addr)
+		if err != nil {
+			return
+		}
+
+		teardown := func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			shutdownErr := sTLS.Shutdown(ctx)
+			if shutdownErr != nil {
+				log.Fatal("Runner-Server: Shutdown Error!")
+			}
+		}
+
+		log.Infof("Listening on :%d", dependencies.Configs["httpGatewayTLS"].Port)
+		serveErr := sTLS.ServeTLS(lis, "httpGateway/certs/http_gateway-server-cert.pem", "httpGateway/certs/http_gateway-server-key.pem")
+		defer func() {
+			teardown()
+		}()
+		if serveErr != nil {
+			log.Fatal("Runner-Server: Serving Error!")
+		}
+	}()
+
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGateway"].Port),
 		Handler: handlerWithCors,

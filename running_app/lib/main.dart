@@ -1,35 +1,36 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/browser_client.dart';
+import 'package:http/io_client.dart';
 import 'package:running_app/constants.dart';
 import 'package:running_app/screens/screen_main.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
+import 'domain/services/service_api.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env.docker.running_app.secret");
   Credentials.runningAppPassword = dotenv.env['RUNNING_APP_PASSWORD'];
-  runApp(const MyApp());
+  final client = http.Client() as BrowserClient..withCredentials = true;
+  final apiService = RunningApiService(client);
+  runApp(MyApp(apiService: apiService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final RunningApiService apiService;
+  const MyApp({super.key, required this.apiService});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Running App',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const Main(title: 'Running Overview'),
+      home: Main(title: 'Running Overview', apiService: apiService),
     );
   }
 }

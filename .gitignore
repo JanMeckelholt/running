@@ -3,7 +3,7 @@
 *.key
 *.crt
 db_clients.txt
-pgdata
+volumes-data
 
 
 ###Flutter

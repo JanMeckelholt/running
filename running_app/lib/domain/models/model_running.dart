@@ -7,7 +7,7 @@ class RunningResponse {
 
   factory RunningResponse.fromJson(List<dynamic> json) {
     return RunningResponse(
-      weeklyClimb: json[0]['weeksummaries']?[0]['climb'],
+      weeklyClimb: json[0]['weeksummaries']?[0]['climb'] ?? "0",
     );
   }
 }

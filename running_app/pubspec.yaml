@@ -41,6 +41,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_dotenv: ^5.0.2
+  dio: ^5.1.1
 
 dev_dependencies:
   flutter_test:
@@ -68,7 +69,7 @@ flutter:
   assets:
    - certs/ca-cert.pem
    - certs/running_app-cert.pem
-   - certs/running_app.includesprivatekey.pem
+   - certs/running_app-key.pem
    - .env.docker.running_app.secret
 
   # An image asset can refer to one or more resolution-specific "variants", see
