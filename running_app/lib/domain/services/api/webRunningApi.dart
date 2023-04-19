@@ -1,16 +1,20 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
 
-import '../../constants.dart';
-import '../models/model_running.dart';
+import '../../../constants.dart';
+import '../../models/model_running.dart';
+import 'runningApi.dart';
 
-class RunningApiService {
-  final http.Client apiClient;
+class WebRunningApiService implements RunningApiService {
+  static final apiClient = http.Client() as BrowserClient
+    ..withCredentials = true;
 
-  RunningApiService(this.apiClient);
+  WebRunningApiService();
 
+  @override
   Future<RunningResponse> fetchRunningResponse() async {
     Map<String, String> headers = {};
 
@@ -22,24 +26,19 @@ class RunningApiService {
         queryParameters: {'client': ApiConstants.clientId, 'weeks': '0'});
     log('httpUri: $httpUriRunningResponse');
 
-    try {
-      var response =
-          await apiClient.get(httpUriRunningResponse, headers: headers);
+    var response =
+        await apiClient.get(httpUriRunningResponse, headers: headers);
 
-      if (response.statusCode == 401) {
-        final updatedCookie = await refreshCookie();
-        if (updatedCookie != "") {
-          headers['cookie'] = updatedCookie;
-          response =
-              await apiClient.get(httpUriRunningResponse, headers: headers);
-        }
+    if (response.statusCode == 401) {
+      final updatedCookie = await refreshCookie();
+      if (updatedCookie != "") {
+        headers['cookie'] = updatedCookie;
+        response =
+            await apiClient.get(httpUriRunningResponse, headers: headers);
       }
-      if (response.statusCode == 200) {
-        return RunningResponse.fromJson(jsonDecode("[${response.body}]"));
-      }
-    } finally {
-      log("something finally");
-      apiClient.close();
+    }
+    if (response.statusCode == 200) {
+      return RunningResponse.fromJson(jsonDecode("[${response.body}]"));
     }
     throw Exception('Failed to get running response');
   }
@@ -65,3 +64,5 @@ class RunningApiService {
     return "";
   }
 }
+
+RunningApiService getRunningApiService() => WebRunningApiService();

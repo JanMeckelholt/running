@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:running_app/domain/models/model_running.dart';
-import 'package:running_app/domain/services/service_api.dart';
+import 'package:running_app/domain/services/api/webRunningApi.dart';
+
+import '../domain/services/api/runningApi.dart';
 
 class Main extends StatefulWidget {
   const Main({super.key, required this.title, required this.apiService});
