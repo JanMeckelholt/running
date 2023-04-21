@@ -1,22 +1,34 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
-import 'package:http/browser_client.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+import 'package:http/io_client.dart';
 
 import '../../../constants.dart';
 import '../../models/model_running.dart';
 import 'runningApi.dart';
 
-class WebRunningApiService implements RunningApiService {
-  static final apiClient = http.Client() as BrowserClient
-    ..withCredentials = true;
-  WebRunningApiService._privateConstructor();
-  static final RunningApiService instance =
-      WebRunningApiService._privateConstructor();
+class AndroidRunningApiService implements RunningApiService {
+  AndroidRunningApiService._privateConstructor();
+  static final AndroidRunningApiService instance =
+      AndroidRunningApiService._privateConstructor();
 
   @override
   Future<RunningResponse> fetchRunningResponse() async {
+    ByteData rootCACertificate = await rootBundle.load("certs/ca-cert.pem");
+    ByteData clientCertificate =
+        await rootBundle.load("certs/running_app-cert.pem");
+    ByteData privateKey = await rootBundle.load("certs/running_app-key.pem");
+    SecurityContext context = SecurityContext(withTrustedRoots: true);
+
+    context.setTrustedCertificatesBytes(rootCACertificate.buffer.asUint8List());
+
+    context.useCertificateChainBytes(clientCertificate.buffer.asUint8List());
+
+    context.usePrivateKeyBytes(privateKey.buffer.asUint8List());
+    IOClient apiClient = IOClient(HttpClient(context: context));
+
     Map<String, String> headers = {};
 
     var httpUriRunningResponse = Uri(
@@ -31,7 +43,7 @@ class WebRunningApiService implements RunningApiService {
         await apiClient.get(httpUriRunningResponse, headers: headers);
 
     if (response.statusCode == 401) {
-      final updatedCookie = await _refreshCookie();
+      final updatedCookie = await refreshCookie(apiClient);
       if (updatedCookie != "") {
         headers['cookie'] = updatedCookie;
         response =
@@ -44,7 +56,7 @@ class WebRunningApiService implements RunningApiService {
     throw Exception('Failed to get running response');
   }
 
-  Future<String> _refreshCookie() async {
+  Future<String> refreshCookie(IOClient apiClient) async {
     var httpUriLogin = Uri(
         scheme: 'http',
         host: ApiConstants.baseURL,
@@ -67,4 +79,4 @@ class WebRunningApiService implements RunningApiService {
 }
 
 @override
-RunningApiService getRunningApiService() => WebRunningApiService.instance;
+RunningApiService getRunningApiService() => AndroidRunningApiService.instance;
