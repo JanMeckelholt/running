@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/io_client.dart';
 
 import '../../../constants.dart';
-import '../../models/model_running.dart';
+import '../../models/runningModel.dart';
 import 'runningApi.dart';
 
 class AndroidRunningApiService implements RunningApiService {
@@ -15,7 +15,7 @@ class AndroidRunningApiService implements RunningApiService {
       AndroidRunningApiService._privateConstructor();
 
   @override
-  Future<RunningResponse> fetchRunningResponse() async {
+  Future<RunningWeek> fetchRunningResponse() async {
     ByteData rootCACertificate = await rootBundle.load("certs/ca-cert.pem");
     ByteData clientCertificate =
         await rootBundle.load("certs/running_app-cert.pem");
@@ -24,16 +24,16 @@ class AndroidRunningApiService implements RunningApiService {
 
     context.setTrustedCertificatesBytes(rootCACertificate.buffer.asUint8List());
 
-    context.useCertificateChainBytes(clientCertificate.buffer.asUint8List());
+    //context.useCertificateChainBytes(clientCertificate.buffer.asUint8List());
 
-    context.usePrivateKeyBytes(privateKey.buffer.asUint8List());
+    //context.usePrivateKeyBytes(privateKey.buffer.asUint8List());
     IOClient apiClient = IOClient(HttpClient(context: context));
 
     Map<String, String> headers = {};
 
     var httpUriRunningResponse = Uri(
         scheme: 'http',
-        host: ApiConstants.baseURL,
+        host: ApiConstants.baseURLAndroidEmulator,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
         queryParameters: {'client': ApiConstants.clientId, 'weeks': '0'});
@@ -51,7 +51,7 @@ class AndroidRunningApiService implements RunningApiService {
       }
     }
     if (response.statusCode == 200) {
-      return RunningResponse.fromJson(jsonDecode("[${response.body}]"));
+      return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
     }
     throw Exception('Failed to get running response');
   }
@@ -59,7 +59,7 @@ class AndroidRunningApiService implements RunningApiService {
   Future<String> refreshCookie(IOClient apiClient) async {
     var httpUriLogin = Uri(
         scheme: 'http',
-        host: ApiConstants.baseURL,
+        host: ApiConstants.baseURLAndroidEmulator,
         port: ApiConstants.port,
         path: ApiConstants.loginPath);
     log('httpUri: $httpUriLogin');

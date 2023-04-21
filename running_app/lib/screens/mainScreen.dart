@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:running_app/domain/models/model_running.dart';
+import 'package:running_app/domain/models/runningModel.dart';
 import '../domain/services/api/runningApi.dart';
+import '../widgets/runningWeekWidget.dart';
 
 class Main extends StatefulWidget {
   const Main({super.key, required this.title, required this.apiService});
@@ -18,15 +19,19 @@ class _MainState extends State<Main> {
     _callApi(widget.apiService);
   }
 
-  int _climb = 0;
-  late Future<RunningResponse> futureRunningResponse;
+  RunningWeek _runningWeek = RunningWeek(
+      climb: 0,
+      distance: 0,
+      numberOfRuns: 0,
+      numberOfOthers: 0,
+      timeUnix: 0,
+      timeStr: "");
+  late Future<RunningWeek> futureRunningResponse;
 
   Future<void> _callApi(RunningApiService apiService) async {
-    futureRunningResponse = apiService.fetchRunningResponse();
-    int climbResponse =
-        await futureRunningResponse.then((value) => value.weeklyClimb);
+    var response = await apiService.fetchRunningResponse();
     setState(() {
-      _climb = climbResponse;
+      _runningWeek = response;
     });
   }
 
@@ -36,22 +41,19 @@ class _MainState extends State<Main> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: FutureBuilder<RunningResponse>(
+        body: FutureBuilder<RunningWeek>(
             future: widget.apiService.fetchRunningResponse(),
-            builder: (BuildContext context,
-                AsyncSnapshot<RunningResponse> snapshot) {
+            builder:
+                (BuildContext context, AsyncSnapshot<RunningWeek> snapshot) {
               if (snapshot.data != null) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       const Text(
-                        'Weekly climb since start of the week: ',
+                        'Current week: ',
                       ),
-                      Text(
-                        '$_climb m',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
+                      runnigWeekList(_runningWeek),
                       ElevatedButton(
                         onPressed: () => _callApi(widget.apiService),
                         child: const Icon(Icons.refresh),

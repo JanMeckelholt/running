@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:running_app/constants.dart';
 import 'package:running_app/domain/services/api/runningApi.dart';
-import 'package:running_app/screens/screen_main.dart';
+import 'package:running_app/screens/mainScreen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 //import 'domain/services/api/runningApi.dart';

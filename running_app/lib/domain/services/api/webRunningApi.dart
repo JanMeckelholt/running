@@ -5,7 +5,7 @@ import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../constants.dart';
-import '../../models/model_running.dart';
+import '../../models/runningModel.dart';
 import 'runningApi.dart';
 
 class WebRunningApiService implements RunningApiService {
@@ -16,7 +16,7 @@ class WebRunningApiService implements RunningApiService {
       WebRunningApiService._privateConstructor();
 
   @override
-  Future<RunningResponse> fetchRunningResponse() async {
+  Future<RunningWeek> fetchRunningResponse() async {
     Map<String, String> headers = {};
 
     var httpUriRunningResponse = Uri(
@@ -36,10 +36,13 @@ class WebRunningApiService implements RunningApiService {
         headers['cookie'] = updatedCookie;
         response =
             await apiClient.get(httpUriRunningResponse, headers: headers);
+        if (response.statusCode == 200) {
+          return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
+        }
       }
     }
     if (response.statusCode == 200) {
-      return RunningResponse.fromJson(jsonDecode("[${response.body}]"));
+      return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
     }
     throw Exception('Failed to get running response');
   }
