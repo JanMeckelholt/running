@@ -19,8 +19,9 @@ type ClimbResponse struct {
 }
 
 type ActivitiesRequestBody struct {
-	ClientId string
-	Since    uint64 `json:"since,omitempty"`
+	ClientId   *string
+	Since      *uint64 `json:"since,omitempty"`
+	SinceWeeks *uint64 `json:"sinceWeeks,omitempty"`
 }
 
 type RunnerRequestBody struct {

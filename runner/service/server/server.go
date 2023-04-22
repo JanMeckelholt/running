@@ -6,6 +6,7 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/runner/service/clients"
 	"github.com/JanMeckelholt/running/runner/service/logic"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -62,7 +63,7 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request *database.Acti
 }
 
 func (rs RunnerServer) GetWeekSummaries(ctx context.Context, request *runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
-	startOfFirstWeek := logic.GetStartOfFirstWeek(request.GetWeeks())
+	startOfFirstWeek := utils.GetStartOfFirstWeek(request.GetWeeks())
 	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, ClientId: request.GetClientId()})
 	if err != nil {
 		return nil, err

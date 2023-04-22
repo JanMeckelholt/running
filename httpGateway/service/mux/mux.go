@@ -12,6 +12,7 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/health"
+	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/httpGateway/service"
 	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/server"
@@ -93,8 +94,13 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
+				if rB.SinceWeeks != nil {
+					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfFirstWeek(*rB.SinceWeeks)
+					rB.Since = &s
+				}
 				log.Infof("Getting activities for client %s since %d", rB.ClientId, rB.Since)
-				res, err := s.GetActivities(context.Background(), database.ActivitiesRequest{Since: rB.Since, ClientId: rB.ClientId})
+				res, err := s.GetActivities(context.Background(), database.ActivitiesRequest{Since: *rB.Since, ClientId: *rB.ClientId})
 				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -149,7 +155,12 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: rB.Since, ClientId: rB.ClientId})
+				if rB.SinceWeeks != nil {
+					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfFirstWeek(*rB.SinceWeeks)
+					rB.Since = &s
+				}
+				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: *rB.Since, ClientId: *rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error adding Activites to DB %s", err.Error()))
