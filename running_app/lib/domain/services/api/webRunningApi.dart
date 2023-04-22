@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 import '../../../constants.dart';
 import '../../models/runningModel.dart';
@@ -27,18 +28,16 @@ class WebRunningApiService implements RunningApiService {
         queryParameters: {'client': ApiConstants.clientId, 'weeks': '0'});
     log('httpUri: $httpUriRunningResponse');
 
-    var response =
+    Response response =
         await apiClient.get(httpUriRunningResponse, headers: headers);
 
     if (response.statusCode == 401) {
       final updatedCookie = await _refreshCookie();
       if (updatedCookie != "") {
         headers['cookie'] = updatedCookie;
+
         response =
             await apiClient.get(httpUriRunningResponse, headers: headers);
-        if (response.statusCode == 200) {
-          return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
-        }
       }
     }
     if (response.statusCode == 200) {

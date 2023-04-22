@@ -53,7 +53,7 @@ class _MainState extends State<Main> {
                       const Text(
                         'Current week: ',
                       ),
-                      runnigWeekList(_runningWeek),
+                      runnigWeekList(snapshot.data!),
                       ElevatedButton(
                         onPressed: () => _callApi(widget.apiService),
                         child: const Icon(Icons.refresh),
