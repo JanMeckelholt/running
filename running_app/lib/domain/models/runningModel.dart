@@ -27,3 +27,12 @@ class RunningWeek {
     );
   }
 }
+
+class WebsiteResponse {
+  final String LatestWebsitePing;
+  const WebsiteResponse({required this.LatestWebsitePing});
+  factory WebsiteResponse.fromJson(Map<String, dynamic> data) {
+    final LatestWebsitePing = data['LatestWebsitePing'] as String;
+    return WebsiteResponse(LatestWebsitePing: LatestWebsitePing);
+  }
+}

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/JanMeckelholt/running/common/models"
+	"github.com/JanMeckelholt/running/common/utils"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -16,9 +18,13 @@ var JwtKey []byte
 const RunningAppHttpClient = "running_app"
 const MasterHttpClient = "master"
 
-var validHttpClientNames = []string{MasterHttpClient, RunningAppHttpClient}
+var LatestWebsitePing string
+
+var validHttpClientNames = []string{MasterHttpClient}
+var validRunningAppNames = []string{RunningAppHttpClient}
 
 var httpClients = map[string]string{}
+var runningAppClients = map[string]string{}
 
 func UpsertHttpClients(httpClient, password string) error {
 	if len(password) < 8 {
@@ -33,19 +39,22 @@ func UpsertHttpClients(httpClient, password string) error {
 	return fmt.Errorf("httpClient does not exist %s", httpClient)
 }
 
-type Credentials struct {
-	Password string `json:"password"`
-	Username string `json:"username"`
-}
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.RegisteredClaims
+func UpsertRunningClients(runningAppClient, password string) error {
+	if len(password) < 8 {
+		return fmt.Errorf("password is too short")
+	}
+	for _, validClient := range validRunningAppNames {
+		if validClient == runningAppClient {
+			runningAppClients[runningAppClient] = password
+			return nil
+		}
+	}
+	return fmt.Errorf("runningAppClient does not exist %s", runningAppClient)
 }
 
 func LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var creds Credentials
+		var creds models.Credentials
 		log.Infof("trying to login")
 		err := json.NewDecoder(r.Body).Decode(&creds)
 		if err != nil {
@@ -54,18 +63,18 @@ func LoginHandler() http.Handler {
 			return
 		}
 
-		expectedPassword, ok := httpClients[creds.Username]
+		expectedPassword, ok := httpClients[*creds.Username]
 
-		if !ok || expectedPassword != creds.Password {
+		if !ok || expectedPassword != *creds.Password {
 			log.Infof("not authorized...")
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode("{\"login\":\"failed - not authorized\"}")
+			json.NewEncoder(w).Encode(&models.LoginResponse{Login: "failed - not authorized"})
 			return
 		}
 
 		expirationTime := time.Now().Add(5 * time.Minute)
 
-		claims := &Claims{
+		claims := &models.Claims{
 			Username: creds.Username,
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(expirationTime),
@@ -77,7 +86,7 @@ func LoginHandler() http.Handler {
 		if err != nil {
 			log.Infof("internal error...%s", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode("{\"login\":\"failed - internal error\"}")
+			json.NewEncoder(w).Encode(&models.LoginResponse{Login: "failed - internal error"})
 			return
 		}
 
@@ -91,6 +100,75 @@ func LoginHandler() http.Handler {
 		})
 		log.Info("Login Success!")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("{\"login\":\"success\"}")
+		json.NewEncoder(w).Encode(&models.LoginResponse{Login: "success"})
+	})
+}
+
+func WebsiteHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			//LatestWebsitePing = utils.RandStr(100)
+			LatestWebsitePing = "Test_Jan"
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(&models.WebsiteResponse{LatestWebsitePing: &LatestWebsitePing})
+
+		case http.MethodPost:
+			var creds models.CredentialsWebsite
+			log.Infof("trying to verify website")
+			err := json.NewDecoder(r.Body).Decode(&creds)
+			if err != nil {
+				log.Infof("failing...%s", err.Error())
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			log.Infof("creds: %s - %s", *creds.Username, *creds.LatestPingEncrypted)
+
+			latestPingEncrypted := creds.LatestPingEncrypted
+
+			//test := "cmQdmLQIPwoO1M_TKXruWJK_Bk9dgD8p"
+			e := utils.Encrypt(runningAppClients[*creds.Username], LatestWebsitePing)
+			d := utils.Decrypt(runningAppClients[*creds.Username], *creds.LatestPingEncrypted)
+			log.Infof("e: %s", e)
+			log.Infof("d: %s", d)
+
+			//if latestPingEncrypted == nil || utils.Encrypt(runningAppClients[*creds.Username], LatestWebsitePing) != *latestPingEncrypted {
+			if latestPingEncrypted == nil || d != LatestWebsitePing {
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(&models.LoginResponse{Login: "failed - not authorized"})
+				return
+			}
+
+			expirationTime := time.Now().Add(5 * time.Minute)
+
+			claims := &models.Claims{
+				Username: creds.Username,
+				RegisteredClaims: jwt.RegisteredClaims{
+					ExpiresAt: jwt.NewNumericDate(expirationTime),
+				},
+			}
+
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+			tokenString, err := token.SignedString(JwtKey)
+			if err != nil {
+				log.Infof("internal error...%s", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(&models.LoginResponse{Login: "failed - internal error"})
+				return
+			}
+
+			http.SetCookie(w, &http.Cookie{
+				Name:     "token",
+				Value:    tokenString,
+				Expires:  expirationTime,
+				HttpOnly: true,
+				Secure:   false,
+				SameSite: http.SameSiteStrictMode,
+			})
+			log.Info("Login Success!")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(&models.LoginResponse{Login: "success"})
+		}
 	})
 }

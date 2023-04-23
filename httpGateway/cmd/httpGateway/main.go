@@ -29,9 +29,9 @@ func main() {
 	}
 	auth.JwtKey = []byte(srv.Config.JWTKey)
 
-	err = auth.UpsertHttpClients(auth.RunningAppHttpClient, srv.Config.RunningAppPassword)
+	err = auth.UpsertRunningClients(auth.RunningAppHttpClient, srv.Config.RunningAppPassword)
 	if err != nil {
-		log.Errorf("Could not setup password for HTTP-Client %s", auth.RunningAppHttpClient)
+		log.Errorf("Could not setup password for runningApp-Client %s", auth.RunningAppHttpClient)
 	}
 	err = auth.UpsertHttpClients(auth.MasterHttpClient, srv.Config.MasterPassword)
 	if err != nil {
@@ -52,6 +52,7 @@ func main() {
 	log.Infof("allowOrigin: %s", allowOriginStr)
 
 	rootMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
+	rootMux.Handle(service.WebsiteRoute, mux.Handler(service.WebsiteRoute, rs))
 	rootMux.Handle("/health", mux.Handler("/health", rs))
 	rootMux.Handle("/athlete", mux.Handler("/athlete", rs))
 	rootMux.Handle("/activities", mux.Handler("/activities", rs))

@@ -8,6 +8,7 @@ import (
 )
 
 const LoginRoute = "/login"
+const WebsiteRoute = "/website"
 
 type Service struct {
 	Clients clients.Clients

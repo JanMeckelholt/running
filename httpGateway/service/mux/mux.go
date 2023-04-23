@@ -22,6 +22,8 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 	switch uri {
 	case service.LoginRoute:
 		return auth.LoginHandler()
+	case service.WebsiteRoute:
+		return auth.WebsiteHandler()
 	case "/health":
 		return health.Handler(health.Health{ServiceName: "runner"})
 

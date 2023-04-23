@@ -19,19 +19,18 @@ class _MainState extends State<Main> {
     _callApi(widget.apiService);
   }
 
-  RunningWeek _runningWeek = RunningWeek(
+  Future<RunningWeek> _runningWeek = Future<RunningWeek>.value(RunningWeek(
       climb: 0,
       distance: 0,
       numberOfRuns: 0,
       numberOfOthers: 0,
       timeUnix: 0,
-      timeStr: "");
-  late Future<RunningWeek> futureRunningResponse;
+      timeStr: ""));
 
   Future<void> _callApi(RunningApiService apiService) async {
     var response = await apiService.fetchRunningResponse();
     setState(() {
-      _runningWeek = response;
+      _runningWeek = response as Future<RunningWeek>;
     });
   }
 
@@ -42,7 +41,7 @@ class _MainState extends State<Main> {
           title: Text(widget.title),
         ),
         body: FutureBuilder<RunningWeek>(
-            future: widget.apiService.fetchRunningResponse(),
+            future: _runningWeek,
             builder:
                 (BuildContext context, AsyncSnapshot<RunningWeek> snapshot) {
               if (snapshot.data != null) {

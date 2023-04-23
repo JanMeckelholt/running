@@ -7,6 +7,7 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/models"
 	"github.com/JanMeckelholt/running/httpGateway/service"
 	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/clients"
@@ -55,7 +56,7 @@ func CorsMiddleware(next http.Handler, allowOrigin string) http.Handler {
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == service.LoginRoute {
+		if r.URL.Path == service.LoginRoute || r.URL.Path == service.WebsiteRoute {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -69,7 +70,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		tknStr := c.Value
-		claims := &auth.Claims{}
+		claims := &models.Claims{}
 
 		tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return auth.JwtKey, nil

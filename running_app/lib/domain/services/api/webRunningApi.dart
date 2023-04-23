@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:http/browser_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:running_app/utils/utils.dart';
 
 import '../../../constants.dart';
 import '../../models/runningModel.dart';
@@ -53,11 +54,22 @@ class WebRunningApiService implements RunningApiService {
         port: ApiConstants.port,
         path: ApiConstants.loginPath);
     log('httpUri: $httpUriLogin');
+    Response response = await apiClient.get(httpUriLogin);
+
+    WebsiteResponse wsResponse =
+        WebsiteResponse.fromJson(jsonDecode(response.body));
+    if (wsResponse.LatestWebsitePing == "") {
+      return "";
+    }
+    EncryptData ed = EncryptData();
+    String latestPingEncrypted = ed.encryptAES(
+        wsResponse.LatestWebsitePing, Credentials.runningAppPassword);
+
     final body = jsonEncode({
       "username": Credentials.technicalUser,
-      "password": Credentials.runningAppPassword ?? ""
+      "LatestPingEncrypted": latestPingEncrypted
     });
-    final response = await apiClient.post(httpUriLogin, body: body);
+    response = await apiClient.post(httpUriLogin, body: body);
 
     String? c = response.headers['set-cookie'];
     if (c != null) {
