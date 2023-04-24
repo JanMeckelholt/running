@@ -9,8 +9,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env.docker.running_app.secret");
-  Credentials.runningAppPassword = dotenv.env['RUNNING_APP_PASSWORD'];
+  //await dotenv.load(fileName: ".env.docker.running_app.secret");
+  const runningAppPassword =
+      String.fromEnvironment('RUNNING_APP_PASSWORD', defaultValue: '');
+  Credentials.runningAppPassword = runningAppPassword;
 
   //final apiService = WebRunningApiService.instance;
   final apiService = RunningApiService();

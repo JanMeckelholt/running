@@ -1,5 +1,6 @@
 FROM ubuntu:23.04
 ARG DEBIAN_FRONTEND=noninteractive
+ARG RUNNING_APP_PASSWORD
 ENV TZ="Europe/Berlin"
 RUN apt-get update
 RUN apt-get install -y curl git wget unzip libgconf-2-4 gdb libstdc++6 libglu1-mesa fonts-droid-fallback lib32stdc++6 python3
@@ -17,7 +18,7 @@ RUN flutter create .
 RUN flutter clean
 RUN flutter pub get
 RUN flutter pub upgrade --major-versions
-RUN flutter build web
+RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
 
 EXPOSE 5000
 
