@@ -22,15 +22,15 @@ func GetStartOfFirstWeek(weeksAgo uint64) uint64 {
 	if roundDay.Weekday() != time.Now().Weekday() {
 		roundDay = roundDay.Add(-24 * time.Hour)
 	}
-	var daysSinceMonday time.Duration
+	var daysSinceMonday int64
 	switch roundDay.Weekday() {
 	case time.Sunday:
-		daysSinceMonday = time.Duration(6 * 24 * time.Hour)
+		daysSinceMonday = 6
 	default:
-		daysSinceMonday = time.Duration(roundDay.Weekday() - startOFWeek)
+		daysSinceMonday = int64(roundDay.Weekday() - startOFWeek)
 	}
 
-	return uint64(roundDay.Add(-daysSinceMonday*24*time.Hour - time.Duration(weeksAgo*7*24*uint64(time.Hour))).Unix())
+	return uint64(roundDay.Add(time.Duration(-daysSinceMonday)*24*time.Hour - time.Duration(weeksAgo*7*24*uint64(time.Hour))).Unix())
 }
 
 func Encrypt(keyString string, stringToEncrypt string) (encryptedString string) {

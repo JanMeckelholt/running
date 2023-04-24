@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:http/io_client.dart';
+import 'package:running_app/utils/utils.dart';
 
 import '../../../constants.dart';
 import '../../models/runningModel.dart';
@@ -63,11 +64,22 @@ class AndroidRunningApiService implements RunningApiService {
         port: ApiConstants.port,
         path: ApiConstants.loginPath);
     log('httpUri: $httpUriLogin');
+    var response = await apiClient.get(httpUriLogin);
+
+    WebsiteResponse wsResponse =
+        WebsiteResponse.fromJson(jsonDecode(response.body));
+    if (wsResponse.LatestWebsitePing == "") {
+      return "";
+    }
+    EncryptData ed = EncryptData();
+    String latestPingEncrypted = ed.encryptAES(
+        wsResponse.LatestWebsitePing, Credentials.runningAppPassword);
+
     final body = jsonEncode({
       "username": Credentials.technicalUser,
-      "password": Credentials.runningAppPassword ?? ""
+      "LatestPingEncrypted": latestPingEncrypted
     });
-    final response = await apiClient.post(httpUriLogin, body: body);
+    response = await apiClient.post(httpUriLogin, body: body);
 
     String? c = response.headers['set-cookie'];
     if (c != null) {

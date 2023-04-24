@@ -109,8 +109,7 @@ func WebsiteHandler() http.Handler {
 		w.Header().Add("Content-Type", "application/json")
 		switch r.Method {
 		case http.MethodGet:
-			//LatestWebsitePing = utils.RandStr(100)
-			LatestWebsitePing = "Test_Jan"
+			LatestWebsitePing = utils.RandStr(8)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(&models.WebsiteResponse{LatestWebsitePing: &LatestWebsitePing})
 
@@ -127,13 +126,10 @@ func WebsiteHandler() http.Handler {
 
 			latestPingEncrypted := creds.LatestPingEncrypted
 
-			//test := "cmQdmLQIPwoO1M_TKXruWJK_Bk9dgD8p"
-			e := utils.Encrypt(runningAppClients[*creds.Username], LatestWebsitePing)
 			d := utils.Decrypt(runningAppClients[*creds.Username], *creds.LatestPingEncrypted)
-			log.Infof("e: %s", e)
+			log.Infof("original: %s", LatestWebsitePing)
 			log.Infof("d: %s", d)
 
-			//if latestPingEncrypted == nil || utils.Encrypt(runningAppClients[*creds.Username], LatestWebsitePing) != *latestPingEncrypted {
 			if latestPingEncrypted == nil || d != LatestWebsitePing {
 				w.WriteHeader(http.StatusUnauthorized)
 				json.NewEncoder(w).Encode(&models.LoginResponse{Login: "failed - not authorized"})

@@ -30,7 +30,7 @@ class _MainState extends State<Main> {
   Future<void> _callApi(RunningApiService apiService) async {
     var response = await apiService.fetchRunningResponse();
     setState(() {
-      _runningWeek = response as Future<RunningWeek>;
+      _runningWeek = Future<RunningWeek>.value(response);
     });
   }
 

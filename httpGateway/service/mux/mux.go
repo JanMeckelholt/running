@@ -101,7 +101,7 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 					s := utils.GetStartOfFirstWeek(*rB.SinceWeeks)
 					rB.Since = &s
 				}
-				log.Infof("Getting activities for client %s since %d", rB.ClientId, rB.Since)
+				log.Infof("Getting activities for client %s since %d", *rB.ClientId, rB.Since)
 				res, err := s.GetActivities(context.Background(), database.ActivitiesRequest{Since: *rB.Since, ClientId: *rB.ClientId})
 				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
