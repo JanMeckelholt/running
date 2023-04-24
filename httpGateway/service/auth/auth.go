@@ -109,7 +109,7 @@ func WebsiteHandler() http.Handler {
 		w.Header().Add("Content-Type", "application/json")
 		switch r.Method {
 		case http.MethodGet:
-			LatestWebsitePing = utils.RandStr(8)
+			LatestWebsitePing = utils.RandStr(100)
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(&models.WebsiteResponse{LatestWebsitePing: &LatestWebsitePing})
 
@@ -125,9 +125,8 @@ func WebsiteHandler() http.Handler {
 			log.Infof("creds: %s - %s", *creds.Username, *creds.LatestPingEncrypted)
 
 			latestPingEncrypted := creds.LatestPingEncrypted
-
-			d := utils.Decrypt(runningAppClients[*creds.Username], *creds.LatestPingEncrypted)
 			log.Infof("original: %s", LatestWebsitePing)
+			d := utils.Decrypt(runningAppClients[*creds.Username], *creds.LatestPingEncrypted)
 			log.Infof("d: %s", d)
 
 			if latestPingEncrypted == nil || d != LatestWebsitePing {

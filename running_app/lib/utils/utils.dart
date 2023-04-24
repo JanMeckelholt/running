@@ -10,7 +10,7 @@ class EncryptData {
   String encryptAES(String plainText, keyStr) {
     final key = Key.fromBase16(keyStr);
     final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(key));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc, padding: 'PKCS7'));
     //final encrypter = Encrypter(AES(key, mode: AESMode.cfb64));
 
     encrypted = encrypter.encrypt(plainText, iv: iv);

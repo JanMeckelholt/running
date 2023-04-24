@@ -1,15 +1,14 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"io"
 	mathRand "math/rand"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -49,9 +48,13 @@ func Encrypt(keyString string, stringToEncrypt string) (encryptedString string) 
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		panic(err)
 	}
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
-	return base64.StdEncoding.EncodeToString(ciphertext)
+	encrypter := cipher.NewCBCEncrypter(block, iv)
+	ciphertext = PKCS5Padding(ciphertext, aes.BlockSize)
+
+	crypted := make([]byte, len(ciphertext))
+	encrypter.CryptBlocks(crypted, ciphertext)
+
+	return base64.StdEncoding.EncodeToString(crypted)
 }
 
 // decrypt from base64 to decrypted string
@@ -74,10 +77,13 @@ func Decrypt(keyString string, stringToDecrypt string) string {
 		panic("ciphertext too short")
 	}
 	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(ciphertext, ciphertext)
-	return strings.Trim(fmt.Sprintf("%s", ciphertext), "\b")
+	log.Infof("iv: %s", iv[:])
+	log.Infof("len cipher without iv: %d", len(ciphertext[aes.BlockSize:]))
+
+	decrypter := cipher.NewCBCDecrypter(block, iv)
+	decrypted := make([]byte, len(ciphertext[aes.BlockSize:]))
+	decrypter.CryptBlocks(decrypted, ciphertext[aes.BlockSize:])
+	return string(PKCS5Trimming(decrypted)[:])
 }
 
 // n is the length of random string we want to generate
@@ -90,4 +96,18 @@ func RandStr(n int) string {
 	}
 
 	return string(b)
+}
+
+func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(ciphertext, padtext...)
+}
+
+func PKCS5Trimming(encrypt []byte) []byte {
+	log.Infof("Trimming: %s", encrypt)
+	log.Infof("Trimming string: %s", string(encrypt[:]))
+	padding := encrypt[len(encrypt)-1]
+	log.Infof("padding: %s - %d", padding, int(padding))
+	return encrypt[:len(encrypt)-int(padding)]
 }
