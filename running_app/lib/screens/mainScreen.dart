@@ -16,16 +16,11 @@ class _MainState extends State<Main> {
   @override
   void initState() {
     super.initState();
-    _callApi(widget.apiService);
+    //_callApi(widget.apiService);
   }
 
-  Future<RunningWeek> _runningWeek = Future<RunningWeek>.value(RunningWeek(
-      climb: 0,
-      distance: 0,
-      numberOfRuns: 0,
-      numberOfOthers: 0,
-      timeUnix: 0,
-      timeStr: ""));
+  late Future<RunningWeek> _runningWeek =
+      widget.apiService.fetchRunningResponse();
 
   Future<void> _callApi(RunningApiService apiService) async {
     var response = await apiService.fetchRunningResponse();
@@ -45,21 +40,48 @@ class _MainState extends State<Main> {
             builder:
                 (BuildContext context, AsyncSnapshot<RunningWeek> snapshot) {
               if (snapshot.data != null) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const Text(
-                        'Current week: ',
-                      ),
-                      runnigWeekList(snapshot.data!),
-                      ElevatedButton(
-                        onPressed: () => _callApi(widget.apiService),
-                        child: const Icon(Icons.refresh),
-                      ),
-                    ],
-                  ),
-                );
+                return Container(
+                    color: Colors.amber,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(child: Container(color: Colors.green)),
+                        SingleChildScrollView(
+                          child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                  minHeight: 600, maxHeight: 800),
+                              child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                          minWidth: 300, maxWidth: 400),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: <Widget>[
+                                          const Text(
+                                            'Current week: ',
+                                            style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          runnigWeekList(snapshot.data!),
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                _callApi(widget.apiService),
+                                            child: const Icon(Icons.refresh),
+                                          ),
+                                          Flexible(
+                                              child: Container(
+                                            color: Colors.blueGrey,
+                                          ))
+                                        ],
+                                      )))),
+                        ),
+                        Expanded(child: Container(color: Colors.lightBlue)),
+                      ],
+                    ));
               } else {
                 return Center(
                   child: Column(

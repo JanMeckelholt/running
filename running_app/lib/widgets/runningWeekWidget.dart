@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:running_app/domain/models/runningModel.dart';
 
-Expanded runnigWeekList(RunningWeek runningWeek) {
-  return Expanded(
+Flexible runnigWeekList(RunningWeek runningWeek) {
+  return Flexible(
       child: (ListView(
+    shrinkWrap: true,
     children: [
       ListTile(
         title: Text('Distance'),

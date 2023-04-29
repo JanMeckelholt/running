@@ -15,7 +15,7 @@ class EncryptData {
 
     encrypted = encrypter.encrypt(plainText, iv: iv);
 
-    log("URI: ${Uri.encodeComponent(encrypted!.base64)}");
+    log("encrypted: ${encrypted!.base64}");
     //return (Uri.encodeComponent(encrypted!.base64));
 
     return (base64.encode(iv.bytes + encrypted!.bytes));

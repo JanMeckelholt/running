@@ -31,7 +31,7 @@ class WebRunningApiService implements RunningApiService {
 
     Response response =
         await apiClient.get(httpUriRunningResponse, headers: headers);
-
+    log("ResponseCode: ${response.statusCode}");
     if (response.statusCode == 401) {
       final updatedCookie = await _refreshCookie();
       if (updatedCookie != "") {
@@ -40,6 +40,7 @@ class WebRunningApiService implements RunningApiService {
         response =
             await apiClient.get(httpUriRunningResponse, headers: headers);
       }
+      log("ResponseCode after 401: ${response.statusCode} -> updatedCookie: $updatedCookie");
     }
     if (response.statusCode == 200) {
       return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
