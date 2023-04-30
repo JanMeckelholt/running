@@ -65,13 +65,17 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request *database.Acti
 
 func (rs RunnerServer) GetWeekSummaries(ctx context.Context, request *runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
 	startOfFirstWeek := utils.GetStartOfWeek(request.GetWeekSince())
-	endOfLastWeek := startOfFirstWeek + 7*24*60*60*uint64((1-(request.GetWeekSince()-request.GetWeekUntil())))
+	var endOfLastWeek uint64
+	if request.GetWeekUntil() == 0 {
+		endOfLastWeek = uint64(time.Now().Unix())
+	} else {
+		endOfLastWeek = startOfFirstWeek + 7*24*60*60*uint64((1-(request.GetWeekSince()-request.GetWeekUntil())))
+	}
 	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, Until: endOfLastWeek, ClientId: request.GetClientId()})
 	if err != nil {
 		return nil, err
 	}
-	now := uint64(time.Now().Unix())
-	weeksummarryResponse := logic.GetWeekSummarryResponse(res, startOfFirstWeek, now)
+	weeksummarryResponse := logic.GetWeekSummariesResponse(res, startOfFirstWeek, endOfLastWeek)
 
 	return &weeksummarryResponse, nil
 }

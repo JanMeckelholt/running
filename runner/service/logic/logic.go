@@ -18,9 +18,10 @@ func GetClimb(activities *database.ActivitiesResponse) uint64 {
 	return totalClimb
 }
 
-func GetWeekSummarryResponse(activities *database.ActivitiesResponse, start, end uint64) runner.WeekSummariesResponse {
+func GetWeekSummariesResponse(activities *database.ActivitiesResponse, start, end uint64) runner.WeekSummariesResponse {
 	weeks := make([]*runner.WeekSummary, 0)
 	startOfWeek := start
+	log.Infof("GetWeekSummaries start %d -> end %d", start, end)
 	for startOfWeek < end {
 		log.Infof("STartOfWeek: %d", startOfWeek)
 		week := GetWeek(activities, startOfWeek)
