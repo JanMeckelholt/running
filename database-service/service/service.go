@@ -187,8 +187,11 @@ func (s *Storer) GetActivities(req *grpcDB.ActivitiesRequest) (*grpcDB.Activitie
 		dbActivities []*DBActivity
 		activities   []*grpcStrava.Activity
 	)
-
-	result := DB.Where("client_id = ? AND start_date_unix > ?", req.GetClientId(), req.GetSince()).Find(&dbActivities)
+	until := req.GetUntil()
+	if until == 0 {
+		until = uint64(time.Now().Unix())
+	}
+	result := DB.Where("client_id = ? AND start_date_unix > ?  AND start_date_unix < ?", req.GetClientId(), req.GetSince(), until).Find(&dbActivities)
 	if result.Error != nil {
 		log.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
 		return nil, fmt.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)

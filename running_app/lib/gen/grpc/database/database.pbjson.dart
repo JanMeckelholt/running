@@ -14,11 +14,12 @@ const ActivitiesRequest$json = const {
   '2': const [
     const {'1': 'ClientId', '3': 1, '4': 1, '5': 9, '10': 'ClientId'},
     const {'1': 'Since', '3': 2, '4': 1, '5': 4, '10': 'Since'},
+    const {'1': 'Until', '3': 3, '4': 1, '5': 4, '10': 'Until'},
   ],
 };
 
 /// Descriptor for `ActivitiesRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List activitiesRequestDescriptor = $convert.base64Decode('ChFBY3Rpdml0aWVzUmVxdWVzdBIaCghDbGllbnRJZBgBIAEoCVIIQ2xpZW50SWQSFAoFU2luY2UYAiABKARSBVNpbmNl');
+final $typed_data.Uint8List activitiesRequestDescriptor = $convert.base64Decode('ChFBY3Rpdml0aWVzUmVxdWVzdBIaCghDbGllbnRJZBgBIAEoCVIIQ2xpZW50SWQSFAoFU2luY2UYAiABKARSBVNpbmNlEhQKBVVudGlsGAMgASgEUgVVbnRpbA==');
 @$core.Deprecated('Use activitiesResponseDescriptor instead')
 const ActivitiesResponse$json = const {
   '1': 'ActivitiesResponse',

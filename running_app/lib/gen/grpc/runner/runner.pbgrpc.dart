@@ -43,6 +43,11 @@ class RunnerClient extends $grpc.Client {
           ($3.WeekSummariesRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) =>
               $3.WeekSummariesResponse.fromBuffer(value));
+  static final _$getWeekSummary =
+      $grpc.ClientMethod<$3.WeekSummaryRequest, $3.WeekSummary>(
+          '/runner.Runner/GetWeekSummary',
+          ($3.WeekSummaryRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $3.WeekSummary.fromBuffer(value));
   static final _$health =
       $grpc.ClientMethod<$3.HealthMessage, $3.HealthMessage>(
           '/runner.Runner/Health',
@@ -79,6 +84,12 @@ class RunnerClient extends $grpc.Client {
       $3.WeekSummariesRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getWeekSummaries, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$3.WeekSummary> getWeekSummary(
+      $3.WeekSummaryRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getWeekSummary, request, options: options);
   }
 
   $grpc.ResponseFuture<$3.HealthMessage> health($3.HealthMessage request,
@@ -128,6 +139,14 @@ abstract class RunnerServiceBase extends $grpc.Service {
             ($core.List<$core.int> value) =>
                 $3.WeekSummariesRequest.fromBuffer(value),
             ($3.WeekSummariesResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$3.WeekSummaryRequest, $3.WeekSummary>(
+        'GetWeekSummary',
+        getWeekSummary_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $3.WeekSummaryRequest.fromBuffer(value),
+        ($3.WeekSummary value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$3.HealthMessage, $3.HealthMessage>(
         'Health',
         health_Pre,
@@ -163,6 +182,11 @@ abstract class RunnerServiceBase extends $grpc.Service {
     return getWeekSummaries(call, await request);
   }
 
+  $async.Future<$3.WeekSummary> getWeekSummary_Pre($grpc.ServiceCall call,
+      $async.Future<$3.WeekSummaryRequest> request) async {
+    return getWeekSummary(call, await request);
+  }
+
   $async.Future<$3.HealthMessage> health_Pre(
       $grpc.ServiceCall call, $async.Future<$3.HealthMessage> request) async {
     return health(call, await request);
@@ -178,6 +202,8 @@ abstract class RunnerServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $3.ActivitiesRequest request);
   $async.Future<$3.WeekSummariesResponse> getWeekSummaries(
       $grpc.ServiceCall call, $3.WeekSummariesRequest request);
+  $async.Future<$3.WeekSummary> getWeekSummary(
+      $grpc.ServiceCall call, $3.WeekSummaryRequest request);
   $async.Future<$3.HealthMessage> health(
       $grpc.ServiceCall call, $3.HealthMessage request);
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"time"
 
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
@@ -63,14 +64,28 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request *database.Acti
 }
 
 func (rs RunnerServer) GetWeekSummaries(ctx context.Context, request *runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
-	startOfFirstWeek := utils.GetStartOfFirstWeek(request.GetWeeks())
-	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, ClientId: request.GetClientId()})
+	startOfFirstWeek := utils.GetStartOfWeek(request.GetWeekSince())
+	endOfLastWeek := startOfFirstWeek + 7*24*60*60*uint64((1-(request.GetWeekSince()-request.GetWeekUntil())))
+	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, Until: endOfLastWeek, ClientId: request.GetClientId()})
 	if err != nil {
 		return nil, err
 	}
-	weeksummarryResponse := logic.GetWeekSummarryResponse(res, startOfFirstWeek)
+	now := uint64(time.Now().Unix())
+	weeksummarryResponse := logic.GetWeekSummarryResponse(res, startOfFirstWeek, now)
 
 	return &weeksummarryResponse, nil
+}
+
+func (rs RunnerServer) GetWeekSummary(ctx context.Context, request *runner.WeekSummaryRequest) (*runner.WeekSummary, error) {
+	startOfWeek := utils.GetStartOfWeek(request.GetWeek())
+	endOfWeek := startOfWeek + 7*24*60*60
+	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfWeek, Until: endOfWeek, ClientId: request.GetClientId()})
+	if err != nil {
+		return nil, err
+	}
+	week := logic.GetWeek(res, startOfWeek)
+
+	return &week, nil
 }
 
 func (rs RunnerServer) StravaActivitiesToDB(ctx context.Context, request strava.ActivitiesRequest) error {

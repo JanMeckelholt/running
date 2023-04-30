@@ -26,19 +26,20 @@ class WebRunningApiService implements RunningApiService {
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
-        queryParameters: {'client': ApiConstants.clientId, 'weeks': '0'});
+        queryParameters: {'client': ApiConstants.clientId, 'week': '0'});
     log('httpUri: $httpUriRunningResponse');
 
     Response response =
         await apiClient.get(httpUriRunningResponse, headers: headers);
     log("ResponseCode: ${response.statusCode}");
     if (response.statusCode == 401) {
-      final updatedCookie = await _refreshCookie();
+      String updatedCookie = await _refreshCookie();
       if (updatedCookie != "") {
         headers['cookie'] = updatedCookie;
 
         response =
             await apiClient.get(httpUriRunningResponse, headers: headers);
+        log("Response with updated coockie ${response.body} - ${response.statusCode}");
       }
       log("ResponseCode after 401: ${response.statusCode} -> updatedCookie: $updatedCookie");
     }
@@ -49,6 +50,7 @@ class WebRunningApiService implements RunningApiService {
   }
 
   Future<String> _refreshCookie() async {
+    log("refresCookie");
     var httpUriLogin = Uri(
         scheme: 'http',
         host: ApiConstants.baseURL,
@@ -60,6 +62,7 @@ class WebRunningApiService implements RunningApiService {
     WebsiteResponse wsResponse =
         WebsiteResponse.fromJson(jsonDecode(response.body));
     if (wsResponse.LatestWebsitePing == "") {
+      log("did not get LatestWebsitePing");
       return "";
     }
     EncryptData ed = EncryptData();
@@ -71,6 +74,7 @@ class WebRunningApiService implements RunningApiService {
       "LatestPingEncrypted": latestPingEncrypted
     });
     response = await apiClient.post(httpUriLogin, body: body);
+    log("postResponse ${response.body} - ${response.statusCode} - ${response.headers}");
 
     String? c = response.headers['set-cookie'];
     if (c != null) {

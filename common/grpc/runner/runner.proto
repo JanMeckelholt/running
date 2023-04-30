@@ -10,6 +10,7 @@ service Runner {
   rpc GetActivities(database.ActivitiesRequest) returns (database.ActivitiesResponse) {}
   rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}
   rpc GetWeekSummaries(WeekSummariesRequest) returns (WeekSummariesResponse) {}
+  rpc GetWeekSummary(WeekSummaryRequest) returns (WeekSummary) {}
   rpc Health(HealthMessage) returns (HealthMessage) {}
 }
 
@@ -26,9 +27,15 @@ message ActivitiesRequest {
     uint64  since = 2;
   }
 
+  message WeekSummaryRequest {
+    string clientId= 1;
+    int64  week = 2;
+  }
+
   message WeekSummariesRequest {
     string clientId= 1;
-    uint64  weeks = 2;
+    int64  weekSince = 2;
+    int64  weekUntil = 3;
   }
 
 message WeekSummary {

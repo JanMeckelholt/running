@@ -37,7 +37,7 @@ class AndroidRunningApiService implements RunningApiService {
         host: ApiConstants.baseURLAndroidEmulator,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
-        queryParameters: {'client': ApiConstants.clientId, 'weeks': '0'});
+        queryParameters: {'client': ApiConstants.clientId, 'week': '0'});
     log('httpUri: $httpUriRunningResponse');
 
     var response =

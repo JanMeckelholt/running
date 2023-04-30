@@ -43,20 +43,19 @@ class _MainState extends State<Main> {
                 return Container(
                     color: Colors.amber,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      mainAxisSize: MainAxisSize.min,
+                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Expanded(child: Container(color: Colors.green)),
                         SingleChildScrollView(
                           child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                  minHeight: 600, maxHeight: 800),
+                              constraints: const BoxConstraints(maxHeight: 400),
                               child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: ConstrainedBox(
-                                      constraints: const BoxConstraints(
-                                          minWidth: 300, maxWidth: 400),
+                                      constraints:
+                                          const BoxConstraints(maxWidth: 400),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.max,
                                         children: <Widget>[
@@ -72,10 +71,6 @@ class _MainState extends State<Main> {
                                                 _callApi(widget.apiService),
                                             child: const Icon(Icons.refresh),
                                           ),
-                                          Flexible(
-                                              child: Container(
-                                            color: Colors.blueGrey,
-                                          ))
                                         ],
                                       )))),
                         ),

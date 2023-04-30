@@ -46,6 +46,10 @@ func (rs HTTPGatewayServer) GetWeekSummaries(ctx context.Context, request runner
 	return rs.clients.RunnerClient.GetWeekSummaries(ctx, &request)
 }
 
+func (rs HTTPGatewayServer) GetWeekSummary(ctx context.Context, request runner.WeekSummaryRequest) (*runner.WeekSummary, error) {
+	return rs.clients.RunnerClient.GetWeekSummary(ctx, &request)
+}
+
 func CorsMiddleware(next http.Handler, allowOrigin string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", allowOrigin)

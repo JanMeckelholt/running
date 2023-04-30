@@ -16,7 +16,11 @@ import (
 
 const startOFWeek = time.Monday // Sunday = 0; Monday = 1
 
-func GetStartOfFirstWeek(weeksAgo uint64) uint64 {
+func GetStartOfWeek(week int64) uint64 {
+	if week > 0 {
+		log.Infof("got invalid week-value %d, defaulting to 0", week)
+		week = 0
+	}
 	roundDay := time.Now().Round(24 * time.Hour)
 	if roundDay.Weekday() != time.Now().Weekday() {
 		roundDay = roundDay.Add(-24 * time.Hour)
@@ -29,7 +33,7 @@ func GetStartOfFirstWeek(weeksAgo uint64) uint64 {
 		daysSinceMonday = int64(roundDay.Weekday() - startOFWeek)
 	}
 
-	return uint64(roundDay.Add(time.Duration(-daysSinceMonday)*24*time.Hour - time.Duration(weeksAgo*7*24*uint64(time.Hour))).Unix())
+	return uint64(roundDay.Add(time.Duration(-daysSinceMonday)*24*time.Hour + time.Duration(week*7*24*int64(time.Hour))).Unix())
 }
 
 func Encrypt(keyString string, stringToEncrypt string) (encryptedString string) {

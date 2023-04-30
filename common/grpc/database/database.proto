@@ -17,6 +17,7 @@ service Database {
 message ActivitiesRequest {
   string ClientId = 1;
   uint64 Since = 2;
+  uint64 Until = 3;
 }
 
 message ActivitiesResponse {

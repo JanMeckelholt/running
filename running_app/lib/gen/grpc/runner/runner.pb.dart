@@ -165,24 +165,90 @@ class ActivitiesRequest extends $pb.GeneratedMessage {
   void clearSince() => clearField(2);
 }
 
+class WeekSummaryRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WeekSummaryRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'runner'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clientId', protoName: 'clientId')
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'week')
+    ..hasRequiredFields = false
+  ;
+
+  WeekSummaryRequest._() : super();
+  factory WeekSummaryRequest({
+    $core.String? clientId,
+    $fixnum.Int64? week,
+  }) {
+    final _result = create();
+    if (clientId != null) {
+      _result.clientId = clientId;
+    }
+    if (week != null) {
+      _result.week = week;
+    }
+    return _result;
+  }
+  factory WeekSummaryRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WeekSummaryRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  WeekSummaryRequest clone() => WeekSummaryRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WeekSummaryRequest copyWith(void Function(WeekSummaryRequest) updates) => super.copyWith((message) => updates(message as WeekSummaryRequest)) as WeekSummaryRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static WeekSummaryRequest create() => WeekSummaryRequest._();
+  WeekSummaryRequest createEmptyInstance() => create();
+  static $pb.PbList<WeekSummaryRequest> createRepeated() => $pb.PbList<WeekSummaryRequest>();
+  @$core.pragma('dart2js:noInline')
+  static WeekSummaryRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WeekSummaryRequest>(create);
+  static WeekSummaryRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get clientId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set clientId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasClientId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearClientId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get week => $_getI64(1);
+  @$pb.TagNumber(2)
+  set week($fixnum.Int64 v) { $_setInt64(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasWeek() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearWeek() => clearField(2);
+}
+
 class WeekSummariesRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WeekSummariesRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'runner'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clientId', protoName: 'clientId')
-    ..a<$fixnum.Int64>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'weeks', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'weekSince', protoName: 'weekSince')
+    ..aInt64(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'weekUntil', protoName: 'weekUntil')
     ..hasRequiredFields = false
   ;
 
   WeekSummariesRequest._() : super();
   factory WeekSummariesRequest({
     $core.String? clientId,
-    $fixnum.Int64? weeks,
+    $fixnum.Int64? weekSince,
+    $fixnum.Int64? weekUntil,
   }) {
     final _result = create();
     if (clientId != null) {
       _result.clientId = clientId;
     }
-    if (weeks != null) {
-      _result.weeks = weeks;
+    if (weekSince != null) {
+      _result.weekSince = weekSince;
+    }
+    if (weekUntil != null) {
+      _result.weekUntil = weekUntil;
     }
     return _result;
   }
@@ -217,13 +283,22 @@ class WeekSummariesRequest extends $pb.GeneratedMessage {
   void clearClientId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $fixnum.Int64 get weeks => $_getI64(1);
+  $fixnum.Int64 get weekSince => $_getI64(1);
   @$pb.TagNumber(2)
-  set weeks($fixnum.Int64 v) { $_setInt64(1, v); }
+  set weekSince($fixnum.Int64 v) { $_setInt64(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasWeeks() => $_has(1);
+  $core.bool hasWeekSince() => $_has(1);
   @$pb.TagNumber(2)
-  void clearWeeks() => clearField(2);
+  void clearWeekSince() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get weekUntil => $_getI64(2);
+  @$pb.TagNumber(3)
+  set weekUntil($fixnum.Int64 v) { $_setInt64(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasWeekUntil() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearWeekUntil() => clearField(3);
 }
 
 class WeekSummary extends $pb.GeneratedMessage {

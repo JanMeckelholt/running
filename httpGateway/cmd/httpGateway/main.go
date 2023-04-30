@@ -58,7 +58,7 @@ func main() {
 	rootMux.Handle("/activities", mux.Handler("/activities", rs))
 	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
 	rootMux.Handle("/weeksummary", mux.Handler("/weeksummary", rs))
-	rootMux.Handle("/weeklyclimb", mux.Handler("/weeklyclimb", rs))
+	rootMux.Handle("/weeksummaries", mux.Handler("/weeksummaries", rs))
 	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 
 	handlerWithAuth := server.AuthMiddleware(rootMux)

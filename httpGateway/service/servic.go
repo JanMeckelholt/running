@@ -20,9 +20,12 @@ type ClimbResponse struct {
 }
 
 type ActivitiesRequestBody struct {
-	ClientId   *string
-	Since      *uint64 `json:"since,omitempty"`
-	SinceWeeks *uint64 `json:"sinceWeeks,omitempty"`
+	ClientId  *string
+	Since     *uint64 `json:"since,omitempty"`
+	Until     *uint64 `json:"until,omitempty"`
+	WeekSince *int64  `json:"weekSince,omitempty"`
+	WeekUntil *int64  `json:"weekUntil,omitempty"`
+	Week      *int64  `json:"week,omitempty"`
 }
 
 type RunnerRequestBody struct {
@@ -38,6 +41,7 @@ type RunnerCreateBody struct {
 }
 
 type WeekSummary struct {
+	StartOfWeek    *uint64
 	Distance       *uint64
 	TimeUnix       *uint64
 	TimeStr        *string
@@ -52,6 +56,6 @@ func (ws *WeekSummary) SetTimeStr() {
 	ws.TimeStr = &timeStr
 }
 
-type WeekSummaryResponse struct {
+type WeekSummariesResponse struct {
 	WeekSummaries []*WeekSummary
 }

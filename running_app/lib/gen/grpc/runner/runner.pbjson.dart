@@ -39,17 +39,29 @@ const ActivitiesRequest$json = const {
 
 /// Descriptor for `ActivitiesRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List activitiesRequestDescriptor = $convert.base64Decode('ChFBY3Rpdml0aWVzUmVxdWVzdBIaCghjbGllbnRJZBgBIAEoCVIIY2xpZW50SWQSFAoFc2luY2UYAiABKARSBXNpbmNl');
+@$core.Deprecated('Use weekSummaryRequestDescriptor instead')
+const WeekSummaryRequest$json = const {
+  '1': 'WeekSummaryRequest',
+  '2': const [
+    const {'1': 'clientId', '3': 1, '4': 1, '5': 9, '10': 'clientId'},
+    const {'1': 'week', '3': 2, '4': 1, '5': 3, '10': 'week'},
+  ],
+};
+
+/// Descriptor for `WeekSummaryRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List weekSummaryRequestDescriptor = $convert.base64Decode('ChJXZWVrU3VtbWFyeVJlcXVlc3QSGgoIY2xpZW50SWQYASABKAlSCGNsaWVudElkEhIKBHdlZWsYAiABKANSBHdlZWs=');
 @$core.Deprecated('Use weekSummariesRequestDescriptor instead')
 const WeekSummariesRequest$json = const {
   '1': 'WeekSummariesRequest',
   '2': const [
     const {'1': 'clientId', '3': 1, '4': 1, '5': 9, '10': 'clientId'},
-    const {'1': 'weeks', '3': 2, '4': 1, '5': 4, '10': 'weeks'},
+    const {'1': 'weekSince', '3': 2, '4': 1, '5': 3, '10': 'weekSince'},
+    const {'1': 'weekUntil', '3': 3, '4': 1, '5': 3, '10': 'weekUntil'},
   ],
 };
 
 /// Descriptor for `WeekSummariesRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List weekSummariesRequestDescriptor = $convert.base64Decode('ChRXZWVrU3VtbWFyaWVzUmVxdWVzdBIaCghjbGllbnRJZBgBIAEoCVIIY2xpZW50SWQSFAoFd2Vla3MYAiABKARSBXdlZWtz');
+final $typed_data.Uint8List weekSummariesRequestDescriptor = $convert.base64Decode('ChRXZWVrU3VtbWFyaWVzUmVxdWVzdBIaCghjbGllbnRJZBgBIAEoCVIIY2xpZW50SWQSHAoJd2Vla1NpbmNlGAIgASgDUgl3ZWVrU2luY2USHAoJd2Vla1VudGlsGAMgASgDUgl3ZWVrVW50aWw=');
 @$core.Deprecated('Use weekSummaryDescriptor instead')
 const WeekSummary$json = const {
   '1': 'WeekSummary',

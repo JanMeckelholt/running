@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:running_app/domain/models/runningModel.dart';
 
-Flexible runnigWeekList(RunningWeek runningWeek) {
-  return Flexible(
+Expanded runnigWeekList(RunningWeek runningWeek) {
+  return Expanded(
       child: (ListView(
     shrinkWrap: true,
     children: [

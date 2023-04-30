@@ -16,6 +16,7 @@ class ActivitiesRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ActivitiesRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'database'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ClientId', protoName: 'ClientId')
     ..a<$fixnum.Int64>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Since', $pb.PbFieldType.OU6, protoName: 'Since', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'Until', $pb.PbFieldType.OU6, protoName: 'Until', defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
   ;
 
@@ -23,6 +24,7 @@ class ActivitiesRequest extends $pb.GeneratedMessage {
   factory ActivitiesRequest({
     $core.String? clientId,
     $fixnum.Int64? since,
+    $fixnum.Int64? until,
   }) {
     final _result = create();
     if (clientId != null) {
@@ -30,6 +32,9 @@ class ActivitiesRequest extends $pb.GeneratedMessage {
     }
     if (since != null) {
       _result.since = since;
+    }
+    if (until != null) {
+      _result.until = until;
     }
     return _result;
   }
@@ -71,6 +76,15 @@ class ActivitiesRequest extends $pb.GeneratedMessage {
   $core.bool hasSince() => $_has(1);
   @$pb.TagNumber(2)
   void clearSince() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get until => $_getI64(2);
+  @$pb.TagNumber(3)
+  set until($fixnum.Int64 v) { $_setInt64(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasUntil() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearUntil() => clearField(3);
 }
 
 class ActivitiesResponse extends $pb.GeneratedMessage {
