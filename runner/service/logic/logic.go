@@ -8,6 +8,7 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/utils"
 )
 
 func GetClimb(activities *database.ActivitiesResponse) uint64 {
@@ -49,15 +50,19 @@ func GetWeek(activities *database.ActivitiesResponse, startOfWeek uint64) runner
 		}
 	}
 	week := runner.WeekSummary{
-		Distance:       distance,
-		TimeUnix:       elapsedTime,
-		NumberOfRuns:   NumberOfRuns,
-		Climb:          totalClimb,
-		NumberOfOthers: numberOfOthers,
+		Distance:        distance,
+		TimeUnix:        elapsedTime,
+		NumberOfRuns:    NumberOfRuns,
+		Climb:           totalClimb,
+		NumberOfOthers:  numberOfOthers,
+		StartOfWeekUnix: startOfWeek,
 	}
 	t := time.Duration(week.TimeUnix * uint64(time.Second))
 	timeStr := t.String()
 	week.TimeStr = timeStr
+	timeStartOfWeek := time.Unix(int64(startOfWeek), 0)
+	loc, _ := time.LoadLocation(utils.Location)
+	week.StartOfWeekStr = timeStartOfWeek.In(loc).Format("02.01.2006 15:04:05")
 	return week
 }
 

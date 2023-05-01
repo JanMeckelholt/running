@@ -41,13 +41,14 @@ type RunnerCreateBody struct {
 }
 
 type WeekSummary struct {
-	StartOfWeek    *uint64
-	Distance       *uint64
-	TimeUnix       *uint64
-	TimeStr        *string
-	NumberOfRuns   *uint64
-	Climb          *uint64
-	NumberOfOthers *uint64
+	StartOfWeekUnix *uint64
+	StartOfWeekStr  *string
+	Distance        *uint64
+	TimeUnix        *uint64
+	TimeStr         *string
+	NumberOfRuns    *uint64
+	Climb           *uint64
+	NumberOfOthers  *uint64
 }
 
 func (ws *WeekSummary) SetTimeStr() {

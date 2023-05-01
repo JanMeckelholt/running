@@ -45,6 +45,8 @@ message WeekSummary {
   uint64 climb = 4;
   uint64 numberOfRuns = 5;
   uint64 numberOfOthers = 6;
+  uint64 startOfWeekUnix = 7;
+  string startOfWeekStr = 8;
 }
 
 message WeekSummariesResponse {

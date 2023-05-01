@@ -72,11 +72,13 @@ const WeekSummary$json = const {
     const {'1': 'climb', '3': 4, '4': 1, '5': 4, '10': 'climb'},
     const {'1': 'numberOfRuns', '3': 5, '4': 1, '5': 4, '10': 'numberOfRuns'},
     const {'1': 'numberOfOthers', '3': 6, '4': 1, '5': 4, '10': 'numberOfOthers'},
+    const {'1': 'startOfWeekUnix', '3': 7, '4': 1, '5': 4, '10': 'startOfWeekUnix'},
+    const {'1': 'startOfWeekStr', '3': 8, '4': 1, '5': 9, '10': 'startOfWeekStr'},
   ],
 };
 
 /// Descriptor for `WeekSummary`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List weekSummaryDescriptor = $convert.base64Decode('CgtXZWVrU3VtbWFyeRIaCghkaXN0YW5jZRgBIAEoBFIIZGlzdGFuY2USGgoIdGltZVVuaXgYAiABKARSCHRpbWVVbml4EhgKB3RpbWVTdHIYAyABKAlSB3RpbWVTdHISFAoFY2xpbWIYBCABKARSBWNsaW1iEiIKDG51bWJlck9mUnVucxgFIAEoBFIMbnVtYmVyT2ZSdW5zEiYKDm51bWJlck9mT3RoZXJzGAYgASgEUg5udW1iZXJPZk90aGVycw==');
+final $typed_data.Uint8List weekSummaryDescriptor = $convert.base64Decode('CgtXZWVrU3VtbWFyeRIaCghkaXN0YW5jZRgBIAEoBFIIZGlzdGFuY2USGgoIdGltZVVuaXgYAiABKARSCHRpbWVVbml4EhgKB3RpbWVTdHIYAyABKAlSB3RpbWVTdHISFAoFY2xpbWIYBCABKARSBWNsaW1iEiIKDG51bWJlck9mUnVucxgFIAEoBFIMbnVtYmVyT2ZSdW5zEiYKDm51bWJlck9mT3RoZXJzGAYgASgEUg5udW1iZXJPZk90aGVycxIoCg9zdGFydE9mV2Vla1VuaXgYByABKARSD3N0YXJ0T2ZXZWVrVW5peBImCg5zdGFydE9mV2Vla1N0chgIIAEoCVIOc3RhcnRPZldlZWtTdHI=');
 @$core.Deprecated('Use weekSummariesResponseDescriptor instead')
 const WeekSummariesResponse$json = const {
   '1': 'WeekSummariesResponse',

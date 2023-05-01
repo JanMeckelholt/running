@@ -309,6 +309,8 @@ class WeekSummary extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'climb', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'numberOfRuns', $pb.PbFieldType.OU6, protoName: 'numberOfRuns', defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'numberOfOthers', $pb.PbFieldType.OU6, protoName: 'numberOfOthers', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'startOfWeekUnix', $pb.PbFieldType.OU6, protoName: 'startOfWeekUnix', defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'startOfWeekStr', protoName: 'startOfWeekStr')
     ..hasRequiredFields = false
   ;
 
@@ -320,6 +322,8 @@ class WeekSummary extends $pb.GeneratedMessage {
     $fixnum.Int64? climb,
     $fixnum.Int64? numberOfRuns,
     $fixnum.Int64? numberOfOthers,
+    $fixnum.Int64? startOfWeekUnix,
+    $core.String? startOfWeekStr,
   }) {
     final _result = create();
     if (distance != null) {
@@ -339,6 +343,12 @@ class WeekSummary extends $pb.GeneratedMessage {
     }
     if (numberOfOthers != null) {
       _result.numberOfOthers = numberOfOthers;
+    }
+    if (startOfWeekUnix != null) {
+      _result.startOfWeekUnix = startOfWeekUnix;
+    }
+    if (startOfWeekStr != null) {
+      _result.startOfWeekStr = startOfWeekStr;
     }
     return _result;
   }
@@ -416,6 +426,24 @@ class WeekSummary extends $pb.GeneratedMessage {
   $core.bool hasNumberOfOthers() => $_has(5);
   @$pb.TagNumber(6)
   void clearNumberOfOthers() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $fixnum.Int64 get startOfWeekUnix => $_getI64(6);
+  @$pb.TagNumber(7)
+  set startOfWeekUnix($fixnum.Int64 v) { $_setInt64(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasStartOfWeekUnix() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearStartOfWeekUnix() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get startOfWeekStr => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set startOfWeekStr($core.String v) { $_setString(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasStartOfWeekStr() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearStartOfWeekStr() => clearField(8);
 }
 
 class WeekSummariesResponse extends $pb.GeneratedMessage {

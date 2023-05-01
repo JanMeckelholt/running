@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const Location = "Europe/Berlin"
 const startOFWeek = time.Monday // Sunday = 0; Monday = 1
 
 func GetStartOfWeek(week int64) uint64 {
@@ -21,16 +22,18 @@ func GetStartOfWeek(week int64) uint64 {
 		log.Infof("got invalid week-value %d, defaulting to 0", week)
 		week = 0
 	}
-	roundDay := time.Now().Round(24 * time.Hour)
-	if roundDay.Weekday() != time.Now().Weekday() {
+	loc, _ := time.LoadLocation(Location)
+	_, offset := time.Now().In(loc).Zone()
+	roundDay := time.Now().UTC().Round(24 * time.Hour).Add(-time.Duration(offset) * time.Second)
+	if roundDay.In(loc).Weekday() != time.Now().In(loc).Weekday() {
 		roundDay = roundDay.Add(-24 * time.Hour)
 	}
 	var daysSinceMonday int64
-	switch roundDay.Weekday() {
+	switch roundDay.In(loc).Weekday() {
 	case time.Sunday:
 		daysSinceMonday = 6
 	default:
-		daysSinceMonday = int64(roundDay.Weekday() - startOFWeek)
+		daysSinceMonday = int64(roundDay.In(loc).Weekday() - startOFWeek)
 	}
 
 	return uint64(roundDay.Add(time.Duration(-daysSinceMonday)*24*time.Hour + time.Duration(week*7*24*int64(time.Hour))).Unix())
