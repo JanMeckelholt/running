@@ -18,7 +18,7 @@ class WebRunningApiService implements RunningApiService {
       WebRunningApiService._privateConstructor();
 
   @override
-  Future<RunningWeek> fetchRunningResponse() async {
+  Future<RunningWeek> fetchRunningResponse(int _weekIndex) async {
     Map<String, String> headers = {};
 
     var httpUriRunningResponse = Uri(
@@ -26,7 +26,10 @@ class WebRunningApiService implements RunningApiService {
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
-        queryParameters: {'client': ApiConstants.clientId, 'week': '0'});
+        queryParameters: {
+          'client': ApiConstants.clientId,
+          'week': '$_weekIndex'
+        });
     log('httpUri: $httpUriRunningResponse');
 
     Response response =

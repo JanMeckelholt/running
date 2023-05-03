@@ -7,7 +7,7 @@ import './runningApiStub.dart'
     if (dart.library.html) './webRunningApi.dart';
 
 abstract class RunningApiService {
-  Future<RunningWeek> fetchRunningResponse() {
+  Future<RunningWeek> fetchRunningResponse(int _weekIndex) {
     return Future<RunningWeek>.value(RunningWeek(
       climb: 0,
       distance: 0,

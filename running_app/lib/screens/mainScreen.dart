@@ -16,17 +16,14 @@ class _MainState extends State<Main> {
   @override
   void initState() {
     super.initState();
-    //_callApi(widget.apiService);
+    _callApi(widget.apiService);
   }
 
-  late Future<RunningWeek> _runningWeek =
-      widget.apiService.fetchRunningResponse();
+  late Future<RunningWeek> _runningWeek;
+  int _weekIndex = 0;
 
   Future<void> _callApi(RunningApiService apiService) async {
-    var response = await apiService.fetchRunningResponse();
-    setState(() {
-      _runningWeek = Future<RunningWeek>.value(response);
-    });
+    _runningWeek = apiService.fetchRunningResponse(_weekIndex);
   }
 
   @override
@@ -42,41 +39,92 @@ class _MainState extends State<Main> {
               if (snapshot.data != null) {
                 return Container(
                     color: Colors.amber,
-                    child: Row(
-                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Expanded(child: Container(color: Colors.green)),
-                        SingleChildScrollView(
-                          child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxHeight: 400),
-                              child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: ConstrainedBox(
-                                      constraints:
-                                          const BoxConstraints(maxWidth: 400),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: <Widget>[
-                                          const Text(
-                                            'Current week: ',
-                                            style: TextStyle(
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          runnigWeekList(snapshot.data!),
-                                          ElevatedButton(
-                                            onPressed: () =>
-                                                _callApi(widget.apiService),
-                                            child: const Icon(Icons.refresh),
-                                          ),
-                                        ],
-                                      )))),
-                        ),
-                        Expanded(child: Container(color: Colors.lightBlue)),
-                      ],
-                    ));
+                    child: Column(children: [
+                      Row(
+                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(child: Container(color: Colors.green)),
+                          SingleChildScrollView(
+                            child: ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxHeight: 400),
+                                child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: ConstrainedBox(
+                                        constraints:
+                                            const BoxConstraints(maxWidth: 400),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: <Widget>[
+                                            Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              20),
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _weekIndex--;
+                                                            _callApi(widget
+                                                                .apiService);
+                                                          });
+                                                        },
+                                                        child: const Icon(
+                                                            Icons.remove),
+                                                      )),
+                                                  Text(
+                                                    'Current week: $_weekIndex',
+                                                    style: const TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              20),
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            if (_weekIndex <
+                                                                0) {
+                                                              _weekIndex++;
+                                                              _callApi(widget
+                                                                  .apiService);
+                                                            }
+                                                          });
+                                                        },
+                                                        child: const Icon(
+                                                            Icons.add),
+                                                      )),
+                                                ]),
+                                            const Text(
+                                              'Summary: ',
+                                              style: TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            runnigWeekList(snapshot.data!),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _callApi(widget.apiService);
+                                                });
+                                              },
+                                              child: const Icon(Icons.refresh),
+                                            ),
+                                          ],
+                                        )))),
+                          ),
+                          Expanded(child: Container(color: Colors.lightBlue)),
+                        ],
+                      )
+                    ]));
               } else {
                 return Center(
                   child: Column(

@@ -16,7 +16,7 @@ class RunningWeek {
   });
 
   factory RunningWeek.fromJson(List<dynamic> json) {
-    var currentWeek = json[0]['weeksummaries']?[0];
+    var currentWeek = json[0];
     return RunningWeek(
       climb: currentWeek['climb'] ?? 0,
       distance: currentWeek['distance'] ?? 0,

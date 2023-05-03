@@ -16,7 +16,7 @@ class AndroidRunningApiService implements RunningApiService {
       AndroidRunningApiService._privateConstructor();
 
   @override
-  Future<RunningWeek> fetchRunningResponse() async {
+  Future<RunningWeek> fetchRunningResponse(int _weekindex) async {
     ByteData rootCACertificate = await rootBundle.load("certs/ca-cert.pem");
     ByteData clientCertificate =
         await rootBundle.load("certs/running_app-cert.pem");
@@ -37,7 +37,10 @@ class AndroidRunningApiService implements RunningApiService {
         host: ApiConstants.baseURLAndroidEmulator,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
-        queryParameters: {'client': ApiConstants.clientId, 'week': '0'});
+        queryParameters: {
+          'client': ApiConstants.clientId,
+          'week': '$_weekindex'
+        });
     log('httpUri: $httpUriRunningResponse');
 
     var response =
