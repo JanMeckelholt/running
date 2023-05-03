@@ -19,8 +19,6 @@ class WebRunningApiService implements RunningApiService {
 
   @override
   Future<RunningWeek> fetchRunningResponse(int _weekIndex) async {
-    Map<String, String> headers = {};
-
     var httpUriRunningResponse = Uri(
         scheme: 'http',
         host: ApiConstants.baseURL,
@@ -32,27 +30,25 @@ class WebRunningApiService implements RunningApiService {
         });
     log('httpUri: $httpUriRunningResponse');
 
-    Response response =
-        await apiClient.get(httpUriRunningResponse, headers: headers);
+    Response response = await apiClient.get(httpUriRunningResponse);
     log("ResponseCode: ${response.statusCode}");
     if (response.statusCode == 401) {
-      String updatedCookie = await _refreshCookie();
-      if (updatedCookie != "") {
-        headers['cookie'] = updatedCookie;
+      int loginStatusCode = await _refreshCookie();
+      if (loginStatusCode == 200) {
+        //  headers['cookie'] = loginResponse;
 
-        response =
-            await apiClient.get(httpUriRunningResponse, headers: headers);
+        response = await apiClient.get(httpUriRunningResponse);
         log("Response with updated coockie ${response.body} - ${response.statusCode}");
       }
-      log("ResponseCode after 401: ${response.statusCode} -> updatedCookie: $updatedCookie");
+      log("ResponseCode after 401: ${response.statusCode} -> loginResponseCookie: $loginStatusCode");
     }
     if (response.statusCode == 200) {
-      return RunningWeek.fromJson(jsonDecode("[${response.body}]"));
+      return RunningWeek.fromJson(jsonDecode(response.body));
     }
     throw Exception('Failed to get running response');
   }
 
-  Future<String> _refreshCookie() async {
+  Future<int> _refreshCookie() async {
     log("refresCookie");
     var httpUriLogin = Uri(
         scheme: 'http',
@@ -66,25 +62,19 @@ class WebRunningApiService implements RunningApiService {
         WebsiteResponse.fromJson(jsonDecode(response.body));
     if (wsResponse.LatestWebsitePing == "") {
       log("did not get LatestWebsitePing");
-      return "";
+      return 0;
     }
     EncryptData ed = EncryptData();
     String latestPingEncrypted = ed.encryptAES(
         wsResponse.LatestWebsitePing, Credentials.runningAppPassword);
 
-    final body = jsonEncode({
+    var body = jsonEncode({
       "username": Credentials.technicalUser,
       "LatestPingEncrypted": latestPingEncrypted
     });
     response = await apiClient.post(httpUriLogin, body: body);
     log("postResponse ${response.body} - ${response.statusCode} - ${response.headers}");
-
-    String? c = response.headers['set-cookie'];
-    if (c != null) {
-      int index = c.indexOf(';');
-      return (index == -1) ? c : c.substring(0, index);
-    }
-    return "";
+    return response.statusCode;
   }
 }
 

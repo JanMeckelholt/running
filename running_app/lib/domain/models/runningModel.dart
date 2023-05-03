@@ -5,6 +5,7 @@ class RunningWeek {
   final int numberOfOthers;
   final int timeUnix;
   final String timeStr;
+  final String startOfWeekStr;
 
   const RunningWeek({
     required this.climb,
@@ -13,10 +14,11 @@ class RunningWeek {
     required this.numberOfOthers,
     required this.timeUnix,
     required this.timeStr,
+    required this.startOfWeekStr,
   });
 
-  factory RunningWeek.fromJson(List<dynamic> json) {
-    var currentWeek = json[0];
+  factory RunningWeek.fromJson(Map<String, dynamic> json) {
+    var currentWeek = json;
     return RunningWeek(
       climb: currentWeek['climb'] ?? 0,
       distance: currentWeek['distance'] ?? 0,
@@ -24,6 +26,7 @@ class RunningWeek {
       numberOfOthers: currentWeek['numberOfOthers'] ?? 0,
       timeUnix: currentWeek['timeUnix'] ?? 0,
       timeStr: currentWeek['timeStr'] ?? "",
+      startOfWeekStr: currentWeek['startOfWeekStr'] ?? "",
     );
   }
 }

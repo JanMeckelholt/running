@@ -62,7 +62,7 @@ func GetWeek(activities *database.ActivitiesResponse, startOfWeek uint64) runner
 	week.TimeStr = timeStr
 	timeStartOfWeek := time.Unix(int64(startOfWeek), 0)
 	loc, _ := time.LoadLocation(utils.Location)
-	week.StartOfWeekStr = timeStartOfWeek.In(loc).Format("02.01.2006 15:04:05")
+	week.StartOfWeekStr = timeStartOfWeek.In(loc).Format("02.01.2006")
 	return week
 }
 

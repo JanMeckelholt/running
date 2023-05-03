@@ -15,6 +15,7 @@ abstract class RunningApiService {
       numberOfOthers: 0,
       timeUnix: 0,
       timeStr: "",
+      startOfWeekStr: "",
     ));
   }
 

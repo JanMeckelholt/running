@@ -103,6 +103,12 @@ class _MainState extends State<Main> {
                                                             Icons.add),
                                                       )),
                                                 ]),
+                                            Text(
+                                              "Week starts at ${snapshot.data!.startOfWeekStr}",
+                                              style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                             const Text(
                                               'Summary: ',
                                               style: TextStyle(
