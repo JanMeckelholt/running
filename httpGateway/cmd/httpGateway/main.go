@@ -45,10 +45,6 @@ func main() {
 	rs, err := server.NewHTTPGatewayServer(srv.Clients)
 
 	rootMux := http.NewServeMux()
-	allowOriginStr = fmt.Sprintf("http://localhost:%d", srv.Config.RunningAppPort)
-	if srv.Config.IsDev {
-		allowOriginStr = "*"
-	}
 	log.Infof("allowOrigin: %s", allowOriginStr)
 
 	rootMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))

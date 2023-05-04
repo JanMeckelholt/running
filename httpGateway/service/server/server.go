@@ -14,6 +14,7 @@ import (
 	"github.com/JanMeckelholt/running/httpGateway/service/clients"
 	"github.com/JanMeckelholt/running/httpGateway/service/config"
 	"github.com/golang-jwt/jwt/v4"
+	log "github.com/sirupsen/logrus"
 )
 
 type HTTPGatewayServer struct {
@@ -60,6 +61,7 @@ func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if origin := r.Header.Get("Origin"); allowList[origin] {
+			log.Infof("allowing Origin: %s", origin)
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
