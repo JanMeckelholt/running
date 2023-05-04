@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/JanMeckelholt/running/common/grpc/database"
@@ -11,6 +12,7 @@ import (
 	"github.com/JanMeckelholt/running/httpGateway/service"
 	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/clients"
+	"github.com/JanMeckelholt/running/httpGateway/service/config"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -50,9 +52,16 @@ func (rs HTTPGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 	return rs.clients.RunnerClient.GetWeekSummary(ctx, &request)
 }
 
-func CorsMiddleware(next http.Handler, allowOrigin string) http.Handler {
+func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler {
+	allowList := map[string]bool{
+		fmt.Sprintf("homepage-server:%d", config.RunningAppPort):  true,
+		fmt.Sprintf("http://localhost:%d", config.RunningAppPort): true,
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
+		if origin := r.Header.Get("Origin"); allowList[origin] {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(w, r)
 	})

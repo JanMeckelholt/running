@@ -62,7 +62,7 @@ func main() {
 	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 
 	handlerWithAuth := server.AuthMiddleware(rootMux)
-	handlerWithCors := server.CorsMiddleware(handlerWithAuth, allowOriginStr)
+	handlerWithCors := server.CorsMiddleware(handlerWithAuth, srv.Config)
 
 	go func() {
 		sTLS := &http.Server{
