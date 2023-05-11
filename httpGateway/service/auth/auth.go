@@ -96,7 +96,7 @@ func LoginHandler() http.Handler {
 			Expires:  expirationTime,
 			HttpOnly: true,
 			Secure:   false,
-			SameSite: http.SameSiteStrictMode,
+			SameSite: http.SameSiteNoneMode,
 		})
 		log.Info("Login Success!")
 		w.WriteHeader(http.StatusOK)
@@ -159,7 +159,7 @@ func WebsiteHandler() http.Handler {
 				Expires:  expirationTime,
 				HttpOnly: true,
 				Secure:   false,
-				SameSite: http.SameSiteStrictMode,
+				SameSite: http.SameSiteNoneMode,
 			})
 			log.Info("Login Success!")
 			w.WriteHeader(http.StatusOK)
