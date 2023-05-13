@@ -18,7 +18,7 @@ RUN flutter create .
 RUN flutter clean
 RUN flutter pub get
 RUN flutter pub upgrade --major-versions
-RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} --web-use-https --web-ssl-cert-path=./certs/running_app-cert.pem --web-ssl-key-path=./certs/running_app-key.pem
+RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} 
 
 EXPOSE 5000
 
