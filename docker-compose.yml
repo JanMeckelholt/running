@@ -29,14 +29,16 @@ services:
     build:
       context: .
       dockerfile: ./httpGateway/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "81:80"
       - "444:443"
-    env_file:
-      - ./httpGateway/.env.docker
-      - ./httpGateway/.env.docker.secret
-      - .env
-      - ./running_app/.env.docker.running_app.secret
+    #env_file:
+      #- ./httpGateway/.env.docker
+      #- ./httpGateway/.env.docker.secret
+      #- .env
+      #- ./running_app/.env.docker.running_app.secret
     depends_on:
       - runner
     networks:
@@ -46,11 +48,13 @@ services:
     build:
       context: .
       dockerfile: ./database-service/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "667:666"
-    env_file:
-      - .env.docker.postgres
-      - .env.docker.postgres.secret
+    #env_file:
+      #- .env.docker.postgres
+      #- .env.docker.postgres.secret
     networks:
       - running-net
       - db-net
@@ -65,10 +69,12 @@ services:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
      # - ./postgres:/docker-entrypoint-initdb.d/
       - ./volumes-data/postgres/certs/:/var/lib/postgresql/certs/
-    user: "1001:1001"
+    user: "1000:1000"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     env_file:
-      - .env.docker.postgres
-      - .env.docker.postgres.secret
+      - ./common/.env.docker.postgres
+     # - .env.docker.postgres.secret
     networks:
       - db-net
   # populate-db:
@@ -94,27 +100,9 @@ services:
     networks:
       - running-net
       - proxy-net
-#   nginx:
-#     container_name: nginx
-#     hostname: nginx
-#     image: nginx
-#     ports:
-#       - 680:80
-#       - 6443:443
-#     volumes:
-#       - nginx_conf:/etc/nginx
-#       - ./running_app/certs:/etc/ssl/private
-# volumes:
-#   nginx_conf:
-#     driver: local
-#     driver_opts:
-#       type: "none"
-#       o: bind
-#       device: ${PWD}/volumes-data/nginx_conf
-#
 networks:
   running-net:
   db-net:
   proxy-net:
-      external:
-        name: proxy-net
+#      external:
+#        name: proxy-net

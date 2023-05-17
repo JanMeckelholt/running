@@ -14,6 +14,7 @@ require (
 require (
 	github.com/fullstorydev/grpcurl v1.8.7 // indirect
 	github.com/jhump/protoreflect v1.12.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 )
 

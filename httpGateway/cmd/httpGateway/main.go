@@ -12,6 +12,7 @@ import (
 	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/mux"
 	"github.com/JanMeckelholt/running/httpGateway/service/server"
+	"github.com/joho/godotenv"
 
 	"github.com/caarlos0/env/v7"
 	log "github.com/sirupsen/logrus"
@@ -19,6 +20,7 @@ import (
 
 func main() {
 	var allowOriginStr string
+	godotenv.Load("./httpGateway/.env.docker", "./httpGateway/.env.docker.secret", "./common/.env.docker.running_app", "./common/.env.docker.running_app.secret")
 	srv := &service.Service{}
 	err := env.Parse(&srv.Config)
 	if err != nil {

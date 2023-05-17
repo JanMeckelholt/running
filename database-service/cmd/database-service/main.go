@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -18,6 +20,13 @@ import (
 )
 
 func main() {
+	wd, _ := os.Getwd()
+	log.Infof("current dir: %s", wd)
+	godotenv.Load("./common/.env.docker.postgres", "./common/.env.docker.postgres.secret")
+	log.Infof("POSTGRES_PASSWORD: %s", os.Getenv("POSTGRES_PASSWORD"))
+	for k, v := range os.Environ() {
+		log.Infof("variable %d: %s\n", k, v)
+	}
 	storer := &service.Storer{}
 	err := env.Parse(&storer.StorerConfig)
 	if err != nil {

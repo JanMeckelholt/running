@@ -10,10 +10,12 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/populate-db/service"
 	"github.com/caarlos0/env/v7"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	godotenv.Load(".env.docker", ".env.docker.secret")
 	srv := &service.Service{}
 	err := env.Parse(&srv.ServiceConfig)
 	if err != nil || !srv.ServiceConfig.Enabled {
