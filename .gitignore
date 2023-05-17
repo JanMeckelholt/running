@@ -1,7 +1,7 @@
 private.key
 .env
 *.secret
-*.pem
+*key.pem
 *.key
 *.crt
 db_clients.txt

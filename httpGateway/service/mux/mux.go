@@ -218,6 +218,7 @@ func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodPost:
+				log.Infof("Getting activites from Strava for last weeks and saving in DB")
 				rB := service.ActivitiesRequestBody{}
 				err := json.NewDecoder(req.Body).Decode(&rB)
 				if err != nil {
