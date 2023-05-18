@@ -13,6 +13,8 @@ COPY ./common/ ./common/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
 RUN gpg -d ./common/.env.docker.postgres.secret.asc > ./common/.env.docker.postgres.secret
+RUN gpg -d ./database-service/certs/database-service-server-key.pem.asc > ./database-service/certs/database-service-server-key.pem
+RUN gpg -d ./database-service/certs/postgres-key.pem.asc > ./database-service/certs/postgres-key.pem
 RUN go mod tidy
 RUN go install ./database-service/cmd/database-service/
 RUN chmod +x ./database-service/wait-for-it.sh ./database-service/docker-entrypoint.sh

@@ -11,8 +11,6 @@ jobs:
       - name: Build the docker-compose stack
         run:    docker-compose up --build -d
         env:
-          RUNNING_APP_PASSWORD: ${{ secrets.RUNNING_APP_PASSWORD}}
-          RUNNING_APP_PORT: ${{ vars.RUNNING_APP_PORT }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY}}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD}}
         

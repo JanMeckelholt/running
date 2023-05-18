@@ -1,6 +1,5 @@
 FROM ubuntu:23.04
 ARG DEBIAN_FRONTEND=noninteractive
-ARG RUNNING_APP_PASSWORD
 ARG GPG_PRIVATE_KEY
 ENV TZ="Europe/Berlin"
 RUN apt-get update
@@ -12,12 +11,15 @@ RUN flutter doctor -v
 RUN flutter channel master
 RUN flutter upgrade
 RUN flutter config --enable-web
-
-WORKDIR /running_app/
-COPY ./running_app/ .
+WORKDIR /
+COPY ./common/ ./common/
+COPY ./running_app/ ./running_app/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
-RUN gpg -d ./certs/running_app-key.pem.asc > ./certs/running_app-key.pem
+RUN gpg -d ./running_app/certs/running_app-key.pem.asc > ./running_app/certs/running_app-key.pem
+RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
+RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.running_app.secret)
+WORKDIR /running_app/
 RUN flutter create .
 RUN flutter clean
 RUN flutter pub get

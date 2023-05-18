@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: ./strava-service/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "669:666"
     env_file:
@@ -15,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: ./runner/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "666:666"
     env_file:
@@ -34,11 +38,6 @@ services:
     ports:
       - "81:80"
       - "444:443"
-    #env_file:
-      #- ./httpGateway/.env.docker
-      #- ./httpGateway/.env.docker.secret
-      #- .env
-      #- ./running_app/.env.docker.running_app.secret
     depends_on:
       - runner
     networks:
@@ -52,50 +51,33 @@ services:
         - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "667:666"
-    #env_file:
-      #- .env.docker.postgres
-      #- .env.docker.postgres.secret
     networks:
       - running-net
       - db-net
   postgres:
     container_name: postgres
-    image: postgres:14.7-alpine    
-    command: -c ssl=on -c ssl_cert_file=/var/lib/postgresql/certs/postgres-cert.pem -c ssl_key_file=/var/lib/postgresql/certs/postgres-key.pem
+    build:
+      context: .
+      dockerfile: ./postgres/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
-     # - ./postgres:/docker-entrypoint-initdb.d/
-      - ./volumes-data/postgres/certs/:/var/lib/postgresql/certs/
     user: "1000:1000"
-    environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    env_file:
-      - ./common/.env.docker.postgres
-     # - .env.docker.postgres.secret
     networks:
       - db-net
-  # populate-db:
-  #   container_name: populate-db
-  #   build:
-  #     context: .
-  #     dockerfile: ./populate-db/Dockerfile
-  #   ports:
-  #     - 678:666
-  #   env_file:
-  #     - ./populate-db/.env.docker
-  # #     - ./populate-db/.env.docker.secret
   running_app:
     container_name: running_app
     build:  
       context: .
       dockerfile: ./running_app/Dockerfile
       args:
-        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
-      - "${RUNNING_APP_PORT}:5000"
+      - "8001:5000"
     restart: unless-stopped
     networks:
       - running-net
