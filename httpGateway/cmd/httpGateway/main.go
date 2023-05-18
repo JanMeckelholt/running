@@ -26,6 +26,7 @@ func main() {
 	if err != nil {
 		return
 	}
+	log.Infof("RunningAppPort: %d", srv.Config.RunningAppPort)
 	if len(srv.Config.JWTKey) < 8 {
 		log.Fatal("JWT not valid")
 	}

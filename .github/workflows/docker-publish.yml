@@ -19,9 +19,19 @@ jobs:
 
       - name: Publish image(s)
         run: |
-          docker tag running ${{ secrets.DOCKER_USERNAME}}/running:${{ github.sha }} && \
+          docker tag http_gateway ${{ secrets.DOCKER_USERNAME}}/http_gateway:${{ github.sha }} && \
+          docker tag runner ${{ secrets.DOCKER_USERNAME}}/runner:${{ github.sha }} && \
+          docker tag strava-service ${{ secrets.DOCKER_USERNAME}}/strava-service:${{ github.sha }} && \
+          docker tag database-service ${{ secrets.DOCKER_USERNAME}}/database-service:${{ github.sha }} && \
+          docker tag running_app ${{ secrets.DOCKER_USERNAME}}/running_app:${{ github.sha }} && \
+          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }} && \
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p "${{ secrets.DOCKER_PASSWORD }}"
-          docker push ${{ secrets.DOCKER_USERNAME}}/running:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/http_gateway:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/runner:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/strava-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/database-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_app:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }}
   deploy:
     if: github.ref == 'refs/heads/master'
     name: Run remote deploy script

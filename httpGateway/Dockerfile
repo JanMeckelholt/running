@@ -1,6 +1,7 @@
 FROM golang:1.20-buster
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GPG_PRIVATE_KEY
+ARG RUNNING_APP_PORT
 RUN apt-get -yq update && apt-get -yq install gnupg2 ca-certificates cl-base64
 WORKDIR /go/src/running
 COPY go.mod .
@@ -14,5 +15,5 @@ RUN gpg -d ./httpGateway/.env.docker.secret.asc > ./httpGateway/.env.docker.secr
 RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
 RUN gpg -d ./httpGateway/certs/http_gateway-server-key.pem.asc > ./httpGateway/certs/http_gateway-server-key.pem
 RUN go mod tidy
-RUN go install ./httpGateway/cmd/httpGateway/
+RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/
 CMD ["httpGateway"]
