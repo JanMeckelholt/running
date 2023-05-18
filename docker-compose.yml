@@ -55,7 +55,7 @@ services:
       - running-net
       - db-net
   postgres:
-    container_name: running_postgres
+    container_name: postgres
     build:
       context: .
       dockerfile: ./postgres/Dockerfile
