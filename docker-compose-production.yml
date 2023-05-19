@@ -1,7 +1,7 @@
 services:
   strava-service:
     container_name: strava-service
-    image: janmeckelholt/running_strava-service
+    image: janmeckelholt/running_strava-service:${COMMIT}
     ports:
       - "669:666"
     env_file:
@@ -10,7 +10,7 @@ services:
       - running-net
   runner:
     container_name: runner
-    image: janmeckelholt/running_runner
+    image: janmeckelholt/running_runner:${COMMIT}
     ports:
       - "666:666"
     env_file:
@@ -22,7 +22,7 @@ services:
       - running-net 
   http_gateway:
     container_name: http_gateway
-    image: janmeckelholt/running_http_gateway
+    image: janmeckelholt/running_http_gateway:${COMMIT}
     ports:
       - "81:80"
       - "444:443"
@@ -32,7 +32,7 @@ services:
       - running-net
   database-service:
     container_name: database-service
-    image: janmeckelholt/running_database-service
+    image: janmeckelholt/running_database-service:${COMMIT}
     ports:
       - "667:666"
     networks:
@@ -40,7 +40,7 @@ services:
       - db-net
   postgres:
     container_name: postgres
-    image: janmeckelholt/running_postgres
+    image: janmeckelholt/running_postgres:${COMMIT}
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -51,7 +51,7 @@ services:
       - db-net
   running_app:
     container_name: running_app
-    image: janmeckelholt/running_running_app
+    image: janmeckelholt/running_running_app:${COMMIT}
     ports:
       - "8001:5000"
     restart: unless-stopped
