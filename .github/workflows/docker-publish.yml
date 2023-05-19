@@ -27,7 +27,7 @@ jobs:
           docker tag running_strava-service ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${{ github.sha }}-arm64 && \
           docker tag running_database-service ${{ secrets.DOCKER_USERNAME}}/running_database-service:${{ github.sha }}-arm64 && \
           docker tag running_running_app ${{ secrets.DOCKER_USERNAME}}/running_running_app:${{ github.sha }}-arm64 && \
-          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }}-arm64
+          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }}-arm64 && \
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p "${{ secrets.DOCKER_PASSWORD }}"
           docker push ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${{ github.sha }}-arm64
           docker push ${{ secrets.DOCKER_USERNAME}}/running_runner:${{ github.sha }}-arm64
