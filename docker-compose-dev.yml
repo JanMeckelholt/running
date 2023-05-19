@@ -1,7 +1,11 @@
 services:
   strava-service:
     container_name: strava-service
-    image: janmeckelholt/running_strava-service:${COMMIT}
+    build:
+      context: .
+      dockerfile: ./strava-service/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "669:666"
     env_file:
@@ -10,7 +14,11 @@ services:
       - running-net
   runner:
     container_name: runner
-    image: janmeckelholt/running_runner:${COMMIT}
+    build:
+      context: .
+      dockerfile: ./runner/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "666:666"
     env_file:
@@ -22,7 +30,11 @@ services:
       - running-net 
   http_gateway:
     container_name: http_gateway
-    image: janmeckelholt/running_http_gateway:${COMMIT}
+    build:
+      context: .
+      dockerfile: ./httpGateway/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "81:80"
       - "444:443"
@@ -32,7 +44,11 @@ services:
       - running-net
   database-service:
     container_name: database-service
-    image: janmeckelholt/running_database-service:${COMMIT}
+    build:
+      context: .
+      dockerfile: ./database-service/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "667:666"
     networks:
@@ -40,7 +56,11 @@ services:
       - db-net
   postgres:
     container_name: postgres
-    image: janmeckelholt/running_postgres:${COMMIT}
+    build:
+      context: .
+      dockerfile: ./postgres/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -51,7 +71,11 @@ services:
       - db-net
   running_app:
     container_name: running_app
-    image: janmeckelholt/running_running_app:${COMMIT}
+    build:  
+      context: .
+      dockerfile: ./running_app/Dockerfile
+      args:
+        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "8001:5000"
     restart: unless-stopped
@@ -62,5 +86,5 @@ networks:
   running-net:
   db-net:
   proxy-net:
-    external:
-      name: proxy-net
+#      external:
+#        name: proxy-net

@@ -1,5 +1,6 @@
 services:
   strava-service:
+    platform: linux/arm64
     container_name: strava-service
     build:
       context: .
@@ -13,6 +14,7 @@ services:
     networks:
       - running-net
   runner:
+    platform: linux/arm64
     container_name: runner
     build:
       context: .
@@ -29,6 +31,7 @@ services:
     networks:
       - running-net 
   http_gateway:
+    platform: linux/arm64
     container_name: http_gateway
     build:
       context: .
@@ -43,6 +46,7 @@ services:
     networks:
       - running-net
   database-service:
+    platform: linux/arm64
     container_name: database-service
     build:
       context: .
@@ -55,6 +59,7 @@ services:
       - running-net
       - db-net
   postgres:
+    platform: linux/arm64
     container_name: postgres
     build:
       context: .
@@ -70,6 +75,7 @@ services:
     networks:
       - db-net
   running_app:
+    platform: linux/arm64
     container_name: running_app
     build:  
       context: .
