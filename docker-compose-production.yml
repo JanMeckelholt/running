@@ -1,3 +1,4 @@
+platform: linux/arm64
 services:
   strava-service:
     container_name: strava-service
