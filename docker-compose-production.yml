@@ -62,5 +62,5 @@ networks:
   running-net:
   db-net:
   proxy-net:
-#      external:
-#        name: proxy-net
+    external:
+      name: proxy-net
