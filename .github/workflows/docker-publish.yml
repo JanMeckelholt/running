@@ -5,6 +5,7 @@ jobs:
   build:
     name: Build, test and publish app Docker images
     runs-on: ubuntu-latest
+    env:
       DOCKER_REGISTRY: janmeckelholt.io
       DOCKER_TARGET_PLATFORM: linux/arm64
       PLATFORM: linux/arm64
