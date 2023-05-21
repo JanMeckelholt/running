@@ -46,7 +46,7 @@ services:
       - "5432:5432"
     volumes:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
-    user: "1000:1000"
+    user: "1001:1001"
     networks:
       - db-net
   running_app:

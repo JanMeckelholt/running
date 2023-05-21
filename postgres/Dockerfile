@@ -9,7 +9,7 @@ RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
 RUN gpg -d ./common/.env.docker.postgres.secret.asc > ./common/.env.docker.postgres.secret
 RUN gpg -d ./postgres/certs/postgres-key.pem.asc > ./postgres/certs/postgres-key.pem
-RUN chown root:1000 ./postgres/certs/postgres-key.pem
+RUN chown root:1001 ./postgres/certs/postgres-key.pem
 RUN chmod 640 ./postgres/certs/postgres-key.pem
 RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.postgres.secret)
 RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.postgres)
