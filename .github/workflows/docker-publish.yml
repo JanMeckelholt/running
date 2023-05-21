@@ -35,19 +35,19 @@ jobs:
 
       - name: Publish image(s)
         run: |
-          docker tag running_http_gateway ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${GITHUB_RUN_NUMBER}  && \
-          docker tag running_runner ${{ secrets.DOCKER_USERNAME}}/running_runner:${GITHUB_RUN_NUMBER} && \
-          docker tag running_strava-service ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${GITHUB_RUN_NUMBER} && \
-          docker tag running_database-service ${{ secrets.DOCKER_USERNAME}}/running_database-service:${GITHUB_RUN_NUMBER} && \
-          docker tag running_running_app ${{ secrets.DOCKER_USERNAME}}/running_running_app:${GITHUB_RUN_NUMBER} && \
-          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${GITHUB_RUN_NUMBER} && \
+          docker tag running_http_gateway ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${{ github.sha }}  && \
+          docker tag running_runner ${{ secrets.DOCKER_USERNAME}}/running_runner:${{ github.sha }} && \
+          docker tag running_strava-service ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${{ github.sha }} && \
+          docker tag running_database-service ${{ secrets.DOCKER_USERNAME}}/running_database-service:${{ github.sha }} && \
+          docker tag running_running_app ${{ secrets.DOCKER_USERNAME}}/running_running_app:${{ github.sha }} && \
+          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }} && \
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p "${{ secrets.DOCKER_PASSWORD }}"
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${GITHUB_RUN_NUMBER}
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_runner:${GITHUB_RUN_NUMBER}
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${GITHUB_RUN_NUMBER}
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_database-service:${GITHUB_RUN_NUMBER}
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_running_app:${GITHUB_RUN_NUMBER}
-          docker push ${{ secrets.DOCKER_USERNAME}}/running_postgres:${GITHUB_RUN_NUMBER}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_runner:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_database-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_running_app:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }}
 
 
 
@@ -57,7 +57,7 @@ jobs:
 #       run: |        
 #         echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
 #         echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}        
-#         echo ::set-output name=version::${GITHUB_RUN_NUMBER}      
+#         echo ::set-output name=version::${{ github.sha }}      
 # - name: Docker Login      
 #       if: success()      
 #       run: |        
