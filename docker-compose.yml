@@ -83,6 +83,7 @@ services:
       dockerfile: ./running_app/Dockerfile
       args:
         - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
+    user: "1001:1001"
     ports:
       - "8001:5000"
     restart: unless-stopped
