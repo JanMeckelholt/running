@@ -54,6 +54,8 @@ services:
     image: janmeckelholt/running_running_app:${COMMIT}
     ports:
       - "8001:5000"
+    volumes:
+      - ./volumes-data/log:/log
     restart: unless-stopped
     networks:
       - running-net

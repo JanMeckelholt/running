@@ -84,6 +84,8 @@ services:
       args:
         - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     user: "1001:1001"
+    volumes:
+      - ./volumes-data/log:/log
     ports:
       - "8001:5000"
     restart: unless-stopped
