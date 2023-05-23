@@ -55,13 +55,14 @@ func (rs HTTPGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 
 func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler {
 	allowList := map[string]bool{
-		"janmeckelholt.de":                                              true,
-		"https://janmeckelholt.de":                                      true,
-		"https://janmeckelholt.de/run":                                  true,
-		"https://janmeckelholt.de/run/":                                 true,
-		fmt.Sprintf("http://192.168.188.99:%d", config.RunningAppPort):  true,
-		fmt.Sprintf("http://homepage-server:%d", config.RunningAppPort): true,
-		fmt.Sprintf("http://localhost:%d", config.RunningAppPort):       true,
+		"janmeckelholt.de":                                               true,
+		"https://janmeckelholt.de":                                       true,
+		"https://janmeckelholt.de/run":                                   true,
+		"https://janmeckelholt.de/run/":                                  true,
+		fmt.Sprintf("http://192.168.188.99:%d", config.RunningAppPort):   true,
+		fmt.Sprintf("http://homepage-server:%d", config.RunningAppPort):  true,
+		fmt.Sprintf("https://homepage-server:%d", config.RunningAppPort): true,
+		fmt.Sprintf("http://localhost:%d", config.RunningAppPort):        true,
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
