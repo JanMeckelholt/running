@@ -38,4 +38,4 @@ RUN chmod +x server.sh
 
 EXPOSE 5000
 
-ENTRYPOINT [ "server.sh"]
+ENTRYPOINT [ "./server.sh"]

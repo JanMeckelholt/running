@@ -18,5 +18,5 @@ RUN go install ./strava-service/cmd/strava-service/
 FROM alpine
 WORKDIR /strava-service
 COPY --from=builder /go/bin/strava-service .
-CMD ["strava-service"]
+CMD ["./strava-service"]
 EXPOSE 666

@@ -22,4 +22,4 @@ RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGatewa
 FROM alpine
 WORKDIR /httpGateway
 COPY --from=builder /go/bin/httpGateway .
-CMD ["httpGateway"]
+CMD ["./httpGateway"]
