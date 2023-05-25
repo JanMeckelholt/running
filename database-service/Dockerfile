@@ -20,9 +20,10 @@ RUN go mod tidy
 RUN go install ./database-service/cmd/database-service/
 
 FROM alpine
-COPY --from=builder /go/bin/database-service /database-service/
-COPY --from=builder /go/src/running/database-service/*.sh /database-service/
-RUN chmod +x /database-service/wait-for-it.sh /database-service/docker-entrypoint.sh 
-ENTRYPOINT ["/database-service/docker-entrypoint.sh"]
-CMD ["/database-service/database-service"]
+WORKDIR /database-service
+COPY --from=builder /go/bin/database-service .
+COPY --from=builder /go/src/running/database-service/*.sh .
+RUN chmod +x .wait-for-it.sh docker-entrypoint.sh 
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["database-service"]
 EXPOSE 666

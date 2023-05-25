@@ -31,10 +31,11 @@ RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
 
 
 FROM alpine
-COPY --from=builder /running_app/build/web /running_app/
-COPY --from=builder /running_app/server.* /running_app/
-RUN chmod +x /running_app/server.sh 
+WORKDIR /running_app
+COPY --from=builder /running_app/build/web .
+COPY --from=builder /running_app/server.* .
+RUN chmod +x server.sh 
 
 EXPOSE 5000
 
-ENTRYPOINT [ "/running_app/server.sh"]
+ENTRYPOINT [ "server.sh"]

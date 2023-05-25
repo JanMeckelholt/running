@@ -16,9 +16,10 @@ RUN go mod tidy
 RUN go install ./runner/cmd/runner/
 
 FROM alpine
-COPY --from=builder /go/bin/runner /runner/
-COPY --from=builder /go/src/running/runner/*.sh /runner/
-RUN chmod +x /runner/wait-for-it.sh /runner/docker-entrypoint.sh 
-ENTRYPOINT ["./runner/docker-entrypoint.sh"]
-CMD ["/runner/runner"]
+WORKDIR /runner
+COPY --from=builder /go/bin/runner .
+COPY --from=builder /go/src/running/runner/*.sh .
+RUN chmod +x wait-for-it.sh docker-entrypoint.sh 
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["runner"]
 EXPOSE 666

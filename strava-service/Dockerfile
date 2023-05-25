@@ -16,6 +16,7 @@ RUN go mod tidy
 RUN go install ./strava-service/cmd/strava-service/
 
 FROM alpine
-COPY --from=builder /go/bin/strava-service /starva-service/
-CMD ["/starva-service/strava-service"]
+WORKDIR /strava-service
+COPY --from=builder /go/bin/strava-service .
+CMD ["strava-service"]
 EXPOSE 666
