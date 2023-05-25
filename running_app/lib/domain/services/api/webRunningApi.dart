@@ -20,7 +20,7 @@ class WebRunningApiService implements RunningApiService {
   @override
   Future<RunningWeek> fetchRunningResponse(int _weekIndex) async {
     var httpUriRunningResponse = Uri(
-        scheme: 'http',
+        scheme: 'https',
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
@@ -51,7 +51,7 @@ class WebRunningApiService implements RunningApiService {
   Future<int> _refreshCookie() async {
     log("refresCookie");
     var httpUriLogin = Uri(
-        scheme: 'http',
+        scheme: 'https',
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.loginPath);
