@@ -14,6 +14,7 @@ RUN gpg --import private.key
 RUN gpg -d ./httpGateway/.env.docker.secret.asc > ./httpGateway/.env.docker.secret
 RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
 RUN gpg -d ./httpGateway/certs/http_gateway-server-key.pem.asc > ./httpGateway/certs/http_gateway-server-key.pem
+RUN rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/
 CMD ["httpGateway"]

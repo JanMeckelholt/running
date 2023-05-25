@@ -18,6 +18,7 @@ RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
 RUN gpg -d ./running_app/certs/running_app-key.pem.asc > ./running_app/certs/running_app-key.pem
 RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
+RUN rm -f private.key && unset GPG_PRIVATE_KEY
 RUN chown root:1001 ./running_app/certs/running_app-key.pem
 RUN chmod 640 ./running_app/certs/running_app-key.pem
 RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.running_app.secret)

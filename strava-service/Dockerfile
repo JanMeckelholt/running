@@ -11,6 +11,7 @@ COPY ./common/ ./common/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
 RUN gpg -d ./strava-service/certs/strava-service-server-key.pem.asc > ./strava-service/certs/strava-service-server-key.pem
+RUN rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./strava-service/cmd/strava-service/
 CMD ["strava-service"]

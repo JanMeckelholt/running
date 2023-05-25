@@ -11,6 +11,7 @@ COPY ./common/ ./common/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
 RUN gpg -d ./httpGateway/.env.docker.secret.asc > .env.docker.secret
+RUN rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./populate-db/cmd/populate-db/
 RUN chmod +x ./populate-db/wait-for-it.sh ./populate-db/docker-entrypoint.sh
