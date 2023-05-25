@@ -1,4 +1,4 @@
-FROM ubuntu:23.04
+FROM ubuntu:23.04 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GPG_PRIVATE_KEY
 ENV TZ="Europe/Berlin"
@@ -14,11 +14,11 @@ RUN flutter config --enable-web
 WORKDIR /
 COPY ./common/ ./common/
 COPY ./running_app/ ./running_app/
-RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
-RUN gpg --import private.key
-RUN gpg -d ./running_app/certs/running_app-key.pem.asc > ./running_app/certs/running_app-key.pem
-RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
-RUN rm -f private.key && unset GPG_PRIVATE_KEY
+RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key && \
+gpg --import private.key && \
+gpg -d ./running_app/certs/running_app-key.pem.asc > ./running_app/certs/running_app-key.pem && \
+gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret && \
+rm -f private.key && unset GPG_PRIVATE_KEY
 RUN chown root:1001 ./running_app/certs/running_app-key.pem
 RUN chmod 640 ./running_app/certs/running_app-key.pem
 RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.running_app.secret)
@@ -29,8 +29,12 @@ RUN flutter pub get
 RUN flutter pub upgrade --major-versions
 RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} 
 
-EXPOSE 5000
 
-RUN ["chmod", "+x", "/running_app/server.sh"]
+FROM alpine
+COPY --from=builder /running_app/build/web /running_app/
+COPY --from=builder /running_app/server.* /running_app/
+RUN chmod +x /running_app/server.sh 
+
+EXPOSE 5000
 
 ENTRYPOINT [ "/running_app/server.sh"]

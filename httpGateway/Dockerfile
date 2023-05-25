@@ -1,4 +1,4 @@
-FROM golang:1.20-buster
+FROM golang:1.20-buster as builder
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GPG_PRIVATE_KEY
 ARG RUNNING_APP_PORT
@@ -9,12 +9,16 @@ COPY go.sum .
 RUN go mod download
 COPY ./httpGateway/ ./httpGateway/
 COPY ./common/ ./common/
-RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
-RUN gpg --import private.key
-RUN gpg -d ./httpGateway/.env.docker.secret.asc > ./httpGateway/.env.docker.secret
-RUN gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret
-RUN gpg -d ./httpGateway/certs/http_gateway-server-key.pem.asc > ./httpGateway/certs/http_gateway-server-key.pem
-RUN rm -f private.key && unset GPG_PRIVATE_KEY
+RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key && \
+gpg --import private.key && \
+gpg -d ./httpGateway/.env.docker.secret.asc > ./httpGateway/.env.docker.secret && \
+gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret && \
+gpg -d ./httpGateway/certs/http_gateway-server-key.pem.asc > ./httpGateway/certs/http_gateway-server-key.pem && \
+rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/
-CMD ["httpGateway"]
+
+
+FROM alpine
+COPY --from=builder /go/bin/httpGateway /httpGateway/
+CMD ["/httpGateway/httpGateway"]

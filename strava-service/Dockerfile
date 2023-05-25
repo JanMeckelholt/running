@@ -1,4 +1,4 @@
-FROM golang:1.20-buster
+FROM golang:1.20-buster as builder
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GPG_PRIVATE_KEY
 RUN apt-get -yq update && apt-get -yq install gnupg2 ca-certificates cl-base64
@@ -8,11 +8,14 @@ COPY go.sum .
 RUN go mod download
 COPY ./strava-service/. ./strava-service/
 COPY ./common/ ./common/
-RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
-RUN gpg --import private.key
-RUN gpg -d ./strava-service/certs/strava-service-server-key.pem.asc > ./strava-service/certs/strava-service-server-key.pem
-RUN rm -f private.key && unset GPG_PRIVATE_KEY
+RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key && \
+gpg --import private.key && \
+gpg -d ./strava-service/certs/strava-service-server-key.pem.asc > ./strava-service/certs/strava-service-server-key.pem && \
+rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./strava-service/cmd/strava-service/
-CMD ["strava-service"]
+
+FROM alpine
+COPY --from=builder /go/bin/strava-service /starva-service/
+CMD ["/starva-service/strava-service"]
 EXPOSE 666
