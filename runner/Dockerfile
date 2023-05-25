@@ -17,7 +17,7 @@ RUN go install ./runner/cmd/runner/
 
 FROM alpine
 COPY --from=builder /go/bin/runner /runner/
-COPY --from=builder /go/src/running/runner/*.sh /go/src/running/runner/
+COPY --from=builder /go/src/running/runner/*.sh /runner/
 RUN chmod +x /runner/wait-for-it.sh /runner/docker-entrypoint.sh 
 ENTRYPOINT ["./runner/docker-entrypoint.sh"]
 CMD ["/runner/runner"]
