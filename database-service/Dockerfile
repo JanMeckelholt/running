@@ -15,9 +15,10 @@ gpg --import private.key && \
 gpg -d ./common/.env.docker.postgres.secret.asc > ./common/.env.docker.postgres.secret && \
 gpg -d ./database-service/certs/database-service-server-key.pem.asc > ./database-service/certs/database-service-server-key.pem && \
 gpg -d ./database-service/certs/postgres-key.pem.asc > ./database-service/certs/postgres-key.pem && \
-rm -f private.key && unset GPG_PRIVATE_KEY
-RUN go mod tidy
-RUN go install ./database-service/cmd/database-service/
+rm -f private.key && unset GPG_PRIVATE_KEY && \
+go mod tidy && \
+go install ./database-service/cmd/database-service/ && \
+rm -f ./common/.env.docker.postgres.secret
 
 FROM ubuntu
 WORKDIR /database-service

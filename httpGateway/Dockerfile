@@ -14,10 +14,10 @@ gpg --import private.key && \
 gpg -d ./httpGateway/.env.docker.secret.asc > ./httpGateway/.env.docker.secret && \
 gpg -d ./common/.env.docker.running_app.secret.asc > ./common/.env.docker.running_app.secret && \
 gpg -d ./httpGateway/certs/http_gateway-server-key.pem.asc > ./httpGateway/certs/http_gateway-server-key.pem && \
-rm -f private.key && unset GPG_PRIVATE_KEY
-RUN go mod tidy
-RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/
-
+rm -f private.key && unset GPG_PRIVATE_KEY && \
+go mod tidy && \
+RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/ && \
+rm -f ./common/.env.docker.running_app.secret ./httpGateway/.env.docker.secret 
 
 FROM ubuntu
 WORKDIR /httpGateway

@@ -47,6 +47,8 @@ services:
     volumes:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
     user: "1001:1001"
+    env:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - db-net
   running_app:

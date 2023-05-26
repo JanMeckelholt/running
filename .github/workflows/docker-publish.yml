@@ -27,7 +27,8 @@ jobs:
       - name: Build the docker-compose stack
         run:  docker-compose build
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY}}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           
         
       #- name: Get init logs

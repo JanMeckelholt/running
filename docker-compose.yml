@@ -67,6 +67,7 @@ services:
       dockerfile: ./postgres/Dockerfile
       args:
         - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: unless-stopped
     ports:
       - "5432:5432"
