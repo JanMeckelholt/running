@@ -9,7 +9,7 @@ COPY ./common/ /common/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key && \
 gpg --import private.key && \
 gpg -d ./postgres/certs/postgres-key.pem.asc > ./postgres/certs/postgres-key.pem && \
-rm -f private.key && unset GPG_PRIVATE_KEY && \
+rm -f private.key && unset GPG_PRIVATE_KEY
 RUN export $( grep -vE "^(#.*|\s*)$" ./common/.env.docker.postgres)
 RUN chown root:1001 ./postgres/certs/postgres-key.pem
 RUN chmod 640 ./postgres/certs/postgres-key.pem
