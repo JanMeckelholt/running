@@ -15,7 +15,7 @@ rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./runner/cmd/runner/
 
-FROM alpine
+FROM ubuntu
 WORKDIR /runner
 COPY --from=builder /go/bin/runner .
 COPY --from=builder /go/src/running/runner/*.sh .

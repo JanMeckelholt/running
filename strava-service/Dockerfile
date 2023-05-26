@@ -15,7 +15,7 @@ rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./strava-service/cmd/strava-service/
 
-FROM alpine
+FROM ubuntu
 WORKDIR /strava-service
 COPY --from=builder /go/bin/strava-service .
 CMD ["./strava-service"]

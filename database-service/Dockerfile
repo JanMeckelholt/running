@@ -19,7 +19,7 @@ rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./database-service/cmd/database-service/
 
-FROM alpine
+FROM ubuntu
 WORKDIR /database-service
 COPY --from=builder /go/bin/database-service .
 COPY --from=builder /go/src/running/database-service/*.sh .

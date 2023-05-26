@@ -19,7 +19,7 @@ RUN go mod tidy
 RUN RUNNING_APP_PORT=${RUNNING_APP_PORT} go install ./httpGateway/cmd/httpGateway/
 
 
-FROM alpine
+FROM ubuntu
 WORKDIR /httpGateway
 COPY --from=builder /go/bin/httpGateway .
 CMD ["./httpGateway"]

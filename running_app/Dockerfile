@@ -32,6 +32,7 @@ RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
 
 FROM alpine
 WORKDIR /running_app
+RUN apk update && apk add bash
 COPY --from=builder /running_app/build/web .
 COPY --from=builder /running_app/server.* .
 RUN chmod +x server.sh 
