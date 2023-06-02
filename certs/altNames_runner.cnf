@@ -1,1 +1,1 @@
-subjectAltName=DNS:runner,DNS:localhost
+subjectAltName=DNS:runner,DNS:localhost,DNS:homepage-server
