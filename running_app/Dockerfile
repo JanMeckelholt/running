@@ -33,7 +33,6 @@ RUN mkdir -p running_app/certs
 RUN mkdir common
 COPY --from=builder /running_app/build/web /running_app
 COPY --from=builder /running_app/certs /running_app/certs
-# COPY --from=builder /common ./common
 COPY --from=builder /running_app/server.* /running_app/
 RUN chmod +x /running_app/server.sh 
 
