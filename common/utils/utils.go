@@ -7,11 +7,15 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
+
 	"io"
 	mathRand "math/rand"
+	"os"
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/openpgp"
+	"golang.org/x/crypto/openpgp/armor"
 )
 
 const Location = "Europe/Berlin"
@@ -117,4 +121,39 @@ func PKCS5Trimming(encrypt []byte) []byte {
 	padding := encrypt[len(encrypt)-1]
 	log.Infof("padding: %s - %d", padding, int(padding))
 	return encrypt[:len(encrypt)-int(padding)]
+}
+
+func DecryptPGP(cipherFile, plaintextFile, skBase64 string) (err error) {
+	cipherText, err := os.ReadFile(cipherFile)
+	if err != nil {
+		return err
+	}
+	sk, err := base64.StdEncoding.DecodeString(skBase64)
+	if err != nil {
+		return err
+	}
+	skBuf := bytes.NewBuffer(cipherText)
+	armorBlock, _ := armor.Decode(skBuf)
+	privateKeyObj, err := openpgp.ReadKeyRing(bytes.NewReader(sk))
+	if err != nil {
+		return err
+	}
+	prompt := func(keys []openpgp.Key, symmetric bool) ([]byte, error) {
+		err := keys[0].PrivateKey.Decrypt([]byte(""))
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	md, err := openpgp.ReadMessage(armorBlock.Body, privateKeyObj, prompt, nil)
+	if err != nil {
+		return err
+	}
+
+	outFile, err := os.Create(plaintextFile)
+	defer outFile.Close()
+
+	_, err = io.Copy(outFile, md.UnverifiedBody)
+
+	return err
 }

@@ -4,22 +4,28 @@ services:
     image: janmeckelholt/running_strava-service:${COMMIT}
     ports:
       - "669:666"
-    env_file:
-      - ./strava-service/.env.docker
     networks:
       - running-net
+    volumes:
+      - ./volumes-data/strava-service/certs:/go/src/running/strava-service/certs
+      - ./volumes-data/strava-service/env:/go/src/running/strava-service/env
+    env_file:
+      - .env.gpg.secret
   runner:
     container_name: runner
     image: janmeckelholt/running_runner:${COMMIT}
     ports:
       - "666:666"
-    env_file:
-      - ./runner/.env.docker
     depends_on:
       - strava-service
       - database-service
     networks:
-      - running-net 
+      - running-net
+    volumes:
+      - ./volumes-data/runner/certs:/go/src/running/runner/certs
+      - ./volumes-data/runner/env:/go/src/running/runner/env 
+    env_file:
+      - .env.gpg.secret 
   http_gateway:
     container_name: http_gateway
     image: janmeckelholt/running_http_gateway:${COMMIT}
@@ -30,6 +36,12 @@ services:
       - runner
     networks:
       - running-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/httpGateway/commonenv
+      - ./volumes-data/httpGateway/certs:/go/src/running/httpGateway/certs
+      - ./volumes-data/httpGateway/env:/go/src/running/httpGateway/env
+    env_file:
+      - .env.gpg.secret
   database-service:
     container_name: database-service
     image: janmeckelholt/running_database-service:${COMMIT}
@@ -38,30 +50,42 @@ services:
     networks:
       - running-net
       - db-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/database-service/commonenv
+      - ./volumes-data/database-service/certs:/go/src/running/database-service/certs
+    env_file:
+      - .env.gpg.secret
   postgres:
     container_name: postgres
     image: janmeckelholt/running_postgres:${COMMIT}
     restart: unless-stopped
     ports:
       - "5432:5432"
-    volumes:
-      - ./volumes-data/postgres/data:/var/lib/postgresql/data
     user: "1001:1001"
-    env:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - db-net
+    volumes:
+      - ./volumes-data/postgres/data:/var/lib/postgresql/data
+      - ./volumes-data/common:/postgres/commonenv
+      - ./volumes-data/postgres/certs:/postgres/certs
+    env_file:
+      - .env.gpg.secret
+      - .env.postgres.secret
   running_app:
     container_name: running_app
     image: janmeckelholt/running_running_app:${COMMIT}
     ports:
       - "8001:5000"
-    volumes:
-      - ./volumes-data/log:/log
     restart: unless-stopped
     networks:
       - running-net
       - proxy-net
+    volumes:
+      - ./volumes-data/running_app/certs:/running_app/certs
+      - ./volumes-data/running_app/log:/log
+    env_file:
+      - .env.gpg.secret
+      - .env.running_app.secret
 networks:
   running-net:
   db-net:

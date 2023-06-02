@@ -1,1 +1,1 @@
-subjectAltName=DNS:http_gateway,DNS:localhost:81,DNS:localhost:444,DNS:homepage-server:81,DNS:homepage-server:444,DNS:192.168.188.99:81,DNS:192.168.188.99:444
+subjectAltName=DNS:http_gateway,DNS:localhost,DNS:localhost,DNS:homepage-server,DNS:homepage-server,DNS:192.168.188.99,DNS:192.168.188.99

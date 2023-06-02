@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/dependencies"
+	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/httpGateway/service"
 	"github.com/JanMeckelholt/running/httpGateway/service/auth"
 	"github.com/JanMeckelholt/running/httpGateway/service/mux"
@@ -20,11 +22,22 @@ import (
 
 func main() {
 	var allowOriginStr string
-	godotenv.Load("./httpGateway/.env.docker", "./httpGateway/.env.docker.secret", "./common/.env.docker.running_app", "./common/.env.docker.running_app.secret")
-	srv := &service.Service{}
-	err := env.Parse(&srv.Config)
+	commonConf := commonconf.GPGConf{}
+	err := env.Parse(&commonConf)
 	if err != nil {
 		return
+	}
+	err = utils.DecryptPGP("./httpGateway/commonenv/.env.docker.running_app.secret.asc", "./httpGateway/commonenv/.env.docker.running_app.secret", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./httpGateway/env/.env.docker.secret.asc", "./httpGateway/env/.env.docker.secret", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./httpGateway/certs/http_gateway-server-key.pem.asc", "./httpGateway/certs/http_gateway-server-key.pem", commonConf.GPGPrivateKey)
+	if err != nil {
+		return
+	}
+	godotenv.Load("./httpGateway/env/.env.docker", "./httpGateway/env/.env.docker.secret", "./httpGateway/commonenv/.env.docker.running_app", "./httpGateway/commonenv/.env.docker.running_app.secret")
+	srv := &service.Service{}
+	err = env.Parse(&srv.Config)
+	if err != nil {
+		log.Errorf("Could not load serviceConfig: %s", err.Error())
 	}
 	log.Infof("RunningAppPort: %d", srv.Config.RunningAppPort)
 	if len(srv.Config.JWTKey) < 8 {

@@ -5,21 +5,33 @@ import (
 	"net"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
+	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
+	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/runner/service"
 	"github.com/JanMeckelholt/running/runner/service/server"
 )
 
 func main() {
-	srv := &service.Service{}
-	err := env.Parse(&srv.Config)
+	commonConf := commonconf.GPGConf{}
+	err := env.Parse(&commonConf)
 	if err != nil {
 		return
+	}
+
+	err = utils.DecryptPGP("./runner/certs/runner-server-key.pem.asc", "./runner/certs/runner-server-key.pem", commonConf.GPGPrivateKey)
+
+	godotenv.Load("./runner/env/.env.docker")
+	srv := &service.Service{}
+	err = env.Parse(&srv.Config)
+	if err != nil {
+		log.Errorf("Could not load serviceConfig: %s", err.Error())
 	}
 	err = srv.Clients.Dial(srv.Config)
 	if err != nil {

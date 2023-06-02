@@ -6,39 +6,39 @@ services:
     build:
       context: .
       dockerfile: ./strava-service/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "669:666"
-    env_file:
-      - ./strava-service/.env.docker
     networks:
       - running-net
+    volumes:
+      - ./volumes-data/strava-service/certs:/go/src/running/strava-service/certs
+      - ./volumes-data/strava-service/env:/go/src/running/strava-service/env
+    env_file:
+      - .env.gpg.secret
   runner:
     platform: ${PLATFORM}
     container_name: runner
     build:
       context: .
       dockerfile: ./runner/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "666:666"
-    env_file:
-      - ./runner/.env.docker
     depends_on:
       - strava-service
       - database-service
     networks:
-      - running-net 
+      - running-net
+    volumes:
+      - ./volumes-data/runner/certs:/go/src/running/runner/certs
+      - ./volumes-data/runner/env:/go/src/running/runner/env 
+    env_file:
+      - .env.gpg.secret
   http_gateway:
     platform: ${PLATFORM}
     container_name: http_gateway
     build:
       context: .
       dockerfile: ./httpGateway/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "81:80"
       - "444:443"
@@ -46,56 +46,69 @@ services:
       - runner
     networks:
       - running-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/httpGateway/commonenv
+      - ./volumes-data/httpGateway/certs:/go/src/running/httpGateway/certs
+      - ./volumes-data/httpGateway/env:/go/src/running/httpGateway/env
+    env_file:
+      - .env.gpg.secret
   database-service:
     platform: ${PLATFORM}
     container_name: database-service
     build:
       context: .
       dockerfile: ./database-service/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
     ports:
       - "667:666"
     networks:
       - running-net
       - db-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/database-service/commonenv
+      - ./volumes-data/database-service/certs:/go/src/running/database-service/certs
+    env_file:
+      - .env.gpg.secret
   postgres:
     platform: ${PLATFORM}
     container_name: postgres
     build:
       context: .
       dockerfile: ./postgres/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
-        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: unless-stopped
     ports:
       - "5432:5432"
-    volumes:
-      - ./volumes-data/postgres/data:/var/lib/postgresql/data
-    user: "1001:1001"
+    user: "$USERID:$USERID"
     networks:
       - db-net
+    volumes:
+      - ./volumes-data/postgres/data:/var/lib/postgresql/data
+      - ./volumes-data/common:/postgres/commonenv
+      - ./volumes-data/postgres/certs:/postgres/certs
+    env_file:
+      - .env.gpg.secret
+      - .env.postgres.secret
   running_app:
     platform: ${PLATFORM}
     container_name: running_app
     build:  
       context: .
       dockerfile: ./running_app/Dockerfile
-      args:
-        - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY}
-    user: "1001:1001"
-    volumes:
-      - ./volumes-data/log:/log
+    user: "$USERID:$USERID"
     ports:
       - "8001:5000"
     restart: unless-stopped
     networks:
       - running-net
       - proxy-net
+    volumes:
+      - ./volumes-data/running_app/certs:/running_app/certs
+      - ./volumes-data/running_app/log:/log
+    env_file:
+      - .env.gpg.secret
+      - .env.running_app.secret
 networks:
   running-net:
   db-net:
   proxy-net:
-    external:
-      name: proxy-net
+  external:
+    name: proxy-net

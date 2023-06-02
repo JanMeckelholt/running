@@ -29,10 +29,8 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          
-        
-      #- name: Get init logs
-      #  run: docker-compose logs
+          RUNNING_APP_PASSWORD: ${{ secrets.RUNNING_APP_PASSWORD }}
+          USERID: 1001
 
       - name: Publish image(s)
         run: |

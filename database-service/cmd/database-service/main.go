@@ -10,8 +10,10 @@ import (
 	"google.golang.org/grpc"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
+	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/dependencies"
 	grpcDB "github.com/JanMeckelholt/running/common/grpc/database"
+	"github.com/JanMeckelholt/running/common/utils"
 
 	"github.com/JanMeckelholt/running/database-service/service/server"
 
@@ -19,11 +21,37 @@ import (
 )
 
 func main() {
-	godotenv.Load("./common/.env.docker.postgres", "./common/.env.docker.postgres.secret")
-	storer := &service.Storer{}
-	err := env.Parse(&storer.StorerConfig)
+	commonConf := commonconf.GPGConf{}
+	err := env.Parse(&commonConf)
 	if err != nil {
+		log.Errorf("Could not load commonConf: %s", err.Error())
 		return
+	}
+	err = utils.DecryptPGP("./database-service/commonenv/.env.docker.postgres.secret.asc", "./database-service/commonenv/.env.docker.postgres.secret", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt postgres.secret: %s", err.Error())
+		return
+	}
+	err = utils.DecryptPGP("./database-service/certs/database-service-server-key.pem.asc", "./database-service/certs/database-service-server-key.pem", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt database-service-server-key.pem: %s", err.Error())
+		return
+	}
+	err = utils.DecryptPGP("./database-service/certs/postgres-key.pem.asc", "./database-service/certs/postgres-key.pem", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt postgres-key.pem: %s", err.Error())
+		return
+	}
+	err = godotenv.Load("./database-service/commonenv/.env.docker.postgres", "./database-service/commonenv/.env.docker.postgres.secret")
+	if err != nil {
+		log.Errorf("load envs: %s", err.Error())
+		return
+	}
+
+	storer := &service.Storer{}
+	err = env.Parse(&storer.StorerConfig)
+	if err != nil {
+		log.Errorf("Could not load storerConfig: %s", err.Error())
 	}
 	storer = service.NewStorer(storer.StorerConfig)
 	err = storer.InitStorage()

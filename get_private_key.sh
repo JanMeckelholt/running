@@ -1,1 +1,2 @@
-gpg --export-secret-key dockerRunning | base64 | tr -d "\n" 
+gpg -r dockerRunning --export-secret-key | base64 | tr -d "\n" 
+

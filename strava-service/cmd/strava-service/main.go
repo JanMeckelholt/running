@@ -6,21 +6,37 @@ import (
 	"net/url"
 
 	"github.com/caarlos0/env/v7"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
+	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
+	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/strava-service/service"
 	"github.com/JanMeckelholt/running/strava-service/service/server"
 )
 
 func main() {
-	srv := &service.Service{}
-	err := env.Parse(&srv.ServiceConfig)
+	gpgConf := commonconf.GPGConf{}
+	err := env.Parse(&gpgConf)
 	if err != nil {
+		log.Errorf("Could not load commonConf: %s", err.Error())
 		return
+	}
+	err = utils.DecryptPGP("./strava-service/certs/strava-service-server-key.pem.asc", "./strava-service/certs/strava-service-server-key.pem", gpgConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not load DecryptPGP: %s", err.Error())
+		return
+	}
+
+	godotenv.Load("./strava-service/env/.env.docker")
+	srv := service.Service{}
+	err = env.Parse(&srv.ServiceConfig)
+	if err != nil {
+		log.Errorf("Could not load serviceConfig: %s", err.Error())
 	}
 	err = srv.Clients.Dial(srv.ServiceConfig)
 	if err != nil {
@@ -30,7 +46,7 @@ func main() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
 	tlsCredentials, err := certhandling.LoadTLSServerCredentials("strava-service/certs/strava-service-server-cert.pem", "strava-service/certs/strava-service-server-key.pem")
 	if err != nil {
-		log.Fatal("cannot load TLS credentials: ", err)
+		log.Errorf("cannot load TLS credentials: %s", err.Error())
 	}
 	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
 

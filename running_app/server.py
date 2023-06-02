@@ -3,7 +3,7 @@ import sys
 buffer = 1
 
 context =  ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-context.load_cert_chain(certfile='./assets/certs/running_app-cert.pem', keyfile='./assets/certs/running_app-key.pem')
+context.load_cert_chain(certfile='/running_app/certs/running_app-cert.pem', keyfile='/running_app/certs/running_app-key.pem')
 handler = http.server.SimpleHTTPRequestHandler
 server_address = ('0.0.0.0', 5000)
 with socketserver.TCPServer(server_address, handler) as httpd:
