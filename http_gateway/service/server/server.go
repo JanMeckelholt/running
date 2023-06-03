@@ -9,47 +9,47 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
 	"github.com/JanMeckelholt/running/common/models"
-	"github.com/JanMeckelholt/running/httpGateway/service"
-	"github.com/JanMeckelholt/running/httpGateway/service/auth"
-	"github.com/JanMeckelholt/running/httpGateway/service/clients"
-	"github.com/JanMeckelholt/running/httpGateway/service/config"
+	"github.com/JanMeckelholt/running/http_gateway/service"
+	"github.com/JanMeckelholt/running/http_gateway/service/auth"
+	"github.com/JanMeckelholt/running/http_gateway/service/clients"
+	"github.com/JanMeckelholt/running/http_gateway/service/config"
 	"github.com/golang-jwt/jwt/v4"
 	log "github.com/sirupsen/logrus"
 )
 
-type HTTPGatewayServer struct {
+type HttpGatewayServer struct {
 	clients clients.Clients
 }
 
-func NewHTTPGatewayServer(clients clients.Clients) (*HTTPGatewayServer, error) {
-	return &HTTPGatewayServer{
+func NewHttpGatewayServer(clients clients.Clients) (*HttpGatewayServer, error) {
+	return &HttpGatewayServer{
 		clients: clients,
 	}, nil
 }
 
-func (rs HTTPGatewayServer) GetRunner(ctx context.Context, request runner.RunnerRequest) (*strava.RunnerResponse, error) {
+func (rs HttpGatewayServer) GetRunner(ctx context.Context, request runner.RunnerRequest) (*strava.RunnerResponse, error) {
 	return rs.clients.RunnerClient.GetRunner(ctx, &request)
 }
 
-func (rs HTTPGatewayServer) ActivitiesToDB(ctx context.Context, request runner.ActivitiesRequest) error {
+func (rs HttpGatewayServer) ActivitiesToDB(ctx context.Context, request runner.ActivitiesRequest) error {
 	_, err := rs.clients.RunnerClient.ActivitiesToDB(ctx, &request)
 	return err
 }
 
-func (rs HTTPGatewayServer) CreateClient(ctx context.Context, request database.Client) error {
+func (rs HttpGatewayServer) CreateClient(ctx context.Context, request database.Client) error {
 	_, err := rs.clients.RunnerClient.CreateClient(ctx, &request)
 	return err
 }
 
-func (rs HTTPGatewayServer) GetActivities(ctx context.Context, request database.ActivitiesRequest) (*database.ActivitiesResponse, error) {
+func (rs HttpGatewayServer) GetActivities(ctx context.Context, request database.ActivitiesRequest) (*database.ActivitiesResponse, error) {
 	return rs.clients.RunnerClient.GetActivities(ctx, &request)
 }
 
-func (rs HTTPGatewayServer) GetWeekSummaries(ctx context.Context, request runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
+func (rs HttpGatewayServer) GetWeekSummaries(ctx context.Context, request runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
 	return rs.clients.RunnerClient.GetWeekSummaries(ctx, &request)
 }
 
-func (rs HTTPGatewayServer) GetWeekSummary(ctx context.Context, request runner.WeekSummaryRequest) (*runner.WeekSummary, error) {
+func (rs HttpGatewayServer) GetWeekSummary(ctx context.Context, request runner.WeekSummaryRequest) (*runner.WeekSummary, error) {
 	return rs.clients.RunnerClient.GetWeekSummary(ctx, &request)
 }
 

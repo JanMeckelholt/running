@@ -10,10 +10,10 @@ import (
 	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/utils"
-	"github.com/JanMeckelholt/running/httpGateway/service"
-	"github.com/JanMeckelholt/running/httpGateway/service/auth"
-	"github.com/JanMeckelholt/running/httpGateway/service/mux"
-	"github.com/JanMeckelholt/running/httpGateway/service/server"
+	"github.com/JanMeckelholt/running/http_gateway/service"
+	"github.com/JanMeckelholt/running/http_gateway/service/auth"
+	"github.com/JanMeckelholt/running/http_gateway/service/mux"
+	"github.com/JanMeckelholt/running/http_gateway/service/server"
 	"github.com/joho/godotenv"
 
 	"github.com/caarlos0/env/v7"
@@ -27,13 +27,13 @@ func main() {
 	if err != nil {
 		return
 	}
-	err = utils.DecryptPGP("./httpGateway/commonenv/.env.docker.running_app.secret.asc", "./httpGateway/commonenv/.env.docker.running_app.secret", commonConf.GPGPrivateKey)
-	err = utils.DecryptPGP("./httpGateway/env/.env.docker.secret.asc", "./httpGateway/env/.env.docker.secret", commonConf.GPGPrivateKey)
-	err = utils.DecryptPGP("./httpGateway/certs/http_gateway-server-key.pem.asc", "./httpGateway/certs/http_gateway-server-key.pem", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./http_gateway/commonenv/.env.docker.running_app.secret.asc", "./http_gateway/commonenv/.env.docker.running_app.secret", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./http_gateway/env/.env.docker.secret.asc", "./http_gateway/env/.env.docker.secret", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./http_gateway/certs/http_gateway-server-key.pem.asc", "./http_gateway/certs/http_gateway-server-key.pem", commonConf.GPGPrivateKey)
 	if err != nil {
 		return
 	}
-	godotenv.Load("./httpGateway/env/.env.docker", "./httpGateway/env/.env.docker.secret", "./httpGateway/commonenv/.env.docker.running_app", "./httpGateway/commonenv/.env.docker.running_app.secret")
+	godotenv.Load("./http_gateway/env/.env.docker", "./http_gateway/env/.env.docker.secret", "./http_gateway/commonenv/.env.docker.running_app", "./http_gateway/commonenv/.env.docker.running_app.secret")
 	srv := &service.Service{}
 	err = env.Parse(&srv.Config)
 	if err != nil {
@@ -58,7 +58,7 @@ func main() {
 	if err != nil {
 		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
-	rs, err := server.NewHTTPGatewayServer(srv.Clients)
+	rs, err := server.NewHttpGatewayServer(srv.Clients)
 
 	rootMux := http.NewServeMux()
 	log.Infof("allowOrigin: %s", allowOriginStr)
@@ -78,7 +78,7 @@ func main() {
 
 	go func() {
 		sTLS := &http.Server{
-			Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGatewayTLS"].Port),
+			Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gatewayTLS"].Port),
 			Handler: handlerWithCors,
 		}
 		lis, err := net.Listen("tcp", sTLS.Addr)
@@ -96,8 +96,8 @@ func main() {
 			}
 		}
 
-		log.Infof("Listening on :%d", dependencies.Configs["httpGatewayTLS"].Port)
-		serveErr := sTLS.ServeTLS(lis, "httpGateway/certs/http_gateway-server-cert.pem", "httpGateway/certs/http_gateway-server-key.pem")
+		log.Infof("Listening on :%d", dependencies.Configs["http_gatewayTLS"].Port)
+		serveErr := sTLS.ServeTLS(lis, "http_gateway/certs/http_gateway-server-cert.pem", "http_gateway/certs/http_gateway-server-key.pem")
 		defer func() {
 			teardown()
 		}()
@@ -107,7 +107,7 @@ func main() {
 	}()
 
 	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", dependencies.Configs["httpGateway"].Port),
+		Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gateway"].Port),
 		Handler: handlerWithCors,
 	}
 	lis, err := net.Listen("tcp", s.Addr)
@@ -125,7 +125,7 @@ func main() {
 		}
 	}
 
-	log.Infof("Listening on :%d", dependencies.Configs["httpGateway"].Port)
+	log.Infof("Listening on :%d", dependencies.Configs["http_gateway"].Port)
 	serveErr := s.Serve(lis)
 	defer func() {
 		teardown()

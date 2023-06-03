@@ -38,7 +38,7 @@ services:
     container_name: http_gateway
     build:
       context: .
-      dockerfile: ./httpGateway/Dockerfile
+      dockerfile: ./http_gateway/Dockerfile
     ports:
       - "81:80"
       - "444:443"
@@ -47,9 +47,9 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/common:/go/src/running/httpGateway/commonenv
-      - ./volumes-data/httpGateway/certs:/go/src/running/httpGateway/certs
-      - ./volumes-data/httpGateway/env:/go/src/running/httpGateway/env
+      - ./volumes-data/common:/go/src/running/http_gateway/commonenv
+      - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
+      - ./volumes-data/http_gateway/env:/go/src/running/http_gateway/env
     #env_file:
     #  - .env.gpg.secret
   database-service:

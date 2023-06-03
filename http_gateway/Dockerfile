@@ -6,9 +6,9 @@ WORKDIR /go/src/running
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-COPY ./httpGateway/ ./httpGateway/
+COPY ./http_gateway/ ./http_gateway/
 COPY ./common/ ./common/
 RUN go mod tidy
-RUN go install ./httpGateway/cmd/httpGateway/ 
+RUN go install ./http_gateway/cmd/http_gateway/ 
 
-CMD ["httpGateway"]
+CMD ["http_gateway"]

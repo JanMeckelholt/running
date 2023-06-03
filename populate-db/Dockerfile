@@ -10,7 +10,7 @@ COPY ./populate-db/. ./populate-db/
 COPY ./common/ ./common/
 RUN echo -n "${GPG_PRIVATE_KEY}" | base64 --decode > private.key
 RUN gpg --import private.key
-RUN gpg -d ./httpGateway/.env.docker.secret.asc > .env.docker.secret
+RUN gpg -d ./http_gateway/.env.docker.secret.asc > .env.docker.secret
 RUN rm -f private.key && unset GPG_PRIVATE_KEY
 RUN go mod tidy
 RUN go install ./populate-db/cmd/populate-db/

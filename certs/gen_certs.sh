@@ -6,7 +6,7 @@ rm -f ../volumes-data/strava-service/certs/*.*
 rm -f ../volumes-data/postgres/certs/*.*
 rm -f ../volumes-data/runner/certs/*.*
 rm -f ../volumes-data/populate-db/certs/*.*
-rm -f ../volumes-data/httpGateway/certs/*.*
+rm -f ../volumes-data/http_gateway/certs/*.*
 rm -f ../volumes-data/running_app/certs/*.*
 
 
@@ -17,7 +17,7 @@ cp ca-cert.pem ../volumes-data/strava-service/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/root.crt
 cp ca-cert.pem ../volumes-data/runner/certs/
 cp ca-cert.pem ../volumes-data/populate-db/certs/
-cp ca-cert.pem ../volumes-data/httpGateway/certs/
+cp ca-cert.pem ../volumes-data/http_gateway/certs/
 cp ca-cert.pem ../volumes-data/running_app/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/
 
@@ -76,7 +76,7 @@ openssl req -newkey rsa:4096 -nodes -keyout http_gateway-server-key.pem -out htt
 # Use CA's private key to sign http_gateway-server's CSR and get back the signed certificate
 openssl x509 -req -in http_gateway-server-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out http_gateway-server-cert.pem -extfile ./altNames_http_gateway.cnf
 gpg -e -a -r dockerRunning http_gateway-server-key.pem
-mv http_gateway-server-cert.pem ../volumes-data/httpGateway/certs/
-mv http_gateway-server-key.pem.asc ../volumes-data/httpGateway/certs/
+mv http_gateway-server-cert.pem ../volumes-data/http_gateway/certs/
+mv http_gateway-server-key.pem.asc ../volumes-data/http_gateway/certs/
 
 rm -f *.asc

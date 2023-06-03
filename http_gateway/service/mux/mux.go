@@ -13,12 +13,12 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/health"
 	"github.com/JanMeckelholt/running/common/utils"
-	"github.com/JanMeckelholt/running/httpGateway/service"
-	"github.com/JanMeckelholt/running/httpGateway/service/auth"
-	"github.com/JanMeckelholt/running/httpGateway/service/server"
+	"github.com/JanMeckelholt/running/http_gateway/service"
+	"github.com/JanMeckelholt/running/http_gateway/service/auth"
+	"github.com/JanMeckelholt/running/http_gateway/service/server"
 )
 
-func Handler(uri string, s *server.HTTPGatewayServer) http.Handler {
+func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 	switch uri {
 	case service.LoginRoute:
 		return auth.LoginHandler()

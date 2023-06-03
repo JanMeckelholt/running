@@ -3,8 +3,8 @@ package service
 import (
 	"time"
 
-	"github.com/JanMeckelholt/running/httpGateway/service/clients"
-	"github.com/JanMeckelholt/running/httpGateway/service/config"
+	"github.com/JanMeckelholt/running/http_gateway/service/clients"
+	"github.com/JanMeckelholt/running/http_gateway/service/config"
 )
 
 const LoginRoute = "/login"

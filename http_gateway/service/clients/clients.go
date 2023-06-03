@@ -10,7 +10,7 @@ import (
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
-	"github.com/JanMeckelholt/running/httpGateway/service/config"
+	"github.com/JanMeckelholt/running/http_gateway/service/config"
 )
 
 type Clients struct {
@@ -29,7 +29,7 @@ func (c *Clients) Dial(config config.ServiceConfig) error {
 }
 
 func dial(serviceName, address string) (*grpc.ClientConn, error) {
-	tlsCredentials, err := certhandling.LoadTLSClientCredentials("httpGateway/certs/ca-cert.pem")
+	tlsCredentials, err := certhandling.LoadTLSClientCredentials("http_gateway/certs/ca-cert.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}

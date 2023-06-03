@@ -37,9 +37,9 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/common:/go/src/running/httpGateway/commonenv
-      - ./volumes-data/httpGateway/certs:/go/src/running/httpGateway/certs
-      - ./volumes-data/httpGateway/env:/go/src/running/httpGateway/env
+      - ./volumes-data/common:/go/src/running/http_gateway/commonenv
+      - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
+      - ./volumes-data/http_gateway/env:/go/src/running/http_gateway/env
     env_file:
       - .env.gpg.secret
   database-service:
@@ -58,7 +58,7 @@ services:
   postgres:
     container_name: postgres
     image: janmeckelholt/running_postgres:${COMMIT}
-    restart: unless-stopped
+    #restart: unless-stopped
     ports:
       - "5432:5432"
     user: "1001:1001"
