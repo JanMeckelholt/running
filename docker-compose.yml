@@ -94,8 +94,6 @@ services:
     volumes:
       - ./volumes-data/running_app/certs:/running_app/certs
       - ./volumes-data/running_app/log:/log
-    env_file:
-      - .env.running_app.secret
 networks:
   running-net:
   db-net:
