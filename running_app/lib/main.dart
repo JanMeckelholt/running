@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:running_app/constants.dart';
 import 'package:running_app/domain/services/api/runningApi.dart';
@@ -11,6 +13,10 @@ void main() async {
   //await dotenv.load(fileName: ".env.docker.running_app.secret");
   const runningAppPassword =
       String.fromEnvironment('RUNNING_APP_PASSWORD', defaultValue: '');
+  log("RunningAppPassword: $runningAppPassword");
+  if (runningAppPassword.length < 8) {
+    print("Password too short!");
+  }
   Credentials.runningAppPassword = runningAppPassword;
 
   //final apiService = WebRunningApiService.instance;

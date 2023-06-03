@@ -91,6 +91,8 @@ services:
     platform: ${PLATFORM}
     container_name: running_app
     build:  
+      args:
+        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
       context: .
       dockerfile: ./running_app/Dockerfile
     user: "$USERID:$USERID"

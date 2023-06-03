@@ -13,8 +13,6 @@ services:
     volumes:
       - ./volumes-data/strava-service/certs:/go/src/running/strava-service/certs
       - ./volumes-data/strava-service/env:/go/src/running/strava-service/env
-    #env_file:
-    #  - .env.gpg.secret
   runner:
     platform: ${PLATFORM}
     container_name: runner
@@ -31,8 +29,6 @@ services:
     volumes:
       - ./volumes-data/runner/certs:/go/src/running/runner/certs
       - ./volumes-data/runner/env:/go/src/running/runner/env 
-    #env_file:
-    #  - .env.gpg.secret
   http_gateway:
     platform: ${PLATFORM}
     container_name: http_gateway
@@ -50,8 +46,6 @@ services:
       - ./volumes-data/common:/go/src/running/http_gateway/commonenv
       - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
       - ./volumes-data/http_gateway/env:/go/src/running/http_gateway/env
-    #env_file:
-    #  - .env.gpg.secret
   database-service:
     platform: ${PLATFORM}
     container_name: database-service
@@ -66,8 +60,6 @@ services:
     volumes:
       - ./volumes-data/common:/go/src/running/database-service/commonenv
       - ./volumes-data/database-service/certs:/go/src/running/database-service/certs
-    #env_file:
-    #  - .env.gpg.secret
   postgres:
     platform: ${PLATFORM}
     container_name: postgres
@@ -84,13 +76,12 @@ services:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
       - ./volumes-data/common:/postgres/commonenv
       - ./volumes-data/postgres/certs:/postgres/certs
-    #env_file:
-    #  - .env.gpg.secret
-    #  - .env.postgres.secret
   running_app:
     platform: ${PLATFORM}
     container_name: running_app
-    build:  
+    build:
+      args:
+        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}  
       context: .
       dockerfile: ./running_app/Dockerfile
     user: "$USERID:$USERID"
@@ -103,9 +94,8 @@ services:
     volumes:
       - ./volumes-data/running_app/certs:/running_app/certs
       - ./volumes-data/running_app/log:/log
-    #env_file:
-    #  - .env.gpg.secret
-    #  - .env.running_app.secret
+    env_file:
+      - .env.running_app.secret
 networks:
   running-net:
   db-net:

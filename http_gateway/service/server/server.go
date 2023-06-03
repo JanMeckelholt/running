@@ -55,30 +55,19 @@ func (rs HttpGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 
 func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler {
 	allowList := map[string]bool{
-		"janmeckelholt.de":                                               true,
-		"https://janmeckelholt.de":                                       true,
-		"https://janmeckelholt.de/run":                                   true,
-		"https://janmeckelholt.de/run/":                                  true,
-		fmt.Sprintf("http://192.168.188.99:%d", config.RunningAppPort):   true,
-		fmt.Sprintf("http://homepage-server:%d", config.RunningAppPort):  true,
-		fmt.Sprintf("https://homepage-server:%d", config.RunningAppPort): true,
-		fmt.Sprintf("http://localhost:%d", config.RunningAppPort):        true,
-		fmt.Sprintf("running_app:%d", config.RunningAppPort):             true,
-		fmt.Sprintf("http://running_app:%d", config.RunningAppPort):      true,
-		fmt.Sprintf("https://running_app:%d", config.RunningAppPort):     true,
-		fmt.Sprintf("running_app"):                                       true,
-		fmt.Sprintf("http://running_app"):                                true,
-		fmt.Sprintf("https://running_app"):                               true,
+		"janmeckelholt.de":                                         true,
+		"https://janmeckelholt.de":                                 true,
+		"https://janmeckelholt.de/run":                             true,
+		"https://janmeckelholt.de/run/":                            true,
+		fmt.Sprintf("http://localhost:%d", config.RunningAppPort):  true,
+		fmt.Sprintf("https://localhost:%d", config.RunningAppPort): true,
 	}
 
-	fmt.Printf("allowList: %s", allowList)
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//if origin := r.Header.Get("Origin"); allowList[origin] {
-		origin := r.Header.Get("Origin")
-		log.Infof("allowing Origin: %s", origin)
-		w.Header().Set("Access-Control-Allow-Origin", origin)
-		//}
+		if origin := r.Header.Get("Origin"); allowList[origin] {
+			log.Infof("allowing Origin: %s", origin)
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(w, r)
 	})

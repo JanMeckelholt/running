@@ -22,8 +22,7 @@ class WebRunningApiService implements RunningApiService {
   @override
   Future<RunningWeek> fetchRunningResponse(int _weekIndex) async {
     var httpUriRunningResponse = Uri(
-        //scheme: 'https',
-        scheme: 'http',
+        scheme: ApiConstants.scheme,
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.summaryPath,
@@ -33,14 +32,18 @@ class WebRunningApiService implements RunningApiService {
         });
     log('httpUri: $httpUriRunningResponse');
 
-    Response response = await apiClient.get(httpUriRunningResponse);
+    Response response = await apiClient
+        .get(httpUriRunningResponse)
+        .timeout(const Duration(seconds: ApiConstants.timeout));
     log("ResponseCode: ${response.statusCode}");
     if (response.statusCode == 401) {
       int loginStatusCode = await _refreshCookie();
       if (loginStatusCode == 200) {
         //  headers['cookie'] = loginResponse;
 
-        response = await apiClient.get(httpUriRunningResponse);
+        response = await apiClient
+            .get(httpUriRunningResponse)
+            .timeout(const Duration(seconds: ApiConstants.timeout));
         log("Response with updated coockie ${response.body} - ${response.statusCode}");
       }
       log("ResponseCode after 401: ${response.statusCode} -> loginResponseCookie: $loginStatusCode");
@@ -54,13 +57,14 @@ class WebRunningApiService implements RunningApiService {
   Future<int> _refreshCookie() async {
     log("refresCookie");
     var httpUriLogin = Uri(
-        //scheme: 'https',
-        scheme: 'http',
+        scheme: ApiConstants.scheme,
         host: ApiConstants.baseURL,
         port: ApiConstants.port,
         path: ApiConstants.loginPath);
     log('httpUri: $httpUriLogin');
-    Response response = await apiClient.get(httpUriLogin);
+    Response response = await apiClient
+        .get(httpUriLogin)
+        .timeout(const Duration(seconds: ApiConstants.timeout));
 
     WebsiteResponse wsResponse =
         WebsiteResponse.fromJson(jsonDecode(response.body));
@@ -68,15 +72,18 @@ class WebRunningApiService implements RunningApiService {
       log("did not get LatestWebsitePing");
       return 0;
     }
+    print("PW-length: ${Credentials.runningAppPassword?.length}");
     EncryptData ed = EncryptData();
     String latestPingEncrypted = ed.encryptAES(
         wsResponse.LatestWebsitePing, Credentials.runningAppPassword);
-
+    log("Encrypted LatestWebsitePing. Trying to refres token...");
     var body = jsonEncode({
       "username": Credentials.technicalUser,
       "LatestPingEncrypted": latestPingEncrypted
     });
-    response = await apiClient.post(httpUriLogin, body: body);
+    response = await apiClient
+        .post(httpUriLogin, body: body)
+        .timeout(const Duration(seconds: ApiConstants.timeout));
     log("postResponse ${response.body} - ${response.statusCode} - ${response.headers}");
     return response.statusCode;
   }
