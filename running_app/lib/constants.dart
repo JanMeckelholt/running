@@ -1,6 +1,7 @@
 class ApiConstants {
   static const String scheme = 'http';
-  static const String baseURL = 'localhost';
+  static const String baseURL = 'homepage-server';
+  //static const String baseURL = 'localhost';
   //static const String baseURL = 'http_gateway';
   static const String baseURLAndroidEmulator = '10.0.2.2';
   //static const int port = 443;
