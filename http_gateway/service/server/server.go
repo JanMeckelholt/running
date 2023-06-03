@@ -63,13 +63,22 @@ func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler
 		fmt.Sprintf("http://homepage-server:%d", config.RunningAppPort):  true,
 		fmt.Sprintf("https://homepage-server:%d", config.RunningAppPort): true,
 		fmt.Sprintf("http://localhost:%d", config.RunningAppPort):        true,
+		fmt.Sprintf("running_app:%d", config.RunningAppPort):             true,
+		fmt.Sprintf("http://running_app:%d", config.RunningAppPort):      true,
+		fmt.Sprintf("https://running_app:%d", config.RunningAppPort):     true,
+		fmt.Sprintf("running_app"):                                       true,
+		fmt.Sprintf("http://running_app"):                                true,
+		fmt.Sprintf("https://running_app"):                               true,
 	}
 
+	fmt.Printf("allowList: %s", allowList)
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if origin := r.Header.Get("Origin"); allowList[origin] {
-			log.Infof("allowing Origin: %s", origin)
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-		}
+		//if origin := r.Header.Get("Origin"); allowList[origin] {
+		origin := r.Header.Get("Origin")
+		log.Infof("allowing Origin: %s", origin)
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+		//}
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(w, r)
 	})
