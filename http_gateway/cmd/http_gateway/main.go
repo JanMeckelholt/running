@@ -12,6 +12,7 @@ import (
 	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/http_gateway/service"
 	"github.com/JanMeckelholt/running/http_gateway/service/auth"
+	"github.com/JanMeckelholt/running/http_gateway/service/config"
 	"github.com/JanMeckelholt/running/http_gateway/service/mux"
 	"github.com/JanMeckelholt/running/http_gateway/service/server"
 	"github.com/joho/godotenv"
@@ -65,13 +66,13 @@ func main() {
 
 	rootMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
 	rootMux.Handle(service.WebsiteRoute, mux.Handler(service.WebsiteRoute, rs))
-	rootMux.Handle("/health", mux.Handler("/health", rs))
-	rootMux.Handle("/athlete", mux.Handler("/athlete", rs))
-	rootMux.Handle("/activities", mux.Handler("/activities", rs))
-	rootMux.Handle("/athlete/create", mux.Handler("/athlete/create", rs))
-	rootMux.Handle("/weeksummary", mux.Handler("/weeksummary", rs))
-	rootMux.Handle("/weeksummaries", mux.Handler("/weeksummaries", rs))
-	rootMux.Handle("/activitiesToDB", mux.Handler("/activitiesToDB", rs))
+	rootMux.Handle(config.Prefix+"/health", mux.Handler("/health", rs))
+	rootMux.Handle(config.Prefix+"/athlete", mux.Handler("/athlete", rs))
+	rootMux.Handle(config.Prefix+"/activities", mux.Handler("/activities", rs))
+	rootMux.Handle(config.Prefix+"/athlete/create", mux.Handler("/athlete/create", rs))
+	rootMux.Handle(config.Prefix+"/weeksummary", mux.Handler("/weeksummary", rs))
+	rootMux.Handle(config.Prefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
+	rootMux.Handle(config.Prefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 
 	handlerWithAuth := server.AuthMiddleware(rootMux)
 	handlerWithCors := server.CorsMiddleware(handlerWithAuth, srv.Config)

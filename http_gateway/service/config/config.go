@@ -1,5 +1,7 @@
 package config
 
+const Prefix = "/run"
+
 type ServiceConfig struct {
 	RunnerName         string `env:"RUNNER_NAME"`
 	IsDev              bool   `env:"IS_DEV"`

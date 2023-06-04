@@ -18,7 +18,7 @@ RUN flutter create .
 RUN flutter clean
 RUN flutter pub get
 RUN flutter pub upgrade --major-versions
-RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} 
+RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} --base-href="/run/"
 
 
 FROM ubuntu
