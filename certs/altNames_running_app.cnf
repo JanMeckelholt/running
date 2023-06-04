@@ -1,1 +1,1 @@
-subjectAltName=DNS:running_app,DNS:homepage-server,DNS:192.168.188.99
+subjectAltName=DNS.1:localhost,DNS.2:running_app,DNS.3:homepage-server:8001,DNS.4:192.168.188.99,DNS.5:janmeckelholt.de

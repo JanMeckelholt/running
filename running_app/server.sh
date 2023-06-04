@@ -1,5 +1,5 @@
 #!/bin/bash
-PORT=5000
+PORT=443
 
 echo 'Server starting on port' $PORT '...'
 echo $(pwd)

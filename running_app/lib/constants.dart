@@ -1,13 +1,15 @@
 class ApiConstants {
-  static const String scheme = 'http';
-  static const String baseURL = 'janmeckelholt.de';
+  static const String scheme = 'https';
+  //static const String baseURL = 'janmeckelholt.de';
   //static const String baseURL = 'localhost';
-  //static const String baseURL = 'http_gateway';
+  static const String baseURL = 'homepage-server';
   static const String baseURLAndroidEmulator = '10.0.2.2';
-  //static const int port = 443;
-  static const int port = 81;
-  static const String summaryPath = '/run/weeksummary';
-  static const String loginPath = '/run/website';
+  static const int port = 444;
+  //static const int port = 81;
+  static const String prefix = '';
+  //static const String prefix = '/run';
+  static const String summaryPath = '$prefix/weeksummary';
+  static const String loginPath = '$prefix/website';
   static const String clientId = '77376';
   static const int timeout = 5;
 }

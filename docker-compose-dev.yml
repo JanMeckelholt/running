@@ -97,7 +97,7 @@ services:
       dockerfile: ./running_app/Dockerfile
     user: "$USERID:$USERID"
     ports:
-      - "8001:5000"
+      - "8001:443"
     restart: unless-stopped
     networks:
       - running-net

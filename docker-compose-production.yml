@@ -75,7 +75,7 @@ services:
     container_name: running_app
     image: janmeckelholt/running_running_app:${COMMIT}
     ports:
-      - "8001:5000"
+      - "8001:443"
     restart: unless-stopped
     networks:
       - running-net

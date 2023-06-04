@@ -31,6 +31,6 @@ COPY --from=builder /running_app/build/web /running_app
 COPY --from=builder /running_app/server.* /running_app/
 RUN chmod +x /running_app/server.sh 
 
-EXPOSE 5000
+EXPOSE 443
 
 ENTRYPOINT [ "/running_app/server.sh"]
