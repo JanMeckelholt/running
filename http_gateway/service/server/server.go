@@ -72,7 +72,10 @@ func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler
 		if origin := r.Header.Get("Origin"); allowList[origin] {
 			log.Infof("allowing Origin: %s", origin)
 			w.Header().Set("Access-Control-Allow-Origin", origin)
+		} else {
+			log.Infof("not allowing Origin: %s", r.Header.Get(("Origin")))
 		}
+
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(w, r)
 	})
