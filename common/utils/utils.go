@@ -70,8 +70,6 @@ func Encrypt(keyString string, stringToEncrypt string) (encryptedString string) 
 
 // decrypt from base64 to decrypted string
 func Decrypt(keyString string, stringToDecrypt string) string {
-	log.Infof("DECRYPT: keytring %s", keyString)
-	log.Infof("DECRYPT: stringToDecrypt %s", stringToDecrypt)
 	key, err := hex.DecodeString(keyString)
 	if err != nil {
 		log.Infof("DECRYPT: could not create hex.Decode key %s", err.Error())
@@ -88,8 +86,6 @@ func Decrypt(keyString string, stringToDecrypt string) string {
 		panic("ciphertext too short")
 	}
 	iv := ciphertext[:aes.BlockSize]
-	log.Infof("iv: %s", iv[:])
-	log.Infof("len cipher without iv: %d", len(ciphertext[aes.BlockSize:]))
 
 	decrypter := cipher.NewCBCDecrypter(block, iv)
 	decrypted := make([]byte, len(ciphertext[aes.BlockSize:]))
@@ -116,10 +112,7 @@ func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
 }
 
 func PKCS5Trimming(encrypt []byte) []byte {
-	log.Infof("Trimming: %s", encrypt)
-	log.Infof("Trimming string: %s", string(encrypt[:]))
 	padding := encrypt[len(encrypt)-1]
-	log.Infof("padding: %s - %d", padding, int(padding))
 	return encrypt[:len(encrypt)-int(padding)]
 }
 

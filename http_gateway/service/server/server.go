@@ -55,10 +55,10 @@ func (rs HttpGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 
 func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler {
 	allowList := map[string]bool{
-		"janmeckelholt.de":                                               true,
-		"https://janmeckelholt.de":                                       true,
-		"https://janmeckelholt.de/run":                                   true,
-		"https://janmeckelholt.de/run/":                                  true,
+		"janmeckelholt.de:444":                                           true,
+		"https://janmeckelholt.de:444":                                   true,
+		"https://janmeckelholt.de:444/run":                               true,
+		"https://janmeckelholt.de:444/run/":                              true,
 		"http://janmeckelholt.de":                                        true,
 		"http://janmeckelholt.de/run":                                    true,
 		"http://janmeckelholt.de/run/":                                   true,
