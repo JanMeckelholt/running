@@ -18,7 +18,7 @@ RUN flutter create .
 RUN flutter clean
 RUN flutter pub get
 RUN flutter pub upgrade --major-versions
-RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
+RUN flutter build web --dart-define=RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD} --base-href="/run/"
 
 
 FROM ubuntu
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y python3
 WORKDIR /
 RUN mkdir -p running_app/certs
 RUN mkdir common
-COPY --from=builder /running_app/build/web /running_app
+COPY --from=builder /running_app/build/web /running_app/run
 COPY --from=builder /running_app/server.* /running_app/
 RUN chmod +x /running_app/server.sh 
 
