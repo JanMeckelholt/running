@@ -36,6 +36,7 @@ services:
       - runner
     networks:
       - running-net
+      - proxy-net
     volumes:
       - ./volumes-data/common:/go/src/running/http_gateway/commonenv
       - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
