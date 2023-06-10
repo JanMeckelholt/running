@@ -98,7 +98,7 @@ services:
       - ./volumes-data/running_app:/volumes-data
     env_file:
       - .env.gpg.secret
-      - .env.running_app.secret
+    #  - .env.running_app.secret
 networks:
   running-net:
   db-net:

@@ -116,14 +116,6 @@ class _MainState extends State<Main> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             runnigWeekList(snapshot.data!),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  _callApi(widget.apiService);
-                                                });
-                                              },
-                                              child: const Icon(Icons.refresh),
-                                            ),
                                           ],
                                         )))),
                           ),

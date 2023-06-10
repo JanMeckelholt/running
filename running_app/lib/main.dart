@@ -11,18 +11,6 @@ import 'package:running_app/screens/mainScreen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //await dotenv.load(fileName: ".env.docker.running_app.secret");
-  const runningAppPassword =
-      String.fromEnvironment('RUNNING_APP_PASSWORD', defaultValue: '');
-  log("RunningAppPassword: $runningAppPassword");
-  if (runningAppPassword.length < 8) {
-    print("Password too short!");
-  }
-  Credentials.runningAppPassword = runningAppPassword;
-  const port = int.fromEnvironment('HTTP_GATEWAY_PORT', defaultValue: 443);
-  ApiConstants.port = port;
-  const baseURL = String.fromEnvironment('HTTP_GATEWAY_BASE_URL',
-      defaultValue: 'janmeckelholt.de');
-  ApiConstants.baseURL = baseURL;
 
   //final apiService = WebRunningApiService.instance;
   final apiService = RunningApiService();

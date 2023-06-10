@@ -100,7 +100,7 @@ services:
     build:
       args:
         - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}  
-        - HTTP_GATEWAY_URL=${HTTP_GATEWAY_BASE_URL}  
+        - HTTP_GATEWAY_BASE_URL=${HTTP_GATEWAY_BASE_URL}  
         - HTTP_GATEWAY_PORT=${HTTP_GATEWAY_PORT}  
       context: .
       dockerfile: ./running_app/Dockerfile
@@ -115,7 +115,7 @@ services:
       - ./volumes-data/running_app:/volumes-data
     env_file:
       - .env.gpg.secret
-      - .env.running_app.secret
+    #  - .env.running_app.secret
 networks:
   running-net:
   db-net:

@@ -1,7 +1,9 @@
 class ApiConstants {
   static const String scheme = 'https';
-  static String baseURL = 'janmeckelholt.de';
-  static int port = 443;
+  static String baseURL = const String.fromEnvironment('HTTP_GATEWAY_BASE_URL',
+      defaultValue: 'janmeckelholt.de');
+  static int port =
+      const int.fromEnvironment('HTTP_GATEWAY_PORT', defaultValue: 443);
   //static const String baseURL = 'localhost';
   //static const String baseURL = 'homepage-server';
   //static const String prefix = '';
@@ -19,5 +21,6 @@ class ApiConstants {
 
 class Credentials {
   static const String technicalUser = 'running_app';
-  static String? runningAppPassword;
+  static const String runningAppPassword =
+      String.fromEnvironment('RUNNING_APP_PASSWORD', defaultValue: '');
 }

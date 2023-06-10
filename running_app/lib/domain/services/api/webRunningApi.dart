@@ -72,7 +72,7 @@ class WebRunningApiService implements RunningApiService {
       log("did not get LatestWebsitePing");
       return 0;
     }
-    print("PW-length: ${Credentials.runningAppPassword?.length}");
+    print("PW-length: ${Credentials.runningAppPassword.length}");
     EncryptData ed = EncryptData();
     String latestPingEncrypted = ed.encryptAES(
         wsResponse.LatestWebsitePing, Credentials.runningAppPassword);

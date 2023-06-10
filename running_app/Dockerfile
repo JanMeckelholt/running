@@ -28,9 +28,6 @@ RUN flutter build web \
 
 
 FROM ubuntu
-ARG RUNNING_APP_PASSWORD
-ARG HTTP_GATEWAY_PORT
-ARG HTTP_GATEWAY_BASE_URL
 RUN apt-get update && apt-get install -y python3 
 WORKDIR /
 RUN mkdir -p running_app/certs
