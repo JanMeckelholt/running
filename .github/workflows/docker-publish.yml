@@ -30,6 +30,8 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           RUNNING_APP_PASSWORD: ${{ secrets.RUNNING_APP_PASSWORD }}
+          HTTP_GATEWAY_BASE_URL: 'janmeckelholt.de'
+          HTTP_GATEWAY_PORT: 443
           USERID: 1001
 
       - name: Publish image(s)

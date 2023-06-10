@@ -18,6 +18,11 @@ void main() async {
     print("Password too short!");
   }
   Credentials.runningAppPassword = runningAppPassword;
+  const port = int.fromEnvironment('HTTP_GATEWAY_PORT', defaultValue: 443);
+  ApiConstants.port = port;
+  const baseURL = String.fromEnvironment('HTTP_GATEWAY_BASE_URL',
+      defaultValue: 'janmeckelholt.de');
+  ApiConstants.baseURL = baseURL;
 
   //final apiService = WebRunningApiService.instance;
   final apiService = RunningApiService();

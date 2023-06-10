@@ -2,6 +2,7 @@ services:
   strava-service:
     container_name: strava-service
     image: janmeckelholt/running_strava-service:${COMMIT}
+    restart: unless-stopped
     ports:
       - "669:666"
     networks:
@@ -13,6 +14,7 @@ services:
   runner:
     container_name: runner
     image: janmeckelholt/running_runner:${COMMIT}
+    restart: unless-stopped
     ports:
       - "666:666"
     depends_on:
@@ -39,6 +41,7 @@ services:
   http_gateway:
     container_name: http_gateway
     image: janmeckelholt/running_http_gateway:${COMMIT}
+    restart: unless-stopped
     ports:
       - "81:80"
       - "444:443"
@@ -55,6 +58,7 @@ services:
   database-service:
     container_name: database-service
     image: janmeckelholt/running_database-service:${COMMIT}
+    restart: unless-stopped
     ports:
       - "667:666"
     networks:
@@ -84,9 +88,9 @@ services:
   running_app:
     container_name: running_app
     image: janmeckelholt/running_running_app:${COMMIT}
+    restart: unless-stopped
     ports:
       - "8001:443"
-    restart: unless-stopped
     networks:
       - running-net
       - proxy-net

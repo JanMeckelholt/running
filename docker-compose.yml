@@ -93,7 +93,9 @@ services:
     container_name: running_app
     build:
       args:
-        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}  
+        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
+        - HTTP_GATEWAY_BASE_URL=${HTTP_GATEWAY_BASE_URL}  
+        - HTTP_GATEWAY_PORT=${HTTP_GATEWAY_PORT}   
       context: .
       dockerfile: ./running_app/Dockerfile
     user: "$USERID:$USERID"

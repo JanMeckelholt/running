@@ -1,7 +1,7 @@
 class ApiConstants {
   static const String scheme = 'https';
-  static const String baseURL = 'janmeckelholt.de';
-  static const int port = 443;
+  static String baseURL = 'janmeckelholt.de';
+  static int port = 443;
   //static const String baseURL = 'localhost';
   //static const String baseURL = 'homepage-server';
   //static const String prefix = '';
