@@ -9,7 +9,7 @@ import (
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/database"
-	"github.com/JanMeckelholt/running/populate-db/service/config"
+	"github.com/JanMeckelholt/running/populate_db/service/config"
 )
 
 type Clients struct {
@@ -27,7 +27,7 @@ func (c *Clients) Dial(config config.ServiceConfig) error {
 }
 
 func dial(serviceName, address string) (*grpc.ClientConn, error) {
-	tlsCredentials, err := certhandling.LoadTLSClientCredentials("populate-db/certs/ca-cert.pem")
+	tlsCredentials, err := certhandling.LoadTLSClientCredentials("volumes-data/certs/ca-cert.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}

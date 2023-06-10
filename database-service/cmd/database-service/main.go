@@ -27,24 +27,24 @@ func main() {
 		log.Errorf("Could not load commonConf: %s", err.Error())
 		return
 	}
-	err = utils.DecryptPGP("./database-service/commonenv/.env.docker.postgres.secret.asc", "./database-service/commonenv/.env.docker.postgres.secret", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./common/.env.docker.postgres.secret.asc", "./secret/env/.env.docker.postgres.secret", commonConf.GPGPrivateKey)
 	if err != nil {
 		log.Errorf("Could not decrypt postgres.secret: %s", err.Error())
 		return
 	}
-	err = utils.DecryptPGP("./database-service/certs/database-service-server-key.pem.asc", "./database-service/certs/database-service-server-key.pem", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./volumes-data/certs/database-service-server-key.pem.asc", "./secret/certs/database-service-server-key.pem", commonConf.GPGPrivateKey)
 	if err != nil {
 		log.Errorf("Could not decrypt database-service-server-key.pem: %s", err.Error())
 		return
 	}
-	err = utils.DecryptPGP("./database-service/certs/postgres-key.pem.asc", "./database-service/certs/postgres-key.pem", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./volumes-data/certs/postgres-key.pem.asc", "./secret/certs/postgres-key.pem", commonConf.GPGPrivateKey)
 	if err != nil {
 		log.Errorf("Could not decrypt postgres-key.pem: %s", err.Error())
 		return
 	}
-	err = godotenv.Load("./database-service/commonenv/.env.docker.postgres", "./database-service/commonenv/.env.docker.postgres.secret")
+	err = godotenv.Load("./common/.env.docker.postgres", "./secret/env/.env.docker.postgres.secret")
 	if err != nil {
-		log.Errorf("load envs: %s", err.Error())
+		log.Errorf("Could not load env: %s", err.Error())
 		return
 	}
 
@@ -77,7 +77,7 @@ func main() {
 		log.Fatal("cannot setup tcp listener for database-service: ", err)
 	}
 
-	tlsCredentials, err := certhandling.LoadTLSServerCredentials("database-service/certs/database-service-server-cert.pem", "database-service/certs/database-service-server-key.pem")
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("volumes-data/certs/database-service-server-cert.pem", "secret/certs/database-service-server-key.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials for database-service: ", err)
 	}

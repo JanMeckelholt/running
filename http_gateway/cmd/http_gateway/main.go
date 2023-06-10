@@ -28,13 +28,26 @@ func main() {
 	if err != nil {
 		return
 	}
-	err = utils.DecryptPGP("./http_gateway/commonenv/.env.docker.running_app.secret.asc", "./http_gateway/commonenv/.env.docker.running_app.secret", commonConf.GPGPrivateKey)
-	err = utils.DecryptPGP("./http_gateway/env/.env.docker.secret.asc", "./http_gateway/env/.env.docker.secret", commonConf.GPGPrivateKey)
-	err = utils.DecryptPGP("./http_gateway/certs/http_gateway-server-key.pem.asc", "./http_gateway/certs/http_gateway-server-key.pem", commonConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./common/.env.docker.running_app.secret.asc", "./secret/env/.env.docker.running_app.secret", commonConf.GPGPrivateKey)
 	if err != nil {
+		log.Errorf("Could not decrypt common-env: %s", err.Error())
 		return
 	}
-	godotenv.Load("./http_gateway/env/.env.docker", "./http_gateway/env/.env.docker.secret", "./http_gateway/commonenv/.env.docker.running_app", "./http_gateway/commonenv/.env.docker.running_app.secret")
+	err = utils.DecryptPGP("./volumes-data/env/.env.docker.secret.asc", "./secret/env/.env.docker.secret", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt env: %s", err.Error())
+		return
+	}
+	err = utils.DecryptPGP("./volumes-data/certs/http_gateway-server-key.pem.asc", "./secret/certs/http_gateway-server-key.pem", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt certs: %s", err.Error())
+		return
+	}
+	err = godotenv.Load("./volumes-data/env/.env.docker", "./secret/env/.env.docker.secret", "./common/.env.docker.running_app", "./secret/env/.env.docker.running_app.secret")
+	if err != nil {
+		log.Errorf("Could not load env: %s", err.Error())
+		return
+	}
 	srv := &service.Service{}
 	err = env.Parse(&srv.Config)
 	if err != nil {
@@ -98,7 +111,7 @@ func main() {
 		}
 
 		log.Infof("Listening on :%d", dependencies.Configs["http_gatewayTLS"].Port)
-		serveErr := sTLS.ServeTLS(lis, "http_gateway/certs/http_gateway-server-cert.pem", "http_gateway/certs/http_gateway-server-key.pem")
+		serveErr := sTLS.ServeTLS(lis, "volumes-data/certs/http_gateway-server-cert.pem", "secret/certs/http_gateway-server-key.pem")
 		defer func() {
 			teardown()
 		}()

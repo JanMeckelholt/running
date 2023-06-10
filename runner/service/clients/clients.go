@@ -35,7 +35,7 @@ func (c *Clients) Dial(config config.ServiceConfig) error {
 }
 
 func dial(serviceName, address string) (*grpc.ClientConn, error) {
-	tlsCredentials, err := certhandling.LoadTLSClientCredentials("runner/certs/ca-cert.pem")
+	tlsCredentials, err := certhandling.LoadTLSClientCredentials("volumes-data/certs/ca-cert.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}

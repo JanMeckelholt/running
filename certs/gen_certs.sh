@@ -5,7 +5,7 @@ rm -f ../volumes-data/database-service/certs/*.*
 rm -f ../volumes-data/strava-service/certs/*.*
 rm -f ../volumes-data/postgres/certs/*.*
 rm -f ../volumes-data/runner/certs/*.*
-rm -f ../volumes-data/populate-db/certs/*.*
+rm -f ../volumes-data/populate_db/certs/*.*
 rm -f ../volumes-data/http_gateway/certs/*.*
 rm -f ../volumes-data/running_app/certs/*.*
 
@@ -16,7 +16,7 @@ cp ca-cert.pem ../volumes-data/database-service/certs/
 cp ca-cert.pem ../volumes-data/strava-service/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/root.crt
 cp ca-cert.pem ../volumes-data/runner/certs/
-cp ca-cert.pem ../volumes-data/populate-db/certs/
+cp ca-cert.pem ../volumes-data/populate_db/certs/
 cp ca-cert.pem ../volumes-data/http_gateway/certs/
 cp ca-cert.pem ../volumes-data/running_app/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/

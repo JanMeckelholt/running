@@ -1,7 +1,6 @@
 version: '2.4'
 services:
   strava-service:
-    platform: ${PLATFORM}
     container_name: strava-service
     build:
       context: .
@@ -11,12 +10,10 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/strava-service/certs:/go/src/running/strava-service/certs
-      - ./volumes-data/strava-service/env:/go/src/running/strava-service/env
+      - ./volumes-data/strava-service:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   runner:
-    platform: ${PLATFORM}
     container_name: runner
     build:
       context: .
@@ -29,12 +26,26 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/runner/certs:/go/src/running/runner/certs
-      - ./volumes-data/runner/env:/go/src/running/runner/env 
+      - ./volumes-data/runner:/go/src/running/volumes-data
+    env_file:
+      - .env.gpg.secret
+  populate_db:
+    container_name: populate_db
+    build:
+      context: .
+      dockerfile: ./populate_db/Dockerfile
+    ports:
+      - "670:666"
+    depends_on:
+      - strava-service
+      - database-service
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/populate_db:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   http_gateway:
-    platform: ${PLATFORM}
     container_name: http_gateway
     build:
       context: .
@@ -47,13 +58,11 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/common:/go/src/running/http_gateway/commonenv
-      - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
-      - ./volumes-data/http_gateway/env:/go/src/running/http_gateway/env
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/http_gateway:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   database-service:
-    platform: ${PLATFORM}
     container_name: database-service
     build:
       context: .
@@ -64,12 +73,11 @@ services:
       - running-net
       - db-net
     volumes:
-      - ./volumes-data/common:/go/src/running/database-service/commonenv
-      - ./volumes-data/database-service/certs:/go/src/running/database-service/certs
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/database-service:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   postgres:
-    platform: ${PLATFORM}
     container_name: postgres
     build:
       context: .
@@ -82,17 +90,16 @@ services:
       - db-net
     volumes:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
-      - ./volumes-data/common:/postgres/commonenv
-      - ./volumes-data/postgres/certs:/postgres/certs
+      - ./volumes-data/common:/common
+      - ./volumes-data/postgres/certs:/volumes-data/certs
     env_file:
       - .env.gpg.secret
       - .env.postgres.secret
   running_app:
-    platform: ${PLATFORM}
     container_name: running_app
-    build:  
+    build:
       args:
-        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}
+        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}  
       context: .
       dockerfile: ./running_app/Dockerfile
     user: "$USERID:$USERID"
@@ -103,8 +110,7 @@ services:
       - running-net
       - proxy-net
     volumes:
-      - ./volumes-data/running_app/certs:/running_app/certs
-      - ./volumes-data/running_app/log:/log
+      - ./volumes-data/running_app:/volumes-data
     env_file:
       - .env.gpg.secret
       - .env.running_app.secret
@@ -112,5 +118,3 @@ networks:
   running-net:
   db-net:
   proxy-net:
-  #external:
-  #  name: proxy-net

@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
+	"path/filepath"
 
 	"io"
 	mathRand "math/rand"
@@ -142,7 +143,7 @@ func DecryptPGP(cipherFile, plaintextFile, skBase64 string) (err error) {
 	if err != nil {
 		return err
 	}
-
+	os.MkdirAll(filepath.Dir(plaintextFile), 0640)
 	outFile, err := os.Create(plaintextFile)
 	defer outFile.Close()
 

@@ -26,13 +26,17 @@ func main() {
 		log.Errorf("Could not load commonConf: %s", err.Error())
 		return
 	}
-	err = utils.DecryptPGP("./strava-service/certs/strava-service-server-key.pem.asc", "./strava-service/certs/strava-service-server-key.pem", gpgConf.GPGPrivateKey)
+	err = utils.DecryptPGP("./volumes-data/certs/strava-service-server-key.pem.asc", "./secret/certs/strava-service-server-key.pem", gpgConf.GPGPrivateKey)
 	if err != nil {
 		log.Errorf("Could not load DecryptPGP: %s", err.Error())
 		return
 	}
 
-	godotenv.Load("./strava-service/env/.env.docker")
+	err = godotenv.Load("./volumes-data/env/.env.docker")
+	if err != nil {
+		log.Errorf("Could not load env: %s", err.Error())
+		return
+	}
 	srv := service.Service{}
 	err = env.Parse(&srv.ServiceConfig)
 	if err != nil {
@@ -44,7 +48,7 @@ func main() {
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["strava-service"].Port))
-	tlsCredentials, err := certhandling.LoadTLSServerCredentials("strava-service/certs/strava-service-server-cert.pem", "strava-service/certs/strava-service-server-key.pem")
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("volumes-data/certs/strava-service-server-cert.pem", "secret/certs/strava-service-server-key.pem")
 	if err != nil {
 		log.Errorf("cannot load TLS credentials: %s", err.Error())
 	}

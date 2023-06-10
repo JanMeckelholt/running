@@ -25,9 +25,16 @@ func main() {
 		return
 	}
 
-	err = utils.DecryptPGP("./runner/certs/runner-server-key.pem.asc", "./runner/certs/runner-server-key.pem", commonConf.GPGPrivateKey)
-
-	godotenv.Load("./runner/env/.env.docker")
+	err = utils.DecryptPGP("./volumes-data/certs/runner-server-key.pem.asc", "./secret/certs/runner-server-key.pem", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt certs: %s", err.Error())
+		return
+	}
+	err = godotenv.Load("./volumes-data/env/.env.docker")
+	if err != nil {
+		log.Errorf("Could not load env: %s", err.Error())
+		return
+	}
 	srv := &service.Service{}
 	err = env.Parse(&srv.Config)
 	if err != nil {
@@ -39,7 +46,7 @@ func main() {
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["runner"].Port))
-	tlsCredentials, err := certhandling.LoadTLSServerCredentials("runner/certs/runner-server-cert.pem", "runner/certs/runner-server-key.pem")
+	tlsCredentials, err := certhandling.LoadTLSServerCredentials("volumes-data/certs/runner-server-cert.pem", "secret/certs/runner-server-key.pem")
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}

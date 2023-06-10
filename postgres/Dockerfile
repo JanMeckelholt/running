@@ -16,7 +16,7 @@ COPY ./postgres/ /postgres/
 #RUN chmod 640 /postgres/certs/postgres-key.pem
 
 
-ENTRYPOINT [ "postgres", "-c", "ssl=on", "-c", "ssl_cert_file=/postgres/certs/postgres-cert.pem", "-c", "ssl_key_file=/postgres/certs/postgres-key.pem"]
+ENTRYPOINT [ "postgres", "-c", "ssl=on", "-c", "ssl_cert_file=/volumes-data/certs/postgres-cert.pem", "-c", "ssl_key_file=/volumes-data/certs/postgres-key.pem"]
 EXPOSE 5432
 
 

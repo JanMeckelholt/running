@@ -7,8 +7,7 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/strava-service/certs:/go/src/running/strava-service/certs
-      - ./volumes-data/strava-service/env:/go/src/running/strava-service/env
+      - ./volumes-data/strava-service:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   runner:
@@ -22,10 +21,21 @@ services:
     networks:
       - running-net
     volumes:
-      - ./volumes-data/runner/certs:/go/src/running/runner/certs
-      - ./volumes-data/runner/env:/go/src/running/runner/env 
+      - ./volumes-data/runner:/go/src/running/volumes-data 
     env_file:
       - .env.gpg.secret 
+  populate_db:
+    container_name: populate_db
+    image: janmeckelholt/running_runner:${COMMIT}
+    ports:
+      - "670:666"
+    depends_on:
+      - strava-service
+      - database-service
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/populate_db:/go/src/running/volumes-data
   http_gateway:
     container_name: http_gateway
     image: janmeckelholt/running_http_gateway:${COMMIT}
@@ -38,9 +48,8 @@ services:
       - running-net
       - proxy-net
     volumes:
-      - ./volumes-data/common:/go/src/running/http_gateway/commonenv
-      - ./volumes-data/http_gateway/certs:/go/src/running/http_gateway/certs
-      - ./volumes-data/http_gateway/env:/go/src/running/http_gateway/env
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/http_gateway:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   database-service:
@@ -52,14 +61,14 @@ services:
       - running-net
       - db-net
     volumes:
-      - ./volumes-data/common:/go/src/running/database-service/commonenv
-      - ./volumes-data/database-service/certs:/go/src/running/database-service/certs
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/database-service:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
   postgres:
     container_name: postgres
     image: janmeckelholt/running_postgres:${COMMIT}
-    #restart: unless-stopped
+    restart: unless-stopped
     ports:
       - "5432:5432"
     user: "1001:1001"
@@ -67,8 +76,8 @@ services:
       - db-net
     volumes:
       - ./volumes-data/postgres/data:/var/lib/postgresql/data
-      - ./volumes-data/common:/postgres/commonenv
-      - ./volumes-data/postgres/certs:/postgres/certs
+      - ./volumes-data/common:/common
+      - ./volumes-data/postgres/certs:/volumes-data/certs
     env_file:
       - .env.gpg.secret
       - .env.postgres.secret
@@ -82,8 +91,7 @@ services:
       - running-net
       - proxy-net
     volumes:
-      - ./volumes-data/running_app/certs:/running_app/certs
-      - ./volumes-data/running_app/log:/log
+      - ./volumes-data/running_app:/volumes-data
     env_file:
       - .env.gpg.secret
       - .env.running_app.secret

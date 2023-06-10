@@ -10,5 +10,5 @@ var Configs = map[string]Config{
 	"http_gatewayTLS":  {Port: 443},
 	"http_gateway":     {Port: 80},
 	"runner":           {Port: 666},
-	"populate-db":      {Port: 666},
+	"populate_db":      {Port: 666},
 }

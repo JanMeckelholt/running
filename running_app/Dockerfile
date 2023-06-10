@@ -28,9 +28,9 @@ WORKDIR /
 RUN mkdir -p running_app/certs
 RUN mkdir common
 COPY --from=builder /running_app/build/web /running_app/run
-COPY --from=builder /running_app/server.* /running_app/
-RUN chmod +x /running_app/server.sh 
+COPY --from=builder /running_app/server.* /running_app/run/
+RUN chmod +x /running_app/run/server.sh 
 
 EXPOSE 443
 
-ENTRYPOINT [ "/running_app/server.sh"]
+ENTRYPOINT [ "/running_app/run/server.sh"]

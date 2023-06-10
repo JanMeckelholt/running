@@ -6,18 +6,34 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/JanMeckelholt/running/common/commonconf"
 	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/strava"
-	"github.com/JanMeckelholt/running/populate-db/service"
+	"github.com/JanMeckelholt/running/common/utils"
+	"github.com/JanMeckelholt/running/populate_db/service"
 	"github.com/caarlos0/env/v7"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	godotenv.Load(".env.docker", ".env.docker.secret")
+	commonConf := commonconf.GPGConf{}
+	err := env.Parse(&commonConf)
+	if err != nil {
+		return
+	}
+	err = utils.DecryptPGP("./volumes-data/env/.env.docker.secret.asc", "./secret/env/.env.docker.secret", commonConf.GPGPrivateKey)
+	if err != nil {
+		log.Errorf("Could not decrypt env: %s", err.Error())
+		return
+	}
+	err = godotenv.Load("./volumes-data/env/.env.docker", "./secret/env/.env.docker.secret")
+	if err != nil {
+		log.Errorf("Could not load env: %s", err.Error())
+		return
+	}
 	srv := &service.Service{}
-	err := env.Parse(&srv.ServiceConfig)
+	err = env.Parse(&srv.ServiceConfig)
 	if err != nil || !srv.ServiceConfig.Enabled {
 		return
 	}
@@ -33,7 +49,7 @@ func main() {
 		AthleteId:    srv.ServiceConfig.ClientsConfig.AthletId,
 	})
 
-	records := readCsvFile("./populate-db/activities.csv")
+	records := readCsvFile("./volumes-data/data/activities.csv")
 	for i := 1; i < len(records); i++ {
 		distance, _ := strconv.ParseFloat(records[i][17], 64)
 		totalElevationGain, _ := strconv.ParseFloat(records[i][20], 64)
