@@ -2,34 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:running_app/domain/models/runningModel.dart';
 
 Expanded runnigWeekList(RunningWeek runningWeek) {
+  const textStyle = TextStyle(color: Colors.black, fontSize: 18);
   return Expanded(
       child: (ListView(
     shrinkWrap: true,
     children: [
       ListTile(
-        title: Text('Distance'),
-        leading: Icon(Icons.label),
-        trailing: Text("${runningWeek.distance / 1000} km"),
+        title: const Text(
+          'Distance',
+          style: textStyle,
+        ),
+        leading: const Icon(Icons.label),
+        trailing: Text(
+          "${runningWeek.distance / 1000} km",
+          style: textStyle,
+        ),
       ),
       ListTile(
-        title: Text('Climb'),
-        leading: Icon(Icons.label),
-        trailing: Text("${runningWeek.climb} m"),
+        title: const Text(
+          'Climb',
+          style: textStyle,
+        ),
+        leading: const Icon(Icons.label),
+        trailing: Text(
+          "${runningWeek.climb} m",
+          style: textStyle,
+        ),
       ),
       ListTile(
-        title: Text('Nubmer of Runs'),
-        leading: Icon(Icons.label),
-        trailing: Text("${runningWeek.numberOfRuns}"),
+        title: const Text(
+          'Nubmer of Runs',
+          style: textStyle,
+        ),
+        leading: const Icon(Icons.label),
+        trailing: Text(
+          "${runningWeek.numberOfRuns}",
+          style: textStyle,
+        ),
       ),
       ListTile(
-        title: Text('Time spent running'),
-        leading: Icon(Icons.label),
-        trailing: Text(runningWeek.timeStr),
+        title: const Text(
+          'Time spent running',
+          style: textStyle,
+        ),
+        leading: const Icon(Icons.label),
+        trailing: Text(
+          runningWeek.timeStr,
+          style: textStyle,
+        ),
       ),
       ListTile(
-        title: Text('Number of other Activities'),
-        leading: Icon(Icons.label),
-        trailing: Text("${runningWeek.numberOfOthers}"),
+        title: const Text(
+          'Number of other Activities',
+          style: textStyle,
+        ),
+        leading: const Icon(Icons.label),
+        trailing: Text(
+          "${runningWeek.numberOfOthers}",
+          style: textStyle,
+        ),
       ),
     ],
   )));

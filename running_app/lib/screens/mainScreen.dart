@@ -38,7 +38,7 @@ class _MainState extends State<Main> {
                 (BuildContext context, AsyncSnapshot<RunningWeek> snapshot) {
               if (snapshot.data != null) {
                 return Container(
-                    color: Colors.amber,
+                    color: Colors.white70,
                     child: Column(children: [
                       Row(
                         //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -46,78 +46,85 @@ class _MainState extends State<Main> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Expanded(child: Container(color: Colors.green)),
-                          SingleChildScrollView(
-                            child: ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxHeight: 400),
-                                child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: ConstrainedBox(
-                                        constraints:
-                                            const BoxConstraints(maxWidth: 400),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          children: <Widget>[
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              20),
-                                                      child: ElevatedButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            _weekIndex--;
-                                                            _callApi(widget
-                                                                .apiService);
-                                                          });
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.remove),
-                                                      )),
-                                                  Text(
-                                                    'Current week: $_weekIndex',
-                                                    style: const TextStyle(
-                                                        fontSize: 24,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              20),
-                                                      child: ElevatedButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            if (_weekIndex <
-                                                                0) {
-                                                              _weekIndex++;
+                          Container(
+                            decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.black, width: 2)),
+                            child: SingleChildScrollView(
+                              child: ConstrainedBox(
+                                  constraints:
+                                      const BoxConstraints(maxHeight: 400),
+                                  child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 400),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: <Widget>[
+                                              Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20),
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              _weekIndex--;
                                                               _callApi(widget
                                                                   .apiService);
-                                                            }
-                                                          });
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.add),
-                                                      )),
-                                                ]),
-                                            Text(
-                                              "Week starts at ${snapshot.data!.startOfWeekStr}",
-                                              style: const TextStyle(
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            const Text(
-                                              'Summary: ',
-                                              style: TextStyle(
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            runnigWeekList(snapshot.data!),
-                                          ],
-                                        )))),
+                                                            });
+                                                          },
+                                                          child: const Icon(
+                                                              Icons.remove),
+                                                        )),
+                                                    Text(
+                                                      'Current week: $_weekIndex',
+                                                      style: const TextStyle(
+                                                          fontSize: 24,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20),
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              if (_weekIndex <
+                                                                  0) {
+                                                                _weekIndex++;
+                                                                _callApi(widget
+                                                                    .apiService);
+                                                              }
+                                                            });
+                                                          },
+                                                          child: const Icon(
+                                                              Icons.add),
+                                                        )),
+                                                  ]),
+                                              Text(
+                                                "Week starts at ${snapshot.data!.startOfWeekStr}",
+                                                style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const Text(
+                                                'Summary: ',
+                                                style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              runnigWeekList(snapshot.data!),
+                                            ],
+                                          )))),
+                            ),
                           ),
                           Expanded(child: Container(color: Colors.lightBlue)),
                         ],

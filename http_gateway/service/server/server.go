@@ -58,6 +58,8 @@ func CorsMiddleware(next http.Handler, config config.ServiceConfig) http.Handler
 		"https://janmeckelholt.de":                                       true,
 		fmt.Sprintf("https://homepage-server:%d", config.RunningAppPort): true,
 		fmt.Sprintf("https://localhost:%d", config.RunningAppPort):       true,
+		//Flutter debug not able to serve https :-(
+		//fmt.Sprintf("http://localhost:%d", config.RunningAppPort): true,
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
