@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:running_app/domain/models/runningModel.dart';
 
-Expanded runnigWeekList(RunningWeek runningWeek) {
+ListView runnigWeekList(RunningWeek runningWeek) {
   const textStyle = TextStyle(color: Colors.black, fontSize: 18);
-  return Expanded(
-      child: (ListView(
+  return ListView(
     shrinkWrap: true,
     children: [
       ListTile(
@@ -63,5 +62,5 @@ Expanded runnigWeekList(RunningWeek runningWeek) {
         ),
       ),
     ],
-  )));
+  );
 }
