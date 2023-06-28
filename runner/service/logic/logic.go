@@ -40,10 +40,10 @@ func GetWeek(activities *database.ActivitiesResponse, startOfWeek uint64) runner
 		if activity.GetStartDateUnix() < startOfWeek || activity.GetStartDateUnix() > startOfWeek+(7*24*60*60) {
 			continue
 		}
-		totalClimb += uint64(activity.GetTotalElevationGain())
-		elapsedTime += uint64(activity.GetElapsedTime())
-		distance += uint64(activity.GetDistance())
 		if activity.GetType() == "Lauf" || activity.GetType() == "Run" {
+			elapsedTime += uint64(activity.GetElapsedTime())
+			totalClimb += uint64(activity.GetTotalElevationGain())
+			distance += uint64(activity.GetDistance())
 			NumberOfRuns++
 		} else {
 			numberOfOthers++

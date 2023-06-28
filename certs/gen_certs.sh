@@ -8,6 +8,7 @@ rm -f ../volumes-data/runner/certs/*.*
 rm -f ../volumes-data/populate_db/certs/*.*
 rm -f ../volumes-data/http_gateway/certs/*.*
 rm -f ../volumes-data/running_app/certs/*.*
+rm -f ../api_call/certs/*.*
 
 
 # Generate CA's private key and self-signed certificate
@@ -20,6 +21,7 @@ cp ca-cert.pem ../volumes-data/populate_db/certs/
 cp ca-cert.pem ../volumes-data/http_gateway/certs/
 cp ca-cert.pem ../volumes-data/running_app/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/
+cp ca-cert.pem ../api_call/certs/
 
 # database-service
 # Generate database-service-server private key and certificate signing request (CSR)
