@@ -95,7 +95,7 @@ func LoginHandler() http.Handler {
 			Value:    tokenString,
 			Expires:  expirationTime,
 			HttpOnly: true,
-			Secure:   false,
+			Secure:   true,
 			SameSite: http.SameSiteNoneMode,
 		})
 		log.Info("Login Success!")
@@ -158,7 +158,7 @@ func WebsiteHandler() http.Handler {
 				Value:    tokenString,
 				Expires:  expirationTime,
 				HttpOnly: true,
-				Secure:   false,
+				Secure:   true,
 				SameSite: http.SameSiteNoneMode,
 			})
 			log.Info("Login Success!")
