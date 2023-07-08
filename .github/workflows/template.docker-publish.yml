@@ -1,7 +1,8 @@
 name: Build
-on: push
-  branches: 
-    - template
+on: 
+  push:
+    branches: 
+      - template
 
 jobs:
   build:
