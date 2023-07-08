@@ -1,0 +1,94 @@
+services:
+  strava-service:
+    container_name: strava-service
+    image: janmeckelholt/running_strava-service:${COMMIT}
+    restart: unless-stopped
+    ports:
+      - "669:666"
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/strava-service:/go/src/running/volumes-data
+    env_file:
+      - .env.gpg.secret
+  runner:
+    container_name: runner
+    image: janmeckelholt/running_runner:${COMMIT}
+    restart: unless-stopped
+    ports:
+      - "666:666"
+      - "8001:443"
+    depends_on:
+      - strava-service
+      - database-service
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/runner:/go/src/running/volumes-data 
+    env_file:
+      - .env.gpg.secret 
+  populate_db:
+    container_name: populate_db
+    image: janmeckelholt/running_runner:${COMMIT}
+    ports:
+      - "670:666"
+    depends_on:
+      - strava-service
+      - database-service
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/populate_db:/go/src/running/volumes-data
+  http_gateway:
+    container_name: http_gateway
+    image: janmeckelholt/running_http_gateway:${COMMIT}
+    restart: unless-stopped
+    ports:
+      - "81:80"
+      - "444:443"
+    depends_on:
+      - runner
+    networks:
+      - running-net
+      - proxy-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/http_gateway:/go/src/running/volumes-data
+    env_file:
+      - .env.gpg.secret
+  database-service:
+    container_name: database-service
+    image: janmeckelholt/running_database-service:${COMMIT}
+    restart: unless-stopped
+    ports:
+      - "667:666"
+    networks:
+      - running-net
+      - db-net
+    volumes:
+      - ./volumes-data/common:/go/src/running/common
+      - ./volumes-data/database-service:/go/src/running/volumes-data
+    env_file:
+      - .env.gpg.secret
+  postgres:
+    container_name: postgres
+    image: janmeckelholt/running_postgres:${COMMIT}
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    user: "1001:1001"
+    networks:
+      - db-net
+    volumes:
+      - ./volumes-data/postgres/data:/var/lib/postgresql/data
+      - ./volumes-data/common:/common
+      - ./volumes-data/postgres/certs:/volumes-data/certs
+    env_file:
+      - .env.gpg.secret
+      - .env.postgres.secret
+networks:
+  running-net:
+  db-net:
+  proxy-net:
+    external:
+      name: proxy-net

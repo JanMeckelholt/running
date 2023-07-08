@@ -49,6 +49,8 @@ openssl x509 -req -in runner-server-req.pem -days 365 -CA ca-cert.pem -CAkey ca-
 gpg -e -a -r dockerRunning runner-server-key.pem
 mv runner-server-cert.pem ../volumes-data/runner/certs/
 mv runner-server-key.pem.asc ../volumes-data/runner/certs/
+###ToDo: Remove me
+mv runner-server-key.pem ../volumes-data/runner/certs/
 
 # postgres
 # Generate postgres-server private key and certificate signing request (CSR)

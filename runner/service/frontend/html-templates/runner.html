@@ -11,12 +11,12 @@
     <li class="done">Number of other activities: {{.RunningData.NumberOfOthers}}</li>
 </ul>
 <span>
-    <form style="display: inline" action="/" method="GET">
+    <form style="display: inline" action="/run/" method="GET">
         <input type="hidden" value="{{dec .Week}}" name="week">
         <button type="submit" action="submit">&lt-</button>
     </form>
     <label>Week: {{.Week}}</label>
-    <form style="display: inline" action="/" method="GET">
+    <form style="display: inline" action="/run/" method="GET">
         <input type="hidden" value="{{inc .Week}}" name="week">
         <button type="submit" action="submit">-&gt</button>
     </form>
