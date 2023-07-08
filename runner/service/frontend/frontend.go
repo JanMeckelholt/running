@@ -4,20 +4,16 @@ import (
 	"context"
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type Todo struct {
-	Title string
-	Done  bool
-}
-
-type TodoPageData struct {
-	PageTitle string
-	Todos     []Todo
+type TemplateData struct {
+	RunningData *runner.WeekSummary
+	Week        int64
 }
 
 var (
@@ -32,14 +28,18 @@ func init() {
 	}
 }
 
-func FrontEnd(week int64, rs runner.RunnerServer) http.HandlerFunc {
-	data, err := rs.GetWeekSummary(context.Background(), &runner.WeekSummaryRequest{ClientId: "77376", Week: week})
-	if err != nil {
-		log.Errorf("Error getting Weeksummary: %s", err.Error())
-	}
-
+func FrontEnd(rs runner.RunnerServer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err = tmpl.Execute(w, data)
+		weekStr := r.URL.Query().Get("week")
+		weekInt, err := strconv.Atoi(weekStr)
+		if err != nil {
+			weekInt = 0
+		}
+		data, err := rs.GetWeekSummary(context.Background(), &runner.WeekSummaryRequest{ClientId: "77376", Week: int64(weekInt)})
+		if err != nil {
+			log.Errorf("Error getting Weeksummary: %s", err.Error())
+		}
+		err = tmpl.Execute(w, TemplateData{RunningData: data, Week: int64(weekInt)})
 	}
 
 }

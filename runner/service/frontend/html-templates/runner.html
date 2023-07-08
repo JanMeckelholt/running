@@ -1,7 +1,12 @@
-<h1>Week starts at {{.StartOfWeekStr}}</h1>
+<!DOCTYPE html>
+
+
+
+<h1>Week starts at {{.RunningData.StartOfWeekStr}}</h1>
 <ul>
-    <li class="done">Number of runs: {{.NumberOfRunns}}</li>
-    <li class="done">Time spent running: {{.TimeStr}}</li>
-    <li class="done">Elevation gain: {{.Climb}}</li>
-    <li class="done">Number of Others: {{.NumberOfOthers}}</li>
+    <li class="done">Number of runs: {{.RunningData.NumberOfRuns}}</li>
+    <li class="done">Distance: {{.RunningData.Distance}}</li>
+    <li class="done">Time spent running: {{.RunningData.TimeStr}}</li>
+    <li class="done">Elevation gain: {{.RunningData.Climb}}</li>
+    <li class="done">Number of other activities: {{.RunningData.NumberOfOthers}}</li>
 </ul>

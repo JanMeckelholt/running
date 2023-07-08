@@ -49,37 +49,6 @@ func main() {
 		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
 
-	go func() {
-		rs, err := server.NewRunnerServer(srv.Clients)
-		sTLS := &http.Server{
-			Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner_frontend"].Port),
-			Handler: frontend.FrontEnd(0, rs),
-		}
-		lis, err := net.Listen("tcp", sTLS.Addr)
-		if err != nil {
-			return
-		}
-
-		teardown := func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-
-			shutdownErr := sTLS.Shutdown(ctx)
-			if shutdownErr != nil {
-				log.Fatal("Runner-Server: Shutdown Error!")
-			}
-		}
-
-		log.Infof("Listening on :%d", dependencies.Configs["runner_frontend"].Port)
-		serveErr := sTLS.ServeTLS(lis, "volumes-data/certs/runner-server-cert.pem", "secret/certs/runner-server-key.pem")
-		defer func() {
-			teardown()
-		}()
-		if serveErr != nil {
-			log.Fatal("Runner-Frontend: Serving Error!")
-		}
-	}()
-
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", dependencies.Configs["runner"].Port))
 	tlsCredentials, err := certhandling.LoadTLSServerCredentials("volumes-data/certs/runner-server-cert.pem", "secret/certs/runner-server-key.pem")
 	if err != nil {
@@ -91,8 +60,8 @@ func main() {
 	teardownGrpc := grpcServer.GracefulStop
 	runnerServer, err := server.NewRunnerServer(srv.Clients)
 	runner.RegisterRunnerServer(grpcServer, runnerServer)
-
 	log.Infof("listening at :%d", dependencies.Configs["runner"].Port)
+	go serveHTTP(runnerServer)
 	serveErr := grpcServer.Serve(lis)
 	defer func() {
 		teardownGrpc()
@@ -101,4 +70,37 @@ func main() {
 		log.Fatal("Runner-Server: Serving Error!")
 	}
 
+}
+
+func serveHTTP(rs runner.RunnerServer) {
+	log.Infof("____entering go routine_____")
+	time.Sleep(time.Second * 4)
+	log.Info("___sleept")
+	sTLS := &http.Server{
+		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner_frontend"].Port),
+		Handler: frontend.FrontEnd(rs),
+	}
+	lis, err := net.Listen("tcp", sTLS.Addr)
+	if err != nil {
+		return
+	}
+
+	teardown := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		shutdownErr := sTLS.Shutdown(ctx)
+		if shutdownErr != nil {
+			log.Fatal("Runner-Server: Shutdown Error!")
+		}
+	}
+
+	log.Infof("Listening on :%d", dependencies.Configs["runner_frontend"].Port)
+	serveErr := sTLS.ServeTLS(lis, "volumes-data/certs/runner-server-cert.pem", "secret/certs/runner-server-key.pem")
+	defer func() {
+		teardown()
+	}()
+	if serveErr != nil {
+		log.Fatal("Runner-Frontend: Serving Error!")
+	}
 }
