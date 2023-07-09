@@ -23,6 +23,7 @@ services:
       - database-service
     networks:
       - running-net
+      - proxy-net
     volumes:
       - ./volumes-data/runner:/go/src/running/volumes-data 
     env_file:

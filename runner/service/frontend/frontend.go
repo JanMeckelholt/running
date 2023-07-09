@@ -2,6 +2,7 @@ package frontend
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -23,14 +24,17 @@ var (
 var templPath = "./runner/service/frontend/html-templates/"
 var templFile = "runner.html"
 var funcMap = template.FuncMap{
-	"dec": func(Week int64) int64 {
-		return Week - 1
+	"dec": func(week int64) int64 {
+		return week - 1
 	},
-	"inc": func(Week int64) int64 {
-		if Week >= 0 {
+	"inc": func(week int64) int64 {
+		if week >= 0 {
 			return 0
 		}
-		return Week + 1
+		return week + 1
+	},
+	"distToStr": func(distance uint64) string {
+		return fmt.Sprintf("%.2f km", float64(distance)/1000)
 	},
 }
 

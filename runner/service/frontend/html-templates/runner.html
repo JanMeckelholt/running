@@ -1,24 +1,74 @@
 <!DOCTYPE html>
+<html>
+    <head>
+        <title>Running Week</title>
+        <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" type="text/css" href="runner.css" />
+    </head>
 
+    <body>
+        <div class="mdc-card mdc-card--outlined" style="width: 600px; padding: 0px 30px 10px 30px;">
+            <h3 style="text-align: center;">Summary for the Week starting at {{.RunningData.StartOfWeekStr}}</h3>
+            <div class="mdc-data-table">
+                <div class="mdc-data-table__table-container">
+                  <table class="mdc-data-table__table" aria-label="Running Week">
+                    <tbody class="mdc-data-table__content">
+                      <tr class="mdc-data-table__row">
+                        <td class="mdc-data-table__cell">Number of runs:</td>
+                        <td class="mdc-data-table__cell">{{.RunningData.NumberOfRuns}}</td>
+                      </tr>
+                      <tr class="mdc-data-table__row">
+                        <td class="mdc-data-table__cell">Distance:</td>
+                        <td class="mdc-data-table__cell">{{distToStr .RunningData.Distance}}</td>
+                      </tr>
+                      <tr class="mdc-data-table__row">
+                        <td class="mdc-data-table__cell">Time spent running:</td>
+                        <td class="mdc-data-table__cell">{{.RunningData.TimeStr}}</td>
+                      </tr>
+                      <tr class="mdc-data-table__row">
+                        <td class="mdc-data-table__cell">Elevation gain:</td>
+                        <td class="mdc-data-table__cell">{{.RunningData.Climb}} m</td>
+                      </tr>
+                      <tr class="mdc-data-table__row">
+                        <td class="mdc-data-table__cell">Number of other activities:</td>
+                        <td class="mdc-data-table__cell">{{.RunningData.NumberOfOthers}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+            <div class="mdc-card__actions" style="margin: auto;">
+                <form style="display: inline" action="/run/" method="GET">
+                    <input type="hidden" value="{{dec .Week}}" name="week">
+                    <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
+                        <div class="mdc-button__ripple"></div>
+                        <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
+                        <span class="mdc-button__label"></span>
+                    </button>
+                </form>
+                <label>Week: {{.Week}}</label>
+                <form style="display: inline" action="/run/" method="GET">
+                    <input type="hidden" value="{{inc .Week}}" name="week">
+                    <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
+                        <div class="mdc-button__ripple"></div>
+                        <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_forward</i>
+                        <span class="mdc-button__label"></span>
+                    </button>
+                </form>            
+            </div>
 
+           
 
-<h1>Week starts at {{.RunningData.StartOfWeekStr}}</h1>
-<ul>
-    <li class="done">Number of runs: {{.RunningData.NumberOfRuns}}</li>
-    <li class="done">Distance: {{.RunningData.Distance}}</li>
-    <li class="done">Time spent running: {{.RunningData.TimeStr}}</li>
-    <li class="done">Elevation gain: {{.RunningData.Climb}}</li>
-    <li class="done">Number of other activities: {{.RunningData.NumberOfOthers}}</li>
-</ul>
-<span>
-    <form style="display: inline" action="/run/" method="GET">
-        <input type="hidden" value="{{dec .Week}}" name="week">
-        <button type="submit" action="submit">&lt-</button>
-    </form>
-    <label>Week: {{.Week}}</label>
-    <form style="display: inline" action="/run/" method="GET">
-        <input type="hidden" value="{{inc .Week}}" name="week">
-        <button type="submit" action="submit">-&gt</button>
-    </form>
+        </div>
 
-</span>
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+        <script>
+            const buttons = document.querySelectorAll('.mdc-button')
+            buttons.forEach(btn =>{
+                mdc.ripple.MDCRipple.attachTo(btn);
+            })
+        </script>
+    </body>
+
+</html>
