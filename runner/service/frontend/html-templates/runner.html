@@ -10,53 +10,101 @@
     <body>
         <div class="mdc-card mdc-card--outlined" style="width: 600px; padding: 0px 30px 10px 30px; margin: 0 auto">
             <h3 style="text-align: center;">Summary for the Week starting at {{.RunningData.StartOfWeekStr}}</h3>
+            <h3 style="text-align: center;">Year: {{.Year}} - Week: {{.Week}}</h3>
             <div class="mdc-data-table">
                 <div class="mdc-data-table__table-container">
                   <table class="mdc-data-table__table" aria-label="Running Week">
+                    <thead>
+                      <tr class=""mdc-data-table__header-row>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Metric</th>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Value</th>
+                        <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Goal</th>
+                      </tr>
+                    </thead>
                     <tbody class="mdc-data-table__content">
                       <tr class="mdc-data-table__row">
                         <td class="mdc-data-table__cell">Number of runs:</td>
                         <td class="mdc-data-table__cell">{{.RunningData.NumberOfRuns}}</td>
+                        <td class="mdc-data-table__cell"></td>
                       </tr>
                       <tr class="mdc-data-table__row">
                         <td class="mdc-data-table__cell">Distance:</td>
                         <td class="mdc-data-table__cell">{{distToStr .RunningData.Distance}}</td>
+                        <td class="mdc-data-table__cell"></td>
                       </tr>
                       <tr class="mdc-data-table__row">
                         <td class="mdc-data-table__cell">Time spent running:</td>
                         <td class="mdc-data-table__cell">{{.RunningData.TimeStr}}</td>
+                        <td class="mdc-data-table__cell"></td>
                       </tr>
                       <tr class="mdc-data-table__row">
                         <td class="mdc-data-table__cell">Elevation gain:</td>
-                        <td class="mdc-data-table__cell">{{.RunningData.Climb}} m</td>
+                        {{if ge .RunningData.Climb 500}}
+                          <td class="mdc-data-table__cell" style="background-color: darkgreen;">{{.RunningData.Climb}} m</td>
+                        {{else}}
+                          <td class="mdc-data-table__cell" style="background-color: orange;">{{.RunningData.Climb}} m</td>
+                        {{end}}  
+                        <td class="mdc-data-table__cell">500 m</td>
                       </tr>
                       <tr class="mdc-data-table__row">
                         <td class="mdc-data-table__cell">Number of other activities:</td>
                         <td class="mdc-data-table__cell">{{.RunningData.NumberOfOthers}}</td>
+                        <td class="mdc-data-table__cell"></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
             </div>
+            
             <div class="mdc-card__actions" style="margin: auto;">
+                {{if gt .Week 1}}
                 <form style="display: inline" action="/run/" method="GET">
-                    <input type="hidden" value="{{dec .Week}}" name="week">
+                    <input type="hidden" value="{{decWeek .Year .Week}}" name="week">
+                    <input type="hidden" value="{{.Year}}" name="year">
                     <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                         <div class="mdc-button__ripple"></div>
                         <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
                         <span class="mdc-button__label"></span>
                     </button>
                 </form>
+                {{end}}
                 <label>Week: {{.Week}}</label>
+                {{if lt .Week 52}}
                 <form style="display: inline" action="/run/" method="GET">
-                    <input type="hidden" value="{{inc .Week}}" name="week">
+                    <input type="hidden" value="{{incWeek .Year .Week}}" name="week">
+                    <input type="hidden" value="{{.Year}}" name="year">
                     <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                         <div class="mdc-button__ripple"></div>
                         <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_forward</i>
                         <span class="mdc-button__label"></span>
                     </button>
-                </form>            
+                </form>
+                {{end}}            
             </div>
+            
+            <div class="mdc-card__actions" style="margin: auto;">
+              {{if gt .Year 1900}}
+              <form style="display: inline" action="/run/" method="GET">
+                  <input type="hidden" value="{{decYear .Year .Week}}" name="year">
+                  <input type="hidden" value="{{.Week}}" name="week">
+                  <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
+                      <div class="mdc-button__ripple"></div>
+                      <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
+                      <span class="mdc-button__label"></span>
+                  </button>
+              </form>
+              {{end}}
+              <label>Year: {{.Year}}</label>
+              <form style="display: inline" action="/run/" method="GET">
+                  <input type="hidden" value="{{incYear .Year .Week}}" name="year">
+                  <input type="hidden" value="{{.Week}}" name="week">
+                  <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
+                      <div class="mdc-button__ripple"></div>
+                      <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_forward</i>
+                      <span class="mdc-button__label"></span>
+                  </button>
+              </form>         
+          </div>
 
            
 

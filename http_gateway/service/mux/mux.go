@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -96,14 +97,14 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
-					if rB.WeekUntil == nil {
+					if rB.WeekUntil == nil || rB.YearUntil == nil {
 						rB.Until = nil
 					} else {
-						until := s + 7*24*60*60
+						until := utils.GetStartOfWeek(*rB.YearUntil, *rB.WeekUntil) + 7*24*60*60
 						rB.Until = &until
 					}
 				}
@@ -130,14 +131,22 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodGet:
+				var weekInt, yearInt int
+				weekStr := req.URL.Query().Get("week")
+				yearStr := req.URL.Query().Get("year")
+
+				weekInt, err := strconv.Atoi(weekStr)
+				if err != nil {
+					weekInt, yearInt = time.Now().ISOWeek()
+				} else {
+					yearInt, err = strconv.Atoi(yearStr)
+					if err != nil {
+						weekInt, yearInt = time.Now().ISOWeek()
+					}
+				}
 				log.Info("get weeks")
 				client := req.URL.Query().Get("client")
-				weeksStr := req.URL.Query().Get("week")
-				week, err := strconv.ParseInt(weeksStr, 10, 64)
-				if err != nil {
-					week = 0
-				}
-				weeksummarryResponse, err := s.GetWeekSummary(context.Background(), runner.WeekSummaryRequest{ClientId: client, Week: week})
+				weeksummarryResponse, err := s.GetWeekSummary(context.Background(), runner.WeekSummaryRequest{ClientId: client, Week: uint64(weekInt), Year: uint64(yearInt)})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummary %s", err.Error()))
@@ -162,11 +171,11 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				client := req.URL.Query().Get("client")
 				weekSinceStr := req.URL.Query().Get("weekSince")
 				weekUntilStr := req.URL.Query().Get("weekUntil")
-				weekSince, err := strconv.ParseInt(weekSinceStr, 10, 64)
+				weekSince, err := strconv.ParseUint(weekSinceStr, 10, 64)
 				if err != nil {
 					weekSince = 0
 				}
-				weekUntil, err := strconv.ParseInt(weekUntilStr, 10, 64)
+				weekUntil, err := strconv.ParseUint(weekUntilStr, 10, 64)
 				if err != nil {
 					weekUntil = 0
 				}
@@ -186,14 +195,14 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
-					if rB.WeekUntil == nil {
+					if rB.WeekUntil == nil || rB.YearUntil == nil {
 						rB.Until = nil
 					} else {
-						until := s + 7*24*60*60
+						until := utils.GetStartOfWeek(*rB.YearUntil, *rB.WeekUntil) + 7*24*60*60
 						rB.Until = &until
 					}
 				}
@@ -224,9 +233,9 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
 				}
 				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: *rB.Since, ClientId: *rB.ClientId})

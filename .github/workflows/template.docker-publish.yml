@@ -28,7 +28,7 @@ jobs:
         run: echo ${{ steps.buildx.outputs.platforms }}
 
       - name: Build the docker-compose stack
-        run:  docker-compose -f template-docker-compose.yml build
+        run:  docker-compose -f docker-compose.yml build
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}

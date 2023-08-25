@@ -29,13 +29,16 @@ message ActivitiesRequest {
 
   message WeekSummaryRequest {
     string clientId= 1;
-    int64  week = 2;
+    uint64  week = 2;
+    uint64  year = 3;
   }
 
   message WeekSummariesRequest {
     string clientId= 1;
-    int64  weekSince = 2;
-    int64  weekUntil = 3;
+    uint64  weekSince = 2;
+    uint64  weekUntil = 3;
+    uint64  yearSince = 4;
+    uint64  yearUntil = 5;
   }
 
 message WeekSummary {

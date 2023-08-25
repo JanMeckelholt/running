@@ -14,4 +14,4 @@ RUN chmod +x ./runner/wait-for-it.sh ./runner/docker-entrypoint.sh
 
 ENTRYPOINT ["./runner/docker-entrypoint.sh"]
 CMD ["runner"]
-EXPOSE 666
+# EXPOSE 666

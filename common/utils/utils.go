@@ -22,26 +22,41 @@ import (
 const Location = "Europe/Berlin"
 const startOFWeek = time.Monday // Sunday = 0; Monday = 1
 
-func GetStartOfWeek(week int64) uint64 {
-	if week > 0 {
-		log.Infof("got invalid week-value %d, defaulting to 0", week)
-		week = 0
+func FirstDayOfISOWeek(year int, week int, timezone *time.Location) uint64 {
+	date := time.Date(year, 0, 0, 0, 0, 0, 0, timezone)
+	isoYear, isoWeek := date.ISOWeek()
+	for date.Weekday() != time.Monday { // iterate back to Monday
+		date = date.AddDate(0, 0, -1)
+		isoYear, isoWeek = date.ISOWeek()
 	}
-	loc, _ := time.LoadLocation(Location)
-	_, offset := time.Now().In(loc).Zone()
-	roundDay := time.Now().UTC().Round(24 * time.Hour).Add(-time.Duration(offset) * time.Second)
-	if roundDay.In(loc).Weekday() != time.Now().In(loc).Weekday() {
-		roundDay = roundDay.Add(-24 * time.Hour)
+	for isoYear < year { // iterate forward to the first day of the first week
+		date = date.AddDate(0, 0, 1)
+		isoYear, isoWeek = date.ISOWeek()
 	}
-	var daysSinceMonday int64
-	switch roundDay.In(loc).Weekday() {
-	case time.Sunday:
-		daysSinceMonday = 6
-	default:
-		daysSinceMonday = int64(roundDay.In(loc).Weekday() - startOFWeek)
+	for isoWeek < week { // iterate forward to the first day of the given week
+		date = date.AddDate(0, 0, 1)
+		isoYear, isoWeek = date.ISOWeek()
 	}
+	return uint64(date.Unix())
+}
 
-	return uint64(roundDay.Add(time.Duration(-daysSinceMonday)*24*time.Hour + time.Duration(week*7*24*int64(time.Hour))).Unix())
+func GetStartOfWeek(year, week uint64) uint64 {
+	loc, _ := time.LoadLocation(Location)
+	date := time.Date(int(year), 0, 0, 0, 0, 0, 0, loc)
+	isoYear, isoWeek := date.ISOWeek()
+	for date.Weekday() != time.Monday { // iterate back to Monday
+		date = date.AddDate(0, 0, -1)
+		isoYear, isoWeek = date.ISOWeek()
+	}
+	for isoYear < int(year) { // iterate forward to the first day of the first week
+		date = date.AddDate(0, 0, 1)
+		isoYear, isoWeek = date.ISOWeek()
+	}
+	for isoWeek < int(week) { // iterate forward to the first day of the given week
+		date = date.AddDate(0, 0, 1)
+		isoYear, isoWeek = date.ISOWeek()
+	}
+	return uint64(date.Unix())
 }
 
 func Encrypt(keyString string, stringToEncrypt string) (encryptedString string) {

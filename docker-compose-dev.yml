@@ -20,6 +20,7 @@ services:
       dockerfile: ./runner/Dockerfile
     ports:
       - "666:666"
+      - "8001:443"
     depends_on:
       - strava-service
       - database-service
@@ -29,22 +30,22 @@ services:
       - ./volumes-data/runner:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
-  populate_db:
-    container_name: populate_db
-    build:
-      context: .
-      dockerfile: ./populate_db/Dockerfile
-    ports:
-      - "670:666"
-    depends_on:
-      - strava-service
-      - database-service
-    networks:
-      - running-net
-    volumes:
-      - ./volumes-data/populate_db:/go/src/running/volumes-data
-    env_file:
-      - .env.gpg.secret
+  # populate_db:
+  #   container_name: populate_db
+  #   build:
+  #     context: .
+  #     dockerfile: ./populate_db/Dockerfile
+  #   ports:
+  #     - "670:666"
+  #   depends_on:
+  #     - strava-service
+  #     - database-service
+  #   networks:
+  #     - running-net
+  #   volumes:
+  #     - ./volumes-data/populate_db:/go/src/running/volumes-data
+  #   env_file:
+  #     - .env.gpg.secret
   http_gateway:
     container_name: http_gateway
     build:
@@ -95,27 +96,6 @@ services:
     env_file:
       - .env.gpg.secret
       - .env.postgres.secret
-  running_app:
-    container_name: running_app
-    build:
-      args:
-        - RUNNING_APP_PASSWORD=${RUNNING_APP_PASSWORD}  
-        - HTTP_GATEWAY_BASE_URL=${HTTP_GATEWAY_BASE_URL}  
-        - HTTP_GATEWAY_PORT=${HTTP_GATEWAY_PORT}  
-      context: .
-      dockerfile: ./running_app/Dockerfile
-    user: "$USERID:$USERID"
-    ports:
-      - "8001:443"
-    restart: unless-stopped
-    networks:
-      - running-net
-      - proxy-net
-    volumes:
-      - ./volumes-data/running_app:/volumes-data
-    env_file:
-      - .env.gpg.secret
-    #  - .env.running_app.secret
 networks:
   running-net:
   db-net:

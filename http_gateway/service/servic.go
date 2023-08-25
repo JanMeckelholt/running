@@ -23,9 +23,10 @@ type ActivitiesRequestBody struct {
 	ClientId  *string
 	Since     *uint64 `json:"since,omitempty"`
 	Until     *uint64 `json:"until,omitempty"`
-	WeekSince *int64  `json:"weekSince,omitempty"`
-	WeekUntil *int64  `json:"weekUntil,omitempty"`
-	Week      *int64  `json:"week,omitempty"`
+	YearSince *uint64 `json:"yearSince,omitempty"`
+	WeekSince *uint64 `json:"weekSince,omitempty"`
+	WeekUntil *uint64 `json:"weekUntil,omitempty"`
+	YearUntil *uint64 `json:"yearUntil,omitempty"`
 }
 
 type RunnerRequestBody struct {
