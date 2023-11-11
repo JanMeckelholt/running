@@ -34,8 +34,8 @@ var funcMap = template.FuncMap{
 	},
 	"incWeek": func(year, week int64) int64 {
 		isoYear, isoWeek := time.Now().ISOWeek()
-		if year == int64(isoYear) && week == int64(isoWeek) {
-			return week
+		if year == int64(isoYear) && week >= int64(isoWeek) {
+			return int64(isoWeek)
 		}
 		return week + 1
 	},
@@ -46,6 +46,10 @@ var funcMap = template.FuncMap{
 		return year - 1
 	},
 	"incYear": func(year, week int64) int64 {
+		isoYear, _ := time.Now().ISOWeek()
+		if year >= int64(isoYear) {
+			return int64(isoYear)
+		}
 		if year <= 1900 {
 			return 1900
 		}
