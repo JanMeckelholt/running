@@ -137,12 +137,7 @@ func websiteHandler(allowOriginStr string, rs *server.HttpGatewayServer, srv *se
 
 	rootMux.Handle(service.WebsiteRoute, mux.Handler(service.WebsiteRoute, rs))
 	rootMux.Handle(config.RunPrefix+"/health", mux.Handler("/health", rs))
-	rootMux.Handle(config.RunPrefix+"/athlete", mux.Handler("/athlete", rs))
-	rootMux.Handle(config.RunPrefix+"/activities", mux.Handler("/activities", rs))
-	rootMux.Handle(config.RunPrefix+"/athlete/create", mux.Handler("/athlete/create", rs))
 	rootMux.Handle(config.RunPrefix+"/weeksummary", mux.Handler("/weeksummary", rs))
-	rootMux.Handle(config.RunPrefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
-	rootMux.Handle(config.RunPrefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))
 
 	handlerWithAuth := server.AuthMiddleware(rootMux)
 	handlerWithCors := server.CorsMiddleware(handlerWithAuth, srv.Config)
