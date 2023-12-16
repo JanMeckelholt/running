@@ -120,6 +120,49 @@ func main() {
 		}
 	}()
 
+	apiMux := http.NewServeMux()
+
+	apiMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
+	apiMux.Handle(config.Prefix+"/health", mux.Handler("/health", rs))
+	apiMux.Handle(config.Prefix+"/athlete", mux.Handler("/athlete", rs))
+	apiMux.Handle(config.Prefix+"/activities", mux.Handler("/activities", rs))
+	apiMux.Handle(config.Prefix+"/athlete/create", mux.Handler("/athlete/create", rs))
+	apiMux.Handle(config.Prefix+"/weeksummary", mux.Handler("/weeksummary", rs))
+	apiMux.Handle(config.Prefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
+	apiMux.Handle(config.Prefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))
+
+	apiHandlerWithAuth := server.AuthMiddleware(apiMux)
+
+	go func() {
+		apiTLS := &http.Server{
+			Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gateway-API"].Port),
+			Handler: apiHandlerWithAuth,
+		}
+		lis, err := net.Listen("tcp", apiTLS.Addr)
+		if err != nil {
+			return
+		}
+
+		teardown := func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			shutdownErr := apiTLS.Shutdown(ctx)
+			if shutdownErr != nil {
+				log.Fatal("Api-server: Shutdown Error!")
+			}
+		}
+
+		log.Infof("Listening on :%d", dependencies.Configs["http_gateway-API"].Port)
+		serveErr := apiTLS.ServeTLS(lis, "volumes-data/certs/http_gateway-server-cert.pem", "secret/certs/http_gateway-server-key.pem")
+		defer func() {
+			teardown()
+		}()
+		if serveErr != nil {
+			log.Fatal("Runner-Server: Serving Error!")
+		}
+	}()
+
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gateway"].Port),
 		Handler: handlerWithCors,

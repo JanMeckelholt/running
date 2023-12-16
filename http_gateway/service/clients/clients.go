@@ -8,14 +8,12 @@ import (
 
 	certhandling "github.com/JanMeckelholt/running/common/cert-handling"
 	"github.com/JanMeckelholt/running/common/dependencies"
-	"github.com/JanMeckelholt/running/common/grpc/database"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/http_gateway/service/config"
 )
 
 type Clients struct {
-	RunnerClient   runner.RunnerClient
-	DatabaseClient database.DatabaseClient
+	RunnerClient runner.RunnerClient
 }
 
 func (c *Clients) Dial(config config.ServiceConfig) error {
