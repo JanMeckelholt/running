@@ -7,8 +7,8 @@ import (
 	"github.com/JanMeckelholt/running/http_gateway/service/config"
 )
 
-const LoginRoute = config.Prefix + "/login"
-const WebsiteRoute = config.Prefix + "/website"
+const LoginRoute = config.ApiPrefix + config.RunPrefix + "/login"
+const WebsiteRoute = config.RunPrefix + "/website"
 
 type Service struct {
 	Clients clients.Clients
