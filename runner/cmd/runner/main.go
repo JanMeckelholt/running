@@ -73,11 +73,11 @@ func main() {
 }
 
 func serveHTTP(rs runner.RunnerServer) {
-	log.Infof("____entering go routine_____")
-	time.Sleep(time.Second * 4)
-	log.Info("___sleept")
+	time.Sleep(time.Second * 3)
 	rootMux := http.NewServeMux()
+	rootMux.Handle(service.CSSPrefix+"/", frontend.CSSHandler())
 	rootMux.Handle(service.RunPrefix+"/", frontend.FrontEnd(rs))
+
 	sTLS := &http.Server{
 		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner_frontend"].Port),
 		Handler: rootMux,

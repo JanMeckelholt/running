@@ -6,6 +6,7 @@ import (
 )
 
 var RunPrefix = "/run"
+var CSSPrefix = "/css"
 
 type Service struct {
 	Clients clients.Clients

@@ -4,13 +4,15 @@
         <title>Running Week</title>
         <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet" crossorigin="anonymous">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" type="text/css" href="runner.css" />
+        <link rel="stylesheet" type="text/css" href="../css/runner.css" />
     </head>
 
     <body>
+      {{$year := .Year}}
+      {{$week := .Week}}
         <div class="mdc-card mdc-card--outlined" style="width: 600px; padding: 0px 30px 10px 30px; margin: 0 auto">
             <h3 style="text-align: center;">Summary for the Week starting at {{.RunningData.StartOfWeekStr}}</h3>
-            <h3 style="text-align: center;">Year: {{.Year}} - Week: {{.Week}}</h3>
+            <h3 style="text-align: center;">Year: {{$year}} - Week: {{$week}}</h3>
             <div class="mdc-data-table">
                 <div class="mdc-data-table__table-container">
                   <table class="mdc-data-table__table" aria-label="Running Week">
@@ -55,38 +57,39 @@
                   </table>
                 </div>
             </div>
-            
+
+
+
             <div class="mdc-card__actions" style="margin: auto;">
-                {{if gt .Week 1}}
                 <form style="display: inline" action="/run/" method="GET">
-                    <input type="hidden" value="{{decWeek .Year .Week}}" name="week">
-                    <input type="hidden" value="{{.Year}}" name="year">
+                  {{$decWeek := decWeek $year $week}}
+                    <input type="hidden" value="{{$decWeek.Week}}" name="week">
+                    <input type="hidden" value="{{$decWeek.Year}}" name="year">
                     <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                         <div class="mdc-button__ripple"></div>
                         <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
                         <span class="mdc-button__label"></span>
                     </button>
                 </form>
-                {{end}}
-                <label>Week: {{.Week}}</label>
-                {{if lt .Week 52}}
+                <label>Week: {{$week}}</label>
                 <form style="display: inline" action="/run/" method="GET">
-                    <input type="hidden" value="{{incWeek .Year .Week}}" name="week">
-                    <input type="hidden" value="{{.Year}}" name="year">
+                  {{$incWeek := incWeek $year $week}}
+                    <input type="hidden" value="{{$incWeek.Week}}" name="week">
+                    <input type="hidden" value="{{$incWeek.Year}}" name="year">
                     <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                         <div class="mdc-button__ripple"></div>
                         <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_forward</i>
                         <span class="mdc-button__label"></span>
                     </button>
-                </form>
-                {{end}}            
+                </form>         
             </div>
             
             <div class="mdc-card__actions" style="margin: auto;">
-              {{if gt .Year 1900}}
+              {{if gt $year 1900}}
               <form style="display: inline" action="/run/" method="GET">
-                  <input type="hidden" value="{{decYear .Year .Week}}" name="year">
-                  <input type="hidden" value="{{.Week}}" name="week">
+                {{$decYear := decYear $year $week}}
+                  <input type="hidden" value="{{$decYear.Year}}" name="year">
+                  <input type="hidden" value="{{$decYear.Week}}" name="week">
                   <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                       <div class="mdc-button__ripple"></div>
                       <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_back</i>
@@ -94,10 +97,11 @@
                   </button>
               </form>
               {{end}}
-              <label>Year: {{.Year}}</label>
+              <label>Year: {{$year}}</label>
               <form style="display: inline" action="/run/" method="GET">
-                  <input type="hidden" value="{{incYear .Year .Week}}" name="year">
-                  <input type="hidden" value="{{.Week}}" name="week">
+                {{$incYear := incYear $year $week}}
+                  <input type="hidden" value="{{$incYear.Year}}" name="year">
+                  <input type="hidden" value="{{$incYear.Week}}" name="week">
                   <button class="mdc-button mdc-card__action mdc-card__action--button" type="submit" action="submit">
                       <div class="mdc-button__ripple"></div>
                       <i class="material-icons mdc-button__icon" aria-hidden="true">arrow_forward</i>
