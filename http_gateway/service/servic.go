@@ -8,7 +8,6 @@ import (
 )
 
 const LoginRoute = config.ApiPrefix + config.RunPrefix + "/login"
-const WebsiteRoute = config.RunPrefix + "/website"
 
 type Service struct {
 	Clients clients.Clients

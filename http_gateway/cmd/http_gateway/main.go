@@ -22,7 +22,6 @@ import (
 )
 
 func main() {
-	var allowOriginStr string
 	commonConf := commonconf.GPGConf{}
 	err := env.Parse(&commonConf)
 	if err != nil {
@@ -77,11 +76,9 @@ func main() {
 		log.Errorf("could create gateway server! %s", err.Error())
 	}
 
-	websiteHandler := websiteHandler(allowOriginStr, rs, srv)
 	apiHandler := apiHandler(rs)
 
-	go serveTLS(apiHandler, dependencies.Configs["http_gateway-API"].Port)
-	serveTLS(websiteHandler, dependencies.Configs["http_gatewayTLS"].Port)
+	serveTLS(apiHandler, dependencies.Configs["http_gateway-API"].Port)
 
 }
 
@@ -129,17 +126,4 @@ func apiHandler(rs *server.HttpGatewayServer) http.Handler {
 
 	apiHandlerWithAuth := server.AuthMiddleware(apiMux)
 	return apiHandlerWithAuth
-}
-
-func websiteHandler(allowOriginStr string, rs *server.HttpGatewayServer, srv *service.Service) http.Handler {
-	rootMux := http.NewServeMux()
-	log.Infof("allowOrigin: %s", allowOriginStr)
-
-	rootMux.Handle(service.WebsiteRoute, mux.Handler(service.WebsiteRoute, rs))
-	rootMux.Handle(config.RunPrefix+"/health", mux.Handler("/health", rs))
-	rootMux.Handle(config.RunPrefix+"/weeksummary", mux.Handler("/weeksummary", rs))
-
-	handlerWithAuth := server.AuthMiddleware(rootMux)
-	handlerWithCors := server.CorsMiddleware(handlerWithAuth, srv.Config)
-	return handlerWithCors
 }
