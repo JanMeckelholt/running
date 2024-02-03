@@ -22,7 +22,6 @@ import (
 )
 
 func main() {
-	var allowOriginStr string
 	commonConf := commonconf.GPGConf{}
 	err := env.Parse(&commonConf)
 	if err != nil {
@@ -70,61 +69,25 @@ func main() {
 
 	err = srv.Clients.Dial(srv.Config)
 	if err != nil {
-		log.Errorf("could not Dial Clients! %s", err.Error())
+		log.Errorf("could not dial clients! %s", err.Error())
 	}
 	rs, err := server.NewHttpGatewayServer(srv.Clients)
-
-	rootMux := http.NewServeMux()
-	log.Infof("allowOrigin: %s", allowOriginStr)
-
-	rootMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
-	rootMux.Handle(service.WebsiteRoute, mux.Handler(service.WebsiteRoute, rs))
-	rootMux.Handle(config.Prefix+"/health", mux.Handler("/health", rs))
-	rootMux.Handle(config.Prefix+"/athlete", mux.Handler("/athlete", rs))
-	rootMux.Handle(config.Prefix+"/activities", mux.Handler("/activities", rs))
-	rootMux.Handle(config.Prefix+"/athlete/create", mux.Handler("/athlete/create", rs))
-	rootMux.Handle(config.Prefix+"/weeksummary", mux.Handler("/weeksummary", rs))
-	rootMux.Handle(config.Prefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
-	rootMux.Handle(config.Prefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))
-
-	handlerWithAuth := server.AuthMiddleware(rootMux)
-	handlerWithCors := server.CorsMiddleware(handlerWithAuth, srv.Config)
-
-	go func() {
-		sTLS := &http.Server{
-			Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gatewayTLS"].Port),
-			Handler: handlerWithCors,
-		}
-		lis, err := net.Listen("tcp", sTLS.Addr)
-		if err != nil {
-			return
-		}
-
-		teardown := func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-
-			shutdownErr := sTLS.Shutdown(ctx)
-			if shutdownErr != nil {
-				log.Fatal("Runner-Server: Shutdown Error!")
-			}
-		}
-
-		log.Infof("Listening on :%d", dependencies.Configs["http_gatewayTLS"].Port)
-		serveErr := sTLS.ServeTLS(lis, "volumes-data/certs/http_gateway-server-cert.pem", "secret/certs/http_gateway-server-key.pem")
-		defer func() {
-			teardown()
-		}()
-		if serveErr != nil {
-			log.Fatal("Runner-Server: Serving Error!")
-		}
-	}()
-
-	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", dependencies.Configs["http_gateway"].Port),
-		Handler: handlerWithCors,
+	if err != nil {
+		log.Errorf("could create gateway server! %s", err.Error())
 	}
-	lis, err := net.Listen("tcp", s.Addr)
+
+	apiHandler := apiHandler(rs)
+
+	serveTLS(apiHandler, dependencies.Configs["http_gateway-API"].Port)
+
+}
+
+func serveTLS(handler http.Handler, addr int) {
+	tlsServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", addr),
+		Handler: handler,
+	}
+	lis, err := net.Listen("tcp", tlsServer.Addr)
 	if err != nil {
 		return
 	}
@@ -133,19 +96,35 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		shutdownErr := s.Shutdown(ctx)
+		shutdownErr := tlsServer.Shutdown(ctx)
 		if shutdownErr != nil {
-			log.Fatal("Runner-Server: Shutdown Error!")
+			log.Fatal("TLS-server: Shutdown Error!")
 		}
 	}
 
-	log.Infof("Listening on :%d", dependencies.Configs["http_gateway"].Port)
-	serveErr := s.Serve(lis)
+	log.Infof("Listening on :%d", addr)
+	serveErr := tlsServer.ServeTLS(lis, "volumes-data/certs/http_gateway-server-cert.pem", "secret/certs/http_gateway-server-key.pem")
 	defer func() {
 		teardown()
 	}()
 	if serveErr != nil {
-		log.Fatal("Runner-Server: Serving Error!")
+		log.Fatalf("HTTP-Gateway-Server: Serving Error: %s", serveErr.Error())
 	}
+}
 
+func apiHandler(rs *server.HttpGatewayServer) http.Handler {
+	apiMux := http.NewServeMux()
+
+	apiMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/health", mux.Handler("/health", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/athlete", mux.Handler("/athlete", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/activities", mux.Handler("/activities", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/athlete/create", mux.Handler("/athlete/create", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/client/create", mux.Handler("/client/create", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/weeksummary", mux.Handler("/weeksummary", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))
+
+	apiHandlerWithAuth := server.AuthMiddleware(apiMux)
+	return apiHandlerWithAuth
 }

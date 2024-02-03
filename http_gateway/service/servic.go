@@ -7,8 +7,7 @@ import (
 	"github.com/JanMeckelholt/running/http_gateway/service/config"
 )
 
-const LoginRoute = config.Prefix + "/login"
-const WebsiteRoute = config.Prefix + "/website"
+const LoginRoute = config.ApiPrefix + config.RunPrefix + "/login"
 
 type Service struct {
 	Clients clients.Clients
@@ -20,24 +19,29 @@ type ClimbResponse struct {
 }
 
 type ActivitiesRequestBody struct {
-	ClientId  *string
+	AthleteId uint64
 	Since     *uint64 `json:"since,omitempty"`
 	Until     *uint64 `json:"until,omitempty"`
-	WeekSince *int64  `json:"weekSince,omitempty"`
-	WeekUntil *int64  `json:"weekUntil,omitempty"`
-	Week      *int64  `json:"week,omitempty"`
+	YearSince *uint64 `json:"yearSince,omitempty"`
+	WeekSince *uint64 `json:"weekSince,omitempty"`
+	WeekUntil *uint64 `json:"weekUntil,omitempty"`
+	YearUntil *uint64 `json:"yearUntil,omitempty"`
 }
 
-type RunnerRequestBody struct {
-	ClientId string
+type AthleteRequestBody struct {
+	AthleteId uint64
 }
 
-type RunnerCreateBody struct {
+type AthleteCreateBody struct {
 	Token        string
 	RefreshToken string
 	ClientId     string
-	ClientSecret string
 	AthletId     uint64
+}
+
+type ClientCreateBody struct {
+	ClientId     string
+	ClientSecret string
 }
 
 type WeekSummary struct {

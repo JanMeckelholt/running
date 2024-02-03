@@ -25,8 +25,11 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DatabaseClient interface {
 	UpsertClient(ctx context.Context, in *Client, opts ...grpc.CallOption) (*empty.Empty, error)
-	UpdateClient(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*Client, error)
+	UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*Client, error)
 	GetClient(ctx context.Context, in *ClientId, opts ...grpc.CallOption) (*Client, error)
+	UpsertAthlete(ctx context.Context, in *Athlete, opts ...grpc.CallOption) (*empty.Empty, error)
+	UpdateAthlete(ctx context.Context, in *UpdateAthleteRequest, opts ...grpc.CallOption) (*Athlete, error)
+	GetAthlete(ctx context.Context, in *AthleteId, opts ...grpc.CallOption) (*Athlete, error)
 	UpsertActivity(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error)
 	UpsertActivityFromCSV(ctx context.Context, in *strava.Activity, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetActivity(ctx context.Context, in *ActivityId, opts ...grpc.CallOption) (*strava.Activity, error)
@@ -50,7 +53,7 @@ func (c *databaseClient) UpsertClient(ctx context.Context, in *Client, opts ...g
 	return out, nil
 }
 
-func (c *databaseClient) UpdateClient(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*Client, error) {
+func (c *databaseClient) UpdateClient(ctx context.Context, in *UpdateClientRequest, opts ...grpc.CallOption) (*Client, error) {
 	out := new(Client)
 	err := c.cc.Invoke(ctx, "/database.Database/UpdateClient", in, out, opts...)
 	if err != nil {
@@ -62,6 +65,33 @@ func (c *databaseClient) UpdateClient(ctx context.Context, in *UpdateRequest, op
 func (c *databaseClient) GetClient(ctx context.Context, in *ClientId, opts ...grpc.CallOption) (*Client, error) {
 	out := new(Client)
 	err := c.cc.Invoke(ctx, "/database.Database/GetClient", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseClient) UpsertAthlete(ctx context.Context, in *Athlete, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/database.Database/UpsertAthlete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseClient) UpdateAthlete(ctx context.Context, in *UpdateAthleteRequest, opts ...grpc.CallOption) (*Athlete, error) {
+	out := new(Athlete)
+	err := c.cc.Invoke(ctx, "/database.Database/UpdateAthlete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseClient) GetAthlete(ctx context.Context, in *AthleteId, opts ...grpc.CallOption) (*Athlete, error) {
+	out := new(Athlete)
+	err := c.cc.Invoke(ctx, "/database.Database/GetAthlete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +139,11 @@ func (c *databaseClient) GetActivities(ctx context.Context, in *ActivitiesReques
 // for forward compatibility
 type DatabaseServer interface {
 	UpsertClient(context.Context, *Client) (*empty.Empty, error)
-	UpdateClient(context.Context, *UpdateRequest) (*Client, error)
+	UpdateClient(context.Context, *UpdateClientRequest) (*Client, error)
 	GetClient(context.Context, *ClientId) (*Client, error)
+	UpsertAthlete(context.Context, *Athlete) (*empty.Empty, error)
+	UpdateAthlete(context.Context, *UpdateAthleteRequest) (*Athlete, error)
+	GetAthlete(context.Context, *AthleteId) (*Athlete, error)
 	UpsertActivity(context.Context, *strava.Activity) (*empty.Empty, error)
 	UpsertActivityFromCSV(context.Context, *strava.Activity) (*empty.Empty, error)
 	GetActivity(context.Context, *ActivityId) (*strava.Activity, error)
@@ -125,11 +158,20 @@ type UnimplementedDatabaseServer struct {
 func (UnimplementedDatabaseServer) UpsertClient(context.Context, *Client) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertClient not implemented")
 }
-func (UnimplementedDatabaseServer) UpdateClient(context.Context, *UpdateRequest) (*Client, error) {
+func (UnimplementedDatabaseServer) UpdateClient(context.Context, *UpdateClientRequest) (*Client, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateClient not implemented")
 }
 func (UnimplementedDatabaseServer) GetClient(context.Context, *ClientId) (*Client, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetClient not implemented")
+}
+func (UnimplementedDatabaseServer) UpsertAthlete(context.Context, *Athlete) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertAthlete not implemented")
+}
+func (UnimplementedDatabaseServer) UpdateAthlete(context.Context, *UpdateAthleteRequest) (*Athlete, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAthlete not implemented")
+}
+func (UnimplementedDatabaseServer) GetAthlete(context.Context, *AthleteId) (*Athlete, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAthlete not implemented")
 }
 func (UnimplementedDatabaseServer) UpsertActivity(context.Context, *strava.Activity) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertActivity not implemented")
@@ -175,7 +217,7 @@ func _Database_UpsertClient_Handler(srv interface{}, ctx context.Context, dec fu
 }
 
 func _Database_UpdateClient_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateRequest)
+	in := new(UpdateClientRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -187,7 +229,7 @@ func _Database_UpdateClient_Handler(srv interface{}, ctx context.Context, dec fu
 		FullMethod: "/database.Database/UpdateClient",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseServer).UpdateClient(ctx, req.(*UpdateRequest))
+		return srv.(DatabaseServer).UpdateClient(ctx, req.(*UpdateClientRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -206,6 +248,60 @@ func _Database_GetClient_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DatabaseServer).GetClient(ctx, req.(*ClientId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Database_UpsertAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Athlete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServer).UpsertAthlete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/database.Database/UpsertAthlete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServer).UpsertAthlete(ctx, req.(*Athlete))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Database_UpdateAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAthleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServer).UpdateAthlete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/database.Database/UpdateAthlete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServer).UpdateAthlete(ctx, req.(*UpdateAthleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Database_GetAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AthleteId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseServer).GetAthlete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/database.Database/GetAthlete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseServer).GetAthlete(ctx, req.(*AthleteId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -300,6 +396,18 @@ var Database_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetClient",
 			Handler:    _Database_GetClient_Handler,
+		},
+		{
+			MethodName: "UpsertAthlete",
+			Handler:    _Database_UpsertAthlete_Handler,
+		},
+		{
+			MethodName: "UpdateAthlete",
+			Handler:    _Database_UpdateAthlete_Handler,
+		},
+		{
+			MethodName: "GetAthlete",
+			Handler:    _Database_GetAthlete_Handler,
 		},
 		{
 			MethodName: "UpsertActivity",

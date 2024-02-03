@@ -7,7 +7,6 @@ rm -f ../volumes-data/postgres/certs/*.*
 rm -f ../volumes-data/runner/certs/*.*
 rm -f ../volumes-data/populate_db/certs/*.*
 rm -f ../volumes-data/http_gateway/certs/*.*
-rm -f ../volumes-data/running_app/certs/*.*
 rm -f ../api_call/certs/*.*
 
 
@@ -19,7 +18,6 @@ cp ca-cert.pem ../volumes-data/postgres/certs/root.crt
 cp ca-cert.pem ../volumes-data/runner/certs/
 cp ca-cert.pem ../volumes-data/populate_db/certs/
 cp ca-cert.pem ../volumes-data/http_gateway/certs/
-cp ca-cert.pem ../volumes-data/running_app/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/
 cp ca-cert.pem ../api_call/certs/
 
@@ -49,6 +47,8 @@ openssl x509 -req -in runner-server-req.pem -days 365 -CA ca-cert.pem -CAkey ca-
 gpg -e -a -r dockerRunning runner-server-key.pem
 mv runner-server-cert.pem ../volumes-data/runner/certs/
 mv runner-server-key.pem.asc ../volumes-data/runner/certs/
+###ToDo: Remove me
+mv runner-server-key.pem ../volumes-data/runner/certs/
 
 # postgres
 # Generate postgres-server private key and certificate signing request (CSR)
@@ -61,16 +61,6 @@ cp postgres-key.pem.asc ../volumes-data/database-service/certs/
 mv postgres-cert.pem ../volumes-data/postgres/certs/
 mv postgres-key.pem ../volumes-data/postgres/certs/
 # mv postgres-key.pem.asc ../volumes-data/postgres/certs/
-
-# running_app
-# Generate running_app private key and certificate signing request (CSR)
-openssl req -newkey rsa:4096 -nodes -keyout running_app-key.pem -out running_app-req.pem -subj "/C=DE/ST=x/L=x/O=x/CN=running_app"
-# Use CA's private key to sign running_app's CSR and get back the signed certificate
-openssl x509 -req -in running_app-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out running_app-cert.pem -extfile ./altNames_running_app.cnf
-gpg -e -a -r dockerRunning running_app-key.pem
-mv running_app-cert.pem ../volumes-data/running_app/certs/
-mv running_app-key.pem ../volumes-data/running_app/certs/
-# mv running_app-key.pem.asc ../volumes-data/running_app/certs/
 
 # http
 # Generate http_gateway-server private key and certificate signing request (CSR)

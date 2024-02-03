@@ -1,0 +1,75 @@
+name: Build main
+on: 
+  push:
+    branches: 
+      - main
+
+jobs:
+  build:
+    name: Build, test and publish app Docker images
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REGISTRY: janmeckelholt.io
+      DOCKER_TARGET_PLATFORM: linux/arm64
+      PLATFORM: linux/arm64
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: Build the docker-compose stack
+        run:  docker-compose build
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          RUNNING_APP_PASSWORD: ${{ secrets.RUNNING_APP_PASSWORD }}
+          HTTP_GATEWAY_BASE_URL: 'janmeckelholt.de'
+          HTTP_GATEWAY_PORT: 443
+          USERID: 1001
+
+      - name: Publish image(s)
+        run: |
+          docker tag running_http_gateway ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${{ github.sha }}  && \
+          docker tag running_runner ${{ secrets.DOCKER_USERNAME}}/running_runner:${{ github.sha }} && \
+          docker tag running_strava-service ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${{ github.sha }} && \
+          docker tag running_database-service ${{ secrets.DOCKER_USERNAME}}/running_database-service:${{ github.sha }} && \
+          docker tag running_running_app ${{ secrets.DOCKER_USERNAME}}/running_running_app:${{ github.sha }} && \
+          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }} && \
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p "${{ secrets.DOCKER_PASSWORD }}"
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_runner:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_strava-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_database-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_running_app:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_postgres:${{ github.sha }}
+
+
+
+#  - name: Prepare      
+#       if: success()      
+#       id: prepare      
+#       run: |        
+#         echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
+#         echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}        
+#         echo ::set-output name=version::${{ github.sha }}      
+# - name: Docker Login      
+#       if: success()      
+#       run: |        
+#         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login ${DOCKER_REGISTRY} --username "${{ secrets.DOCKER_USERNAME}}" --password-stdin              - name: Run Buildx (push image)      
+#       if: success()      
+#       run: |        
+#         docker buildx build \        
+#         --platform ${{ steps.prepare.outputs.docker_platform }} \        
+#         --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }} \        
+#         --file ./Dockerfile \        
+#         --output type=image,push=true .

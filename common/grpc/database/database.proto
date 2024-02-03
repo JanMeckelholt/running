@@ -6,8 +6,11 @@ import "strava/strava.proto";
 
 service Database {
   rpc UpsertClient(Client) returns (google.protobuf.Empty) {}
-  rpc UpdateClient(UpdateRequest) returns (Client) {}
+  rpc UpdateClient(UpdateClientRequest) returns (Client) {}
   rpc GetClient(ClientId) returns (Client) {}
+  rpc UpsertAthlete(Athlete) returns (google.protobuf.Empty) {}
+  rpc UpdateAthlete(UpdateAthleteRequest) returns (Athlete) {}
+  rpc GetAthlete(AthleteId) returns (Athlete) {}
   rpc UpsertActivity(strava.Activity) returns (google.protobuf.Empty) {}
   rpc UpsertActivityFromCSV(strava.Activity) returns (google.protobuf.Empty) {}
   rpc GetActivity(ActivityId) returns (strava.Activity) {}
@@ -15,9 +18,9 @@ service Database {
 }
 
 message ActivitiesRequest {
-  string ClientId = 1;
-  uint64 Since = 2;
-  uint64 Until = 3;
+  uint64 athleteId = 1;
+  uint64 since = 2;
+  uint64 until = 3;
 }
 
 message ActivitiesResponse {
@@ -28,20 +31,34 @@ message ClientId {
   string clientId =1;
 }
 
+message AthleteId {
+  uint64 athleteId =1;
+}
+
 message ActivityId {
-  string ActivityId =1;
+  string activityId =1;
 }
 
 message Client {
   string clientId = 1;
   string clientSecret = 2;
-  string token = 3;
-  string refreshToken = 4;
-  uint64 athleteId = 5;
 }
 
-message UpdateRequest {
+message Athlete {
+  uint64 athleteId = 1;
+  string clientId = 2;
+  string token = 3;
+  string refreshToken = 4;
+  repeated strava.Activity Activities = 5;
+}
+
+message UpdateClientRequest {
   string clientId=1;
+repeated kvPair kvPairs=2;
+}
+
+message UpdateAthleteRequest {
+  uint64 athleteId=1;
 repeated kvPair kvPairs=2;
 }
 

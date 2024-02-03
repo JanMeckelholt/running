@@ -17,11 +17,13 @@ services:
     restart: unless-stopped
     ports:
       - "666:666"
+      - "8001:443"
     depends_on:
       - strava-service
       - database-service
     networks:
       - running-net
+      - proxy-net
     volumes:
       - ./volumes-data/runner:/go/src/running/volumes-data 
     env_file:
@@ -45,6 +47,7 @@ services:
     ports:
       - "81:80"
       - "444:443"
+      - "333:333"
     depends_on:
       - runner
     networks:
@@ -85,20 +88,6 @@ services:
     env_file:
       - .env.gpg.secret
       - .env.postgres.secret
-  running_app:
-    container_name: running_app
-    image: janmeckelholt/running_running_app:${COMMIT}
-    restart: unless-stopped
-    ports:
-      - "8001:443"
-    networks:
-      - running-net
-      - proxy-net
-    volumes:
-      - ./volumes-data/running_app:/volumes-data
-    env_file:
-      - .env.gpg.secret
-    #  - .env.running_app.secret
 networks:
   running-net:
   db-net:

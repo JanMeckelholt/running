@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StravaClient interface {
-	GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*RunnerResponse, error)
+	GetAthlete(ctx context.Context, in *AthleteRequest, opts ...grpc.CallOption) (*AthleteResponse, error)
 	GetActivities(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*ActivitiesResponse, error)
 	ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	UseRefreshToken(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*TokenResponse, error)
@@ -37,9 +37,9 @@ func NewStravaClient(cc grpc.ClientConnInterface) StravaClient {
 	return &stravaClient{cc}
 }
 
-func (c *stravaClient) GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*RunnerResponse, error) {
-	out := new(RunnerResponse)
-	err := c.cc.Invoke(ctx, "/strava.Strava/GetRunner", in, out, opts...)
+func (c *stravaClient) GetAthlete(ctx context.Context, in *AthleteRequest, opts ...grpc.CallOption) (*AthleteResponse, error) {
+	out := new(AthleteResponse)
+	err := c.cc.Invoke(ctx, "/strava.Strava/GetAthlete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *stravaClient) UseRefreshToken(ctx context.Context, in *RefreshRequest, 
 // All implementations must embed UnimplementedStravaServer
 // for forward compatibility
 type StravaServer interface {
-	GetRunner(context.Context, *RunnerRequest) (*RunnerResponse, error)
+	GetAthlete(context.Context, *AthleteRequest) (*AthleteResponse, error)
 	GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error)
 	ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error)
 	UseRefreshToken(context.Context, *RefreshRequest) (*TokenResponse, error)
@@ -88,8 +88,8 @@ type StravaServer interface {
 type UnimplementedStravaServer struct {
 }
 
-func (UnimplementedStravaServer) GetRunner(context.Context, *RunnerRequest) (*RunnerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRunner not implemented")
+func (UnimplementedStravaServer) GetAthlete(context.Context, *AthleteRequest) (*AthleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAthlete not implemented")
 }
 func (UnimplementedStravaServer) GetActivities(context.Context, *ActivitiesRequest) (*ActivitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivities not implemented")
@@ -113,20 +113,20 @@ func RegisterStravaServer(s grpc.ServiceRegistrar, srv StravaServer) {
 	s.RegisterService(&Strava_ServiceDesc, srv)
 }
 
-func _Strava_GetRunner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunnerRequest)
+func _Strava_GetAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AthleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StravaServer).GetRunner(ctx, in)
+		return srv.(StravaServer).GetAthlete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/strava.Strava/GetRunner",
+		FullMethod: "/strava.Strava/GetAthlete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StravaServer).GetRunner(ctx, req.(*RunnerRequest))
+		return srv.(StravaServer).GetAthlete(ctx, req.(*AthleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -193,8 +193,8 @@ var Strava_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*StravaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetRunner",
-			Handler:    _Strava_GetRunner_Handler,
+			MethodName: "GetAthlete",
+			Handler:    _Strava_GetAthlete_Handler,
 		},
 		{
 			MethodName: "GetActivities",

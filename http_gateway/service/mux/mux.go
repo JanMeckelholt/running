@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -22,22 +23,19 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 	switch uri {
 	case service.LoginRoute:
 		return auth.LoginHandler()
-	case service.WebsiteRoute:
-		return auth.WebsiteHandler()
 	case "/health":
 		return health.Handler(health.Health{ServiceName: "runner"})
-
 	case "/athlete":
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodPost:
-				rB := service.RunnerRequestBody{}
+				rB := service.AthleteRequestBody{}
 				err := json.NewDecoder(req.Body).Decode(&rB)
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				res, err := s.GetRunner(context.Background(), runner.RunnerRequest{ClientId: rB.ClientId})
+				res, err := s.GetAthlete(context.Background(), runner.AthleteRequest{AthleteId: rB.AthleteId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting StravaClient %s", err.Error()))
@@ -58,15 +56,14 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodPost:
-				rB := service.RunnerCreateBody{}
+				rB := service.AthleteCreateBody{}
 				err := json.NewDecoder(req.Body).Decode(&rB)
 				if err != nil {
 					log.Errorf(err.Error())
 				}
 				log.Infof("AthletId: %d", uint64(rB.AthletId))
-				err = s.CreateClient(context.Background(), database.Client{
+				err = s.CreateAthlete(context.Background(), database.Athlete{
 					ClientId:     rB.ClientId,
-					ClientSecret: rB.ClientSecret,
 					Token:        rB.Token,
 					RefreshToken: rB.RefreshToken,
 					AthleteId:    uint64(rB.AthletId),
@@ -86,6 +83,36 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				rw.WriteHeader(http.StatusMethodNotAllowed)
 			}
 		})
+	case "/client/create":
+		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			switch req.Method {
+			case http.MethodPost:
+				rB := service.ClientCreateBody{}
+				err := json.NewDecoder(req.Body).Decode(&rB)
+				if err != nil {
+					log.Errorf(err.Error())
+				}
+				log.Infof("ClientId: %s", rB.ClientId)
+				err = s.CreateClient(context.Background(), database.Client{
+					ClientId:     rB.ClientId,
+					ClientSecret: rB.ClientSecret,
+				})
+				if err != nil {
+					rw.WriteHeader(http.StatusInternalServerError)
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error creating cliente %s", err.Error()))
+					return
+				}
+				rw.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(rw).Encode(fmt.Sprintf("cliente successfully created!"))
+			case http.MethodOptions:
+				rw.Header().Set("Allow", "OPTIONS, POST")
+				rw.Header().Set("Cache-Control", "max-age=604800")
+				rw.WriteHeader(http.StatusOK)
+			default:
+				rw.WriteHeader(http.StatusMethodNotAllowed)
+			}
+		})
 	case "/activities":
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Add("Content-Type", "application/json")
@@ -96,19 +123,19 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
-					if rB.WeekUntil == nil {
+					if rB.WeekUntil == nil || rB.YearUntil == nil {
 						rB.Until = nil
 					} else {
-						until := s + 7*24*60*60
+						until := utils.GetStartOfWeek(*rB.YearUntil, *rB.WeekUntil) + 7*24*60*60
 						rB.Until = &until
 					}
 				}
-				log.Infof("Getting activities for client %s since %d until %d", *rB.ClientId, rB.Since, *rB.Until)
-				res, err := s.GetActivities(context.Background(), database.ActivitiesRequest{Since: *rB.Since, Until: *rB.Until, ClientId: *rB.ClientId})
+				log.Infof("Getting activities for athlete %d since %d until %d", *&rB.AthleteId, rB.Since, *rB.Until)
+				res, err := s.GetActivities(context.Background(), database.ActivitiesRequest{Since: *rB.Since, Until: *rB.Until, AthleteId: rB.AthleteId})
 				//res, err := rs.GetActivities(context.Background(), strava.ActivityRequest{Token: rB.Token, Since: rB.Since, ClientId: rB.ClientId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
@@ -130,14 +157,27 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 			rw.Header().Add("Content-Type", "application/json")
 			switch req.Method {
 			case http.MethodGet:
-				log.Info("get weeks")
-				client := req.URL.Query().Get("client")
-				weeksStr := req.URL.Query().Get("week")
-				week, err := strconv.ParseInt(weeksStr, 10, 64)
+				var weekInt, yearInt int
+				weekStr := req.URL.Query().Get("week")
+				yearStr := req.URL.Query().Get("year")
+
+				weekInt, err := strconv.Atoi(weekStr)
 				if err != nil {
-					week = 0
+					weekInt, yearInt = time.Now().ISOWeek()
+				} else {
+					yearInt, err = strconv.Atoi(yearStr)
+					if err != nil {
+						weekInt, yearInt = time.Now().ISOWeek()
+					}
 				}
-				weeksummarryResponse, err := s.GetWeekSummary(context.Background(), runner.WeekSummaryRequest{ClientId: client, Week: week})
+				log.Info("get weeks")
+				athleteId, err := strconv.ParseUint(req.URL.Query().Get("athlete"), 10, 64)
+				if err != nil {
+					rw.WriteHeader(http.StatusBadRequest)
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummary %s", err.Error()))
+					return
+				}
+				weeksummarryResponse, err := s.GetWeekSummary(context.Background(), runner.WeekSummaryRequest{AthleteId: athleteId, Week: uint64(weekInt), Year: uint64(yearInt)})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummary %s", err.Error()))
@@ -159,18 +199,23 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 			switch req.Method {
 			case http.MethodGet:
 				log.Info("get weeksummaries")
-				client := req.URL.Query().Get("client")
+				athleteId, err := strconv.ParseUint(req.URL.Query().Get("athlete"), 10, 64)
+				if err != nil {
+					rw.WriteHeader(http.StatusBadRequest)
+					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummary %s", err.Error()))
+					return
+				}
 				weekSinceStr := req.URL.Query().Get("weekSince")
 				weekUntilStr := req.URL.Query().Get("weekUntil")
-				weekSince, err := strconv.ParseInt(weekSinceStr, 10, 64)
+				weekSince, err := strconv.ParseUint(weekSinceStr, 10, 64)
 				if err != nil {
 					weekSince = 0
 				}
-				weekUntil, err := strconv.ParseInt(weekUntilStr, 10, 64)
+				weekUntil, err := strconv.ParseUint(weekUntilStr, 10, 64)
 				if err != nil {
 					weekUntil = 0
 				}
-				weeksummariesResponse, err := s.GetWeekSummaries(context.Background(), runner.WeekSummariesRequest{ClientId: client, WeekSince: weekSince, WeekUntil: weekUntil})
+				weeksummariesResponse, err := s.GetWeekSummaries(context.Background(), runner.WeekSummariesRequest{AthleteId: athleteId, WeekSince: weekSince, WeekUntil: weekUntil})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummaries %s", err.Error()))
@@ -186,18 +231,18 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
-					if rB.WeekUntil == nil {
+					if rB.WeekUntil == nil || rB.YearUntil == nil {
 						rB.Until = nil
 					} else {
-						until := s + 7*24*60*60
+						until := utils.GetStartOfWeek(*rB.YearUntil, *rB.WeekUntil) + 7*24*60*60
 						rB.Until = &until
 					}
 				}
-				weeksummariesResponse, err := s.GetWeekSummaries(context.Background(), runner.WeekSummariesRequest{ClientId: *rB.ClientId, WeekSince: *rB.WeekSince, WeekUntil: *rB.WeekUntil})
+				weeksummariesResponse, err := s.GetWeekSummaries(context.Background(), runner.WeekSummariesRequest{AthleteId: *&rB.AthleteId, WeekSince: *rB.WeekSince, WeekUntil: *rB.WeekUntil})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error requesting WeekSummaries %s", err.Error()))
@@ -224,12 +269,12 @@ func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
 				if err != nil {
 					log.Errorf(err.Error())
 				}
-				if rB.WeekSince != nil {
-					log.Infof("using sinceWeeks-parameter, since-parameter is overwritten")
-					s := utils.GetStartOfWeek(*rB.WeekSince)
+				if rB.WeekSince != nil && rB.YearSince != nil {
+					log.Infof("using sinceWeek/siceYear-parameter, since-parameter is overwritten")
+					s := utils.GetStartOfWeek(*rB.YearSince, *rB.WeekSince)
 					rB.Since = &s
 				}
-				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: *rB.Since, ClientId: *rB.ClientId})
+				err = s.ActivitiesToDB(context.Background(), runner.ActivitiesRequest{Since: *rB.Since, AthleteId: rB.AthleteId})
 				if err != nil {
 					rw.WriteHeader(http.StatusInternalServerError)
 					_ = json.NewEncoder(rw).Encode(fmt.Sprintf("Error adding Activites to DB %s", err.Error()))

@@ -25,8 +25,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RunnerClient interface {
-	GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error)
+	GetAthlete(ctx context.Context, in *AthleteRequest, opts ...grpc.CallOption) (*strava.AthleteResponse, error)
 	CreateClient(ctx context.Context, in *database.Client, opts ...grpc.CallOption) (*empty.Empty, error)
+	CreateAthlete(ctx context.Context, in *database.Athlete, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetActivities(ctx context.Context, in *database.ActivitiesRequest, opts ...grpc.CallOption) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(ctx context.Context, in *ActivitiesRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	GetWeekSummaries(ctx context.Context, in *WeekSummariesRequest, opts ...grpc.CallOption) (*WeekSummariesResponse, error)
@@ -42,9 +43,9 @@ func NewRunnerClient(cc grpc.ClientConnInterface) RunnerClient {
 	return &runnerClient{cc}
 }
 
-func (c *runnerClient) GetRunner(ctx context.Context, in *RunnerRequest, opts ...grpc.CallOption) (*strava.RunnerResponse, error) {
-	out := new(strava.RunnerResponse)
-	err := c.cc.Invoke(ctx, "/runner.Runner/GetRunner", in, out, opts...)
+func (c *runnerClient) GetAthlete(ctx context.Context, in *AthleteRequest, opts ...grpc.CallOption) (*strava.AthleteResponse, error) {
+	out := new(strava.AthleteResponse)
+	err := c.cc.Invoke(ctx, "/runner.Runner/GetAthlete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +55,15 @@ func (c *runnerClient) GetRunner(ctx context.Context, in *RunnerRequest, opts ..
 func (c *runnerClient) CreateClient(ctx context.Context, in *database.Client, opts ...grpc.CallOption) (*empty.Empty, error) {
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/runner.Runner/CreateClient", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *runnerClient) CreateAthlete(ctx context.Context, in *database.Athlete, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/runner.Runner/CreateAthlete", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +119,9 @@ func (c *runnerClient) Health(ctx context.Context, in *HealthMessage, opts ...gr
 // All implementations must embed UnimplementedRunnerServer
 // for forward compatibility
 type RunnerServer interface {
-	GetRunner(context.Context, *RunnerRequest) (*strava.RunnerResponse, error)
+	GetAthlete(context.Context, *AthleteRequest) (*strava.AthleteResponse, error)
 	CreateClient(context.Context, *database.Client) (*empty.Empty, error)
+	CreateAthlete(context.Context, *database.Athlete) (*empty.Empty, error)
 	GetActivities(context.Context, *database.ActivitiesRequest) (*database.ActivitiesResponse, error)
 	ActivitiesToDB(context.Context, *ActivitiesRequest) (*empty.Empty, error)
 	GetWeekSummaries(context.Context, *WeekSummariesRequest) (*WeekSummariesResponse, error)
@@ -123,11 +134,14 @@ type RunnerServer interface {
 type UnimplementedRunnerServer struct {
 }
 
-func (UnimplementedRunnerServer) GetRunner(context.Context, *RunnerRequest) (*strava.RunnerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRunner not implemented")
+func (UnimplementedRunnerServer) GetAthlete(context.Context, *AthleteRequest) (*strava.AthleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAthlete not implemented")
 }
 func (UnimplementedRunnerServer) CreateClient(context.Context, *database.Client) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateClient not implemented")
+}
+func (UnimplementedRunnerServer) CreateAthlete(context.Context, *database.Athlete) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAthlete not implemented")
 }
 func (UnimplementedRunnerServer) GetActivities(context.Context, *database.ActivitiesRequest) (*database.ActivitiesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActivities not implemented")
@@ -157,20 +171,20 @@ func RegisterRunnerServer(s grpc.ServiceRegistrar, srv RunnerServer) {
 	s.RegisterService(&Runner_ServiceDesc, srv)
 }
 
-func _Runner_GetRunner_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunnerRequest)
+func _Runner_GetAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AthleteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RunnerServer).GetRunner(ctx, in)
+		return srv.(RunnerServer).GetAthlete(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/runner.Runner/GetRunner",
+		FullMethod: "/runner.Runner/GetAthlete",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RunnerServer).GetRunner(ctx, req.(*RunnerRequest))
+		return srv.(RunnerServer).GetAthlete(ctx, req.(*AthleteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -189,6 +203,24 @@ func _Runner_CreateClient_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RunnerServer).CreateClient(ctx, req.(*database.Client))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Runner_CreateAthlete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(database.Athlete)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RunnerServer).CreateAthlete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/runner.Runner/CreateAthlete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RunnerServer).CreateAthlete(ctx, req.(*database.Athlete))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -291,12 +323,16 @@ var Runner_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RunnerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetRunner",
-			Handler:    _Runner_GetRunner_Handler,
+			MethodName: "GetAthlete",
+			Handler:    _Runner_GetAthlete_Handler,
 		},
 		{
 			MethodName: "CreateClient",
 			Handler:    _Runner_CreateClient_Handler,
+		},
+		{
+			MethodName: "CreateAthlete",
+			Handler:    _Runner_CreateAthlete_Handler,
 		},
 		{
 			MethodName: "GetActivities",

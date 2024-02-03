@@ -26,8 +26,13 @@ func NewRunnerServer(clients clients.Clients) (*RunnerServer, error) {
 	}, nil
 }
 
-func (rs RunnerServer) GetRunner(ctx context.Context, request *runner.RunnerRequest) (*strava.RunnerResponse, error) {
-	return rs.clients.StravaClient.GetRunner(ctx, &strava.RunnerRequest{ClientId: request.GetClientId()})
+func (rs RunnerServer) GetAthlete(ctx context.Context, request *runner.AthleteRequest) (*strava.AthleteResponse, error) {
+	return rs.clients.StravaClient.GetAthlete(ctx, &strava.AthleteRequest{AthleteId: request.GetAthleteId()})
+}
+
+func (rs RunnerServer) CreateAthlete(ctx context.Context, request *database.Athlete) (*emptypb.Empty, error) {
+	log.Infof("runner server: creating athlete %d for client %s", request.GetAthleteId(), request.GetClientId())
+	return rs.clients.DatabaseClient.UpsertAthlete(ctx, request)
 }
 
 func (rs RunnerServer) GetActivitiesFromStrava(ctx context.Context, request strava.ActivitiesRequest) (*strava.ActivitiesResponse, error) {
@@ -35,13 +40,15 @@ func (rs RunnerServer) GetActivitiesFromStrava(ctx context.Context, request stra
 }
 
 func (rs RunnerServer) ActivitiesToDB(ctx context.Context, request *runner.ActivitiesRequest) (*emptypb.Empty, error) {
-	clientId := request.GetClientId()
-	dbClient, err := rs.clients.DatabaseClient.GetClient(ctx, &database.ClientId{ClientId: clientId})
+	athleteId := request.GetAthleteId()
+	dbAthlete, err := rs.clients.DatabaseClient.GetAthlete(ctx, &database.AthleteId{AthleteId: athleteId})
 	if err != nil {
+		log.Errorf("error getting dbathlete: %s", err.Error())
 		return nil, err
 	}
-	activitiesResp, err := rs.clients.StravaClient.GetActivities(ctx, &strava.ActivitiesRequest{ClientId: clientId, Token: dbClient.Token, Since: request.GetSince()})
+	activitiesResp, err := rs.clients.StravaClient.GetActivities(ctx, &strava.ActivitiesRequest{AthleteId: athleteId, Token: dbAthlete.Token, Since: request.GetSince()})
 	if err != nil {
+		log.Errorf("error getting activites from Strava: %s", err.Error())
 		return nil, err
 	}
 	log.Infof("got %d activities from Strava", len(activitiesResp.GetActivities()))
@@ -56,6 +63,7 @@ func (rs RunnerServer) ActivitiesToDB(ctx context.Context, request *runner.Activ
 }
 
 func (rs RunnerServer) CreateClient(ctx context.Context, request *database.Client) (*emptypb.Empty, error) {
+	log.Infof("runner server: creating client %s", request.GetClientId())
 	return rs.clients.DatabaseClient.UpsertClient(ctx, request)
 }
 
@@ -64,14 +72,15 @@ func (rs RunnerServer) GetActivities(ctx context.Context, request *database.Acti
 }
 
 func (rs RunnerServer) GetWeekSummaries(ctx context.Context, request *runner.WeekSummariesRequest) (*runner.WeekSummariesResponse, error) {
-	startOfFirstWeek := utils.GetStartOfWeek(request.GetWeekSince())
+	startOfFirstWeek := utils.GetStartOfWeek(uint64(request.GetYearSince()), uint64(request.GetWeekSince()))
 	var endOfLastWeek uint64
-	if request.GetWeekUntil() == 0 {
+	isoYear, isoWeek := time.Now().ISOWeek()
+	if request.GetWeekUntil() == 0 || request.GetYearUntil() == 0 || (isoYear == int(request.GetYearUntil()) && isoWeek == int(request.GetWeekUntil())) {
 		endOfLastWeek = uint64(time.Now().Unix())
 	} else {
-		endOfLastWeek = startOfFirstWeek + 7*24*60*60*uint64((1-(request.GetWeekSince()-request.GetWeekUntil())))
+		endOfLastWeek = utils.GetStartOfWeek(uint64(request.GetYearUntil()), uint64(request.GetWeekUntil())) + 7*24*60*60
 	}
-	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, Until: endOfLastWeek, ClientId: request.GetClientId()})
+	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfFirstWeek, Until: endOfLastWeek, AthleteId: request.GetAthleteId()})
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +90,9 @@ func (rs RunnerServer) GetWeekSummaries(ctx context.Context, request *runner.Wee
 }
 
 func (rs RunnerServer) GetWeekSummary(ctx context.Context, request *runner.WeekSummaryRequest) (*runner.WeekSummary, error) {
-	startOfWeek := utils.GetStartOfWeek(request.GetWeek())
+	startOfWeek := utils.GetStartOfWeek(request.GetYear(), request.GetWeek())
 	endOfWeek := startOfWeek + 7*24*60*60
-	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfWeek, Until: endOfWeek, ClientId: request.GetClientId()})
+	res, err := rs.clients.DatabaseClient.GetActivities(context.Background(), &database.ActivitiesRequest{Since: startOfWeek, Until: endOfWeek, AthleteId: request.GetAthleteId()})
 	if err != nil {
 		return nil, err
 	}

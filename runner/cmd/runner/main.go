@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
+	"net/http"
+	"time"
 
 	"github.com/caarlos0/env/v7"
 	"github.com/joho/godotenv"
@@ -15,6 +18,7 @@ import (
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/runner/service"
+	"github.com/JanMeckelholt/running/runner/service/frontend"
 	"github.com/JanMeckelholt/running/runner/service/server"
 )
 
@@ -50,13 +54,14 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot load TLS credentials: ", err)
 	}
+
 	grpcServer := grpc.NewServer(grpc.Creds(tlsCredentials))
 
 	teardownGrpc := grpcServer.GracefulStop
 	runnerServer, err := server.NewRunnerServer(srv.Clients)
 	runner.RegisterRunnerServer(grpcServer, runnerServer)
-
 	log.Infof("listening at :%d", dependencies.Configs["runner"].Port)
+	go serveHTTP(runnerServer)
 	serveErr := grpcServer.Serve(lis)
 	defer func() {
 		teardownGrpc()
@@ -65,4 +70,39 @@ func main() {
 		log.Fatal("Runner-Server: Serving Error!")
 	}
 
+}
+
+func serveHTTP(rs runner.RunnerServer) {
+	time.Sleep(time.Second * 3)
+	rootMux := http.NewServeMux()
+	rootMux.Handle(service.CSSPrefix+"/", frontend.CSSHandler())
+	rootMux.Handle(service.RunPrefix+"/", frontend.FrontEnd(rs))
+
+	sTLS := &http.Server{
+		Addr:    fmt.Sprintf(":%d", dependencies.Configs["runner_frontend"].Port),
+		Handler: rootMux,
+	}
+	lis, err := net.Listen("tcp", sTLS.Addr)
+	if err != nil {
+		return
+	}
+
+	teardown := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		shutdownErr := sTLS.Shutdown(ctx)
+		if shutdownErr != nil {
+			log.Fatal("Runner-Server: Shutdown Error!")
+		}
+	}
+
+	log.Infof("Listening on :%d", dependencies.Configs["runner_frontend"].Port)
+	serveErr := sTLS.ServeTLS(lis, "volumes-data/certs/runner-server-cert.pem", "secret/certs/runner-server-key.pem")
+	defer func() {
+		teardown()
+	}()
+	if serveErr != nil {
+		log.Fatal("Runner-Frontend: Serving Error!")
+	}
 }

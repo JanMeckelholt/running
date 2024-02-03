@@ -1,0 +1,51 @@
+name: Build template
+on: 
+  push:
+    branches: 
+      - template
+
+jobs:
+  build:
+    name: Build, test and publish app Docker images
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REGISTRY: janmeckelholt.io
+      DOCKER_TARGET_PLATFORM: linux/arm64
+      PLATFORM: linux/arm64
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: Build the docker-compose stack
+        run:  docker-compose -f docker-compose.yml build
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          HTTP_GATEWAY_BASE_URL: 'janmeckelholt.de'
+          HTTP_GATEWAY_PORT: 443
+          USERID: 1001
+
+      - name: Publish image(s)
+        run: |
+          docker tag running_http_gateway ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:template-${{ github.sha }}  && \
+          docker tag running_runner ${{ secrets.DOCKER_USERNAME}}/running_runner:template-${{ github.sha }} && \
+          docker tag running_strava-service ${{ secrets.DOCKER_USERNAME}}/running_strava-service:template-${{ github.sha }} && \
+          docker tag running_database-service ${{ secrets.DOCKER_USERNAME}}/running_database-service:template-${{ github.sha }} && \
+          docker tag running_postgres ${{ secrets.DOCKER_USERNAME}}/running_postgres:template-${{ github.sha }} && \
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p "${{ secrets.DOCKER_PASSWORD }}"
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_http_gateway:template-${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_runner:template-${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_strava-service:template-${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_database-service:template-${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME}}/running_postgres:template-${{ github.sha }}

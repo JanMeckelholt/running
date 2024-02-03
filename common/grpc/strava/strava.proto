@@ -3,14 +3,14 @@ package strava;
 option go_package = "github.com/JanMeckelholt/running/common/grpc/strava";
 import "google/protobuf/empty.proto";
 service Strava {
-  rpc GetRunner(RunnerRequest) returns (RunnerResponse) {}
+  rpc GetAthlete(AthleteRequest) returns (AthleteResponse) {}
   rpc GetActivities(ActivitiesRequest) returns (ActivitiesResponse) {}
   rpc ActivitiesToDB(ActivitiesRequest) returns (google.protobuf.Empty) {}
   rpc UseRefreshToken(RefreshRequest) returns (TokenResponse) {}
 }
 
-message RunnerRequest {
-  string clientId = 1;
+message AthleteRequest {
+  uint64 athleteId = 1;
   string token = 2;
 }
 
@@ -34,7 +34,7 @@ message coordinate {
 
 }
 
-message RunnerResponse{
+message AthleteResponse{
   uint64  id = 1;
   string username = 2;
   uint64 resource_state = 3;
@@ -56,18 +56,18 @@ message RunnerResponse{
 }
 
 message ActivityRequest {
-  string clientId= 1;
+  uint64 athleteId= 1;
   string token = 2;
 }
 
 message ActivitiesRequest {
-  string clientId= 1;
+  uint64 athleteId= 1;
   string token = 2;
   uint64  since = 3;
 }
 
 message ActivitiesResponse {
-  repeated Activity Activities= 1;
+  repeated Activity activities= 1;
 }
 
 message Activity{

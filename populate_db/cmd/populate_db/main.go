@@ -20,6 +20,7 @@ func main() {
 	commonConf := commonconf.GPGConf{}
 	err := env.Parse(&commonConf)
 	if err != nil {
+		log.Errorf("Could not parse commonConf: %s", err.Error())
 		return
 	}
 	err = utils.DecryptPGP("./volumes-data/env/.env.docker.secret.asc", "./secret/env/.env.docker.secret", commonConf.GPGPrivateKey)
@@ -35,21 +36,32 @@ func main() {
 	srv := &service.Service{}
 	err = env.Parse(&srv.ServiceConfig)
 	if err != nil || !srv.ServiceConfig.Enabled {
+		log.Info("starting populating DB...")
 		return
 	}
 	err = srv.Clients.Dial(srv.ServiceConfig)
 	if err != nil {
 		log.Errorf("could not Dial Clients! %s", err.Error())
 	}
+
+	log.Infof("creating client %s...", srv.ServiceConfig.ClientsConfig.ClientId)
 	srv.Clients.DatabaseClient.UpsertClient(context.Background(), &database.Client{
 		ClientId:     srv.ServiceConfig.ClientsConfig.ClientId,
 		ClientSecret: srv.ServiceConfig.ClientsConfig.ClientSecret,
+	})
+
+	log.Infof("creating athlete %d...", srv.ServiceConfig.ClientsConfig.AthletId)
+	srv.Clients.DatabaseClient.UpsertAthlete(context.Background(), &database.Athlete{
 		Token:        srv.ServiceConfig.ClientsConfig.Token,
 		RefreshToken: srv.ServiceConfig.ClientsConfig.RefreshToken,
 		AthleteId:    srv.ServiceConfig.ClientsConfig.AthletId,
+		ClientId:     srv.ServiceConfig.ClientsConfig.ClientId,
 	})
-
+	if !srv.ServiceConfig.CsvEnabled {
+		return
+	}
 	records := readCsvFile("./volumes-data/data/activities.csv")
+	log.Infof("creating %d records from csv...", len(records))
 	for i := 1; i < len(records); i++ {
 		distance, _ := strconv.ParseFloat(records[i][17], 64)
 		totalElevationGain, _ := strconv.ParseFloat(records[i][20], 64)

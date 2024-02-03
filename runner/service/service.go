@@ -5,6 +5,9 @@ import (
 	"github.com/JanMeckelholt/running/runner/service/config"
 )
 
+var RunPrefix = "/run"
+var CSSPrefix = "/css"
+
 type Service struct {
 	Clients clients.Clients
 	Config  config.ServiceConfig
