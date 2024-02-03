@@ -79,6 +79,10 @@ func (s DatabaseServer) GetActivities(ctx context.Context, req *grpcDB.Activitie
 	return s.Storer.GetActivities(req)
 }
 
+func (s DatabaseServer) UpsertActivity(ctx context.Context, req *grpcStrava.Activity) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, s.Storer.UpsertActivity(req, false)
+}
+
 func (s DatabaseServer) UpsertActivityFromCSV(ctx context.Context, req *grpcStrava.Activity) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, s.Storer.UpsertActivity(req, true)
 }

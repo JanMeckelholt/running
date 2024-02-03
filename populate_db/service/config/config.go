@@ -2,6 +2,7 @@ package config
 
 type ServiceConfig struct {
 	Enabled             bool   `env:"ENABLED"`
+	CsvEnabled          bool   `env:"CSV_ENABLED"`
 	DatabaseServiceName string `env:"DATABASE_SERVICE_NAME"`
 	ClientsConfig       clientConfig
 }
