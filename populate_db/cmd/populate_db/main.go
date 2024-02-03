@@ -44,9 +44,13 @@ func main() {
 	srv.Clients.DatabaseClient.UpsertClient(context.Background(), &database.Client{
 		ClientId:     srv.ServiceConfig.ClientsConfig.ClientId,
 		ClientSecret: srv.ServiceConfig.ClientsConfig.ClientSecret,
+	})
+
+	srv.Clients.DatabaseClient.UpsertAthlete(context.Background(), &database.Athlete{
 		Token:        srv.ServiceConfig.ClientsConfig.Token,
 		RefreshToken: srv.ServiceConfig.ClientsConfig.RefreshToken,
 		AthleteId:    srv.ServiceConfig.ClientsConfig.AthletId,
+		ClientId:     srv.ServiceConfig.ClientsConfig.ClientId,
 	})
 
 	records := readCsvFile("./volumes-data/data/activities.csv")

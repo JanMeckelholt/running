@@ -27,5 +27,9 @@ get_clients:
 	docker exec -i postgres psql -U root running < ./get_clients.sql > db_clients.txt
 	cat db_clients.txt
 
+set_athleteId:
+	docker exec -i postgres psql -U root running < ./set_athleteId.sql > db_clients.txt
+	cat db_clients.txt
+
 build_api_call:
 	cd api_call/cmd/api_call &&  GOOS=linux GOARCH=arm64 go build -ldflags="-s -w"

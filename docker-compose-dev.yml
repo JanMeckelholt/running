@@ -30,22 +30,22 @@ services:
       - ./volumes-data/runner:/go/src/running/volumes-data
     env_file:
       - .env.gpg.secret
-  # populate_db:
-  #   container_name: populate_db
-  #   build:
-  #     context: .
-  #     dockerfile: ./populate_db/Dockerfile
-  #   ports:
-  #     - "670:666"
-  #   depends_on:
-  #     - strava-service
-  #     - database-service
-  #   networks:
-  #     - running-net
-  #   volumes:
-  #     - ./volumes-data/populate_db:/go/src/running/volumes-data
-  #   env_file:
-  #     - .env.gpg.secret
+  populate_db:
+    container_name: populate_db
+    build:
+      context: .
+      dockerfile: ./populate_db/Dockerfile
+    ports:
+      - "670:666"
+    depends_on:
+      - strava-service
+      - database-service
+    networks:
+      - running-net
+    volumes:
+      - ./volumes-data/populate_db:/go/src/running/volumes-data
+    env_file:
+      - .env.gpg.secret
   http_gateway:
     container_name: http_gateway
     build:

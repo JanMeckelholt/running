@@ -120,6 +120,7 @@ func apiHandler(rs *server.HttpGatewayServer) http.Handler {
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/athlete", mux.Handler("/athlete", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/activities", mux.Handler("/activities", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/athlete/create", mux.Handler("/athlete/create", rs))
+	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/client/create", mux.Handler("/client/create", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/weeksummary", mux.Handler("/weeksummary", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/weeksummaries", mux.Handler("/weeksummaries", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/activitiesToDB", mux.Handler("/activitiesToDB", rs))

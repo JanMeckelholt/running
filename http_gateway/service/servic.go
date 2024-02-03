@@ -19,7 +19,7 @@ type ClimbResponse struct {
 }
 
 type ActivitiesRequestBody struct {
-	ClientId  *string
+	AthleteId uint64
 	Since     *uint64 `json:"since,omitempty"`
 	Until     *uint64 `json:"until,omitempty"`
 	YearSince *uint64 `json:"yearSince,omitempty"`
@@ -28,16 +28,20 @@ type ActivitiesRequestBody struct {
 	YearUntil *uint64 `json:"yearUntil,omitempty"`
 }
 
-type RunnerRequestBody struct {
-	ClientId string
+type AthleteRequestBody struct {
+	AthleteId uint64
 }
 
-type RunnerCreateBody struct {
+type AthleteCreateBody struct {
 	Token        string
 	RefreshToken string
 	ClientId     string
-	ClientSecret string
 	AthletId     uint64
+}
+
+type ClientCreateBody struct {
+	ClientId     string
+	ClientSecret string
 }
 
 type WeekSummary struct {

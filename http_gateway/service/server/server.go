@@ -24,17 +24,22 @@ func NewHttpGatewayServer(clients clients.Clients) (*HttpGatewayServer, error) {
 	}, nil
 }
 
-func (rs HttpGatewayServer) GetRunner(ctx context.Context, request runner.RunnerRequest) (*strava.RunnerResponse, error) {
-	return rs.clients.RunnerClient.GetRunner(ctx, &request)
-}
-
-func (rs HttpGatewayServer) ActivitiesToDB(ctx context.Context, request runner.ActivitiesRequest) error {
-	_, err := rs.clients.RunnerClient.ActivitiesToDB(ctx, &request)
+func (rs HttpGatewayServer) CreateAthlete(ctx context.Context, request database.Athlete) error {
+	_, err := rs.clients.RunnerClient.CreateAthlete(ctx, &request)
 	return err
 }
 
 func (rs HttpGatewayServer) CreateClient(ctx context.Context, request database.Client) error {
 	_, err := rs.clients.RunnerClient.CreateClient(ctx, &request)
+	return err
+}
+
+func (rs HttpGatewayServer) GetAthlete(ctx context.Context, request runner.AthleteRequest) (*strava.AthleteResponse, error) {
+	return rs.clients.RunnerClient.GetAthlete(ctx, &request)
+}
+
+func (rs HttpGatewayServer) ActivitiesToDB(ctx context.Context, request runner.ActivitiesRequest) error {
+	_, err := rs.clients.RunnerClient.ActivitiesToDB(ctx, &request)
 	return err
 }
 

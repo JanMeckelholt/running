@@ -64,6 +64,11 @@ func main() {
 		log.Errorf("could not automigrate DBActivity %s", err.Error())
 		return
 	}
+	err = storer.AutoMigrate(service.DBAthlete{})
+	if err != nil {
+		log.Errorf("could not automigrate DBClient %s", err.Error())
+		return
+	}
 	err = storer.AutoMigrate(service.DBClient{})
 	if err != nil {
 		log.Errorf("could not automigrate DBClient %s", err.Error())

@@ -106,7 +106,7 @@ func FrontEnd(rs runner.RunnerServer) http.HandlerFunc {
 		}
 
 		log.Infof("Year: %d, Week: %d", yearInt, weekInt)
-		data, err := rs.GetWeekSummary(context.Background(), &runner.WeekSummaryRequest{ClientId: "77376", Week: uint64(weekInt), Year: uint64(yearInt)})
+		data, err := rs.GetWeekSummary(context.Background(), &runner.WeekSummaryRequest{AthleteId: 7845894, Week: uint64(weekInt), Year: uint64(yearInt)})
 		if err != nil {
 			log.Errorf("Error getting Weeksummary: %s", err.Error())
 		}

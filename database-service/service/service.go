@@ -20,15 +20,20 @@ var DB *gorm.DB
 type DBClient struct {
 	ClientId     *string `gorm:"primaryKey;not null"`
 	ClientSecret *string
+	Athletes     []*DBAthlete `gorm:"foreignKey:ClientId;references:ClientId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+}
+
+type DBAthlete struct {
+	AthleteId    *uint64 `gorm:"primaryKey;not null"`
+	ClientId     *string `gorm:"not null"`
 	Token        *string
 	RefreshToken *string
-	Activities   []*DBActivity `gorm:"foreignKey:ClientId;references:ClientId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	AthletId     *uint64       `gorm:"unique;not null"`
+	Activities   []*DBActivity `gorm:"foreignKey:AthleteId;references:AthleteId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type DBActivity struct {
 	Id                 *uint64  `gorm:"primaryKey" json:"id"`
-	ClientId           *string  `gorm:"not null"`
+	AthleteId          *uint64  `gorm:"not null"`
 	Name               *string  `json:"name,omitempty"`
 	Distance           *float64 `json:"distance,omitempty"`
 	MovingTime         *uint64  `json:"moving_time,omitempty"`
@@ -86,16 +91,16 @@ func (s *Storer) AutoMigrate(object interface{}) error {
 
 	var err error
 	if err = DB.Debug().AutoMigrate(object); err != nil {
-		log.Error("DB error: could not automigrate object")
+		log.Errorf("DB error: could not automigrate object: %s", err.Error())
 		return err
 	}
 	log.Info("Automatic migrations finished")
 	return nil
 }
 
-func (s *Storer) UpsertClient(clientId, clientSecret, token, refreshToken string, athletId uint64) error {
-	log.Infof("Creating: %s %s %s %s", clientId, clientSecret, token, refreshToken)
-	result := DB.Create(&DBClient{ClientId: &clientId, ClientSecret: &clientSecret, Token: &token, RefreshToken: &refreshToken, AthletId: &athletId})
+func (s *Storer) UpsertClient(clientId, clientSecret string) error {
+	log.Infof("Creating: %s %s", clientId, clientSecret)
+	result := DB.Create(&DBClient{ClientId: &clientId, ClientSecret: &clientSecret})
 	if result.Error != nil {
 		log.Error("DB error: could not create object")
 		return result.Error
@@ -134,7 +139,7 @@ func (s *Storer) GetDBClient(clientId string) (*DBClient, error) {
 		log.Errorf("DB error: could not get object by id %s: %s", clientId, result.Error)
 		return nil, result.Error
 	}
-	log.Infof("Retrieved client %s, %d, %s", *dbClient.ClientId, dbClient.AthletId, *dbClient.Token)
+	log.Infof("Retrieved client %s", *dbClient.ClientId)
 	return &dbClient, nil
 }
 
@@ -142,26 +147,93 @@ func dbClientToClient(dbClient *DBClient) *grpcDB.Client {
 	return &grpcDB.Client{
 		ClientId:     *dbClient.ClientId,
 		ClientSecret: *dbClient.ClientSecret,
-		Token:        *dbClient.Token,
-		RefreshToken: *dbClient.RefreshToken,
+	}
+}
+
+func (s *Storer) UpsertAthlete(athleteId uint64, clientId, token, refreshToken string) error {
+	log.Infof("Creating: %d %s %s %s", athleteId, clientId, token, refreshToken)
+
+	var dbClient DBClient
+
+	result := DB.First(&dbClient, &clientId)
+	if result.Error != nil {
+		log.Errorf("DB error: could not get Client %s for %d: %s", clientId, athleteId, result.Error)
+		return fmt.Errorf("DB error: could not get %s Client %d: %s", clientId, athleteId, result.Error)
+	}
+	log.Infof("Creating Athlete %d for Client %s", athleteId, *dbClient.ClientId)
+	err := DB.Model(&dbClient).Association("Athletes").Append(&DBAthlete{
+		AthleteId:    &athleteId,
+		ClientId:     &clientId,
+		Token:        &token,
+		RefreshToken: &refreshToken,
+	})
+	if err != nil {
+		log.Errorf("DB error: could not insert athlete: %s", err.Error())
+		return fmt.Errorf("DB error: could not insert athlete %s", err.Error())
+	}
+	log.Infof("Added athlete %d to client %s", athleteId, clientId)
+	return nil
+
+}
+
+func (s *Storer) UpdateAthlete(athleteId uint64, kvPairs []*grpcDB.KvPair) (*grpcDB.Athlete, error) {
+	oldDBAthlete, err := s.GetDBAthlete(athleteId)
+	if err != nil {
+		return nil, err
+	}
+	for _, kvPair := range kvPairs {
+		log.Infof("Updating: %d %s %s ", athleteId, kvPair.Key, kvPair.Value)
+		result := DB.Model(oldDBAthlete).Update(kvPair.Key, &kvPair.Value)
+		if result.Error != nil {
+			log.Errorf("DB error: could not update athlete: %s", result.Error)
+			return nil, result.Error
+		}
+	}
+	log.Infof("Stored client: %s", oldDBAthlete)
+	return dbAthleteToAthlete(oldDBAthlete), nil
+}
+func (s *Storer) GetDBAthlete(athleteId uint64) (*DBAthlete, error) {
+	var (
+		result    *gorm.DB
+		dbAthlete DBAthlete
+	)
+	result = DB.Where(&DBAthlete{AthleteId: &athleteId}).First(&dbAthlete)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		log.Infof("No record found with id %d", athleteId)
+		return nil, nil
+	}
+	if result.Error != nil {
+		log.Errorf("DB error: could not get object by id %d: %s", athleteId, result.Error)
+		return nil, result.Error
+	}
+	log.Infof("Retrieved athlete %d", *dbAthlete.AthleteId)
+	return &dbAthlete, nil
+}
+
+func dbAthleteToAthlete(dbAthlete *DBAthlete) *grpcDB.Athlete {
+	return &grpcDB.Athlete{
+		ClientId:     *dbAthlete.ClientId,
+		AthleteId:    *dbAthlete.AthleteId,
+		Token:        *dbAthlete.Token,
+		RefreshToken: *dbAthlete.RefreshToken,
 	}
 }
 
 func (s *Storer) UpsertActivity(req *grpcStrava.Activity, fromCSV bool) error {
 	log.Infof("Creating: %s %d %s", req.GetName(), req.GetAthlete().GetId(), req.GetStartDate())
-	athletId := req.GetAthlete().GetId()
-	var dbClient DBClient
-	result := DB.Where(&DBClient{AthletId: &athletId}).First(&dbClient)
+	athleteId := req.GetAthlete().GetId()
+	var dbAthlete DBAthlete
+	result := DB.Where(&DBAthlete{AthleteId: &athleteId}).First(&dbAthlete)
 	if result.Error != nil {
-		log.Errorf("DB error: could not get Client %s: %s", athletId, result.Error)
-		return fmt.Errorf("DB error: could not get Client %d: %s", athletId, result.Error)
+		log.Errorf("DB error: could not get Athlete %d: %s", athleteId, result.Error)
+		return fmt.Errorf("DB error: could not get Athlete %d: %s", athleteId, result.Error)
 	}
-	dbActivity := activityToDBActivity(req, *dbClient.ClientId, fromCSV)
-	err := DB.Model(&dbClient).Association("Activities").Append(dbActivity)
+	dbActivity := activityToDBActivity(req, *dbAthlete.AthleteId, fromCSV)
+	err := DB.Model(&dbAthlete).Association("Activities").Append(dbActivity)
 	if isDuplicateKeyError(err) {
 		var duplicates []DBActivity
 		startDateUnix := dbActivity.StartDateUnix
-		_ = DB.Where(&DBActivity{ClientId: dbClient.ClientId, StartDateUnix: startDateUnix}).Find(&duplicates)
+		_ = DB.Where(&DBActivity{AthleteId: dbAthlete.AthleteId, StartDateUnix: startDateUnix}).Find(&duplicates)
 		log.Infof("found %d duplicates. Deleting..", len(duplicates))
 		result = DB.Unscoped().Delete(&duplicates)
 		if result.Error != nil {
@@ -177,7 +249,7 @@ func (s *Storer) UpsertActivity(req *grpcStrava.Activity, fromCSV bool) error {
 		log.Errorf("DB error: could not add activity: %s", err.Error())
 		return fmt.Errorf("DB error: could not add activity %s", err.Error())
 	}
-	log.Infof("Added activity %s to athlet %d", req.GetName(), athletId)
+	log.Infof("Added activity %s to athlet %d", req.GetName(), athleteId)
 	return nil
 }
 
@@ -191,17 +263,17 @@ func (s *Storer) GetActivities(req *grpcDB.ActivitiesRequest) (*grpcDB.Activitie
 	if until == 0 {
 		until = uint64(time.Now().Unix())
 	}
-	result := DB.Where("client_id = ? AND start_date_unix > ?  AND start_date_unix < ?", req.GetClientId(), req.GetSince(), until).Find(&dbActivities)
+	result := DB.Where("athlete_id = ? AND start_date_unix > ?  AND start_date_unix < ?", req.AthleteId, req.GetSince(), until).Find(&dbActivities)
 	if result.Error != nil {
-		log.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
-		return nil, fmt.Errorf("DB error: could not get activities %s_%d: %s", req.GetClientId(), req.GetSince(), result.Error)
+		log.Errorf("DB error: could not get activities %d_%d-%d: %s", req.GetAthleteId(), req.GetSince(), req.GetUntil(), result.Error)
+		return nil, fmt.Errorf("DB error: could not get activities %d_%d-%d: %s", req.GetAthleteId(), req.GetSince(), req.GetUntil(), result.Error)
 	}
 	for _, a := range dbActivities {
 		sA := dbActivityToActivity(a)
 		activities = append(activities, sA)
 	}
 
-	log.Infof("Got %d activities for %s since %d", len(dbActivities), req.GetClientId(), req.GetSince())
+	log.Infof("Got %d activities for %d since %d until %d", len(dbActivities), req.GetAthleteId(), req.GetSince(), req.GetUntil())
 	return &grpcDB.ActivitiesResponse{Activities: activities}, nil
 }
 
@@ -219,7 +291,7 @@ func ptr[T any](x T) *T {
 	return &x
 }
 
-func activityToDBActivity(activity *grpcStrava.Activity, clientId string, fromCSV bool) *DBActivity {
+func activityToDBActivity(activity *grpcStrava.Activity, athleteId uint64, fromCSV bool) *DBActivity {
 	var (
 		startDateUnix uint64
 		layout        string
@@ -239,7 +311,7 @@ func activityToDBActivity(activity *grpcStrava.Activity, clientId string, fromCS
 	startDateUnix = uint64(t.Unix())
 
 	return &DBActivity{
-		ClientId:           &clientId,
+		AthleteId:          &athleteId,
 		ResourceState:      ptr(activity.GetResourceState()),
 		Name:               ptr(activity.GetName()),
 		Distance:           ptr(activity.GetDistance()),
