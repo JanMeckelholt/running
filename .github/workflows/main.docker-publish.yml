@@ -48,13 +48,13 @@ jobs:
           docker tag running_runner ${{ secrets.DOCKERHUB_USERNAME}}/running_runner:main-${{ github.sha }} 
           docker tag running_strava-service ${{ secrets.DOCKERHUB_USERNAME}}/running_strava-service:main-${{ github.sha }} 
           docker tag running_database-service ${{ secrets.DOCKERHUB_USERNAME}}/running_database-service:main-${{ github.sha }}
-          docker tag running_running_app ${{ secrets.DOCKERHUB_USERNAME}}/running_running_app:main-${{ github.sha }} 
+          docker tag running_populate_db ${{ secrets.DOCKERHUB_USERNAME}}/running_populate_db:main-${{ github.sha }} 
           docker tag running_postgres ${{ secrets.DOCKERHUB_USERNAME}}/running_postgres:main-${{ github.sha }} 
           docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_http_gateway:main-${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_runner:main-${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_strava-service:main-${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_database-service:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_running_app:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_populate_db:main-${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_postgres:main-${{ github.sha }}
 
 
