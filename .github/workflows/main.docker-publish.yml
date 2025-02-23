@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: janmeckelholt.io
-      DOCKER_TARGET_PLATFORM: linux/arm64
-      PLATFORM: linux/arm64
+      DOCKER_TARGET_PLATFORM: linux/amd64
+      PLATFORM: linux/amd64
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
     steps:
