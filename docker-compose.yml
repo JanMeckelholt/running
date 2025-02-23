@@ -1,8 +1,8 @@
 version: '2.4'
 services:
-  running_strava-service:
+  strava-service:
     platform: ${PLATFORM}
-    container_name: running_strava-service
+    container_name: strava-service
     build:
       context: .
       dockerfile: ./strava-service/Dockerfile
@@ -12,9 +12,9 @@ services:
       - running-net
     volumes:
       - ./volumes-data/strava-service:/go/src/running/volumes-data
-  running_runner:
+  runner:
     platform: ${PLATFORM}
-    container_name: running_runner
+    container_name: runner
     build:
       context: .
       dockerfile: ./runner/Dockerfile
@@ -22,30 +22,30 @@ services:
       - "666:666"
       - "8001:443"
     depends_on:
-      - running_strava-service
-      - running_database-service
+      - strava-service
+      - database-service
     networks:
       - running-net
     volumes:
       - ./volumes-data/runner:/go/src/running/volumes-data
-  running_populate_db:
+  populate_db:
     platform: ${PLATFORM}
-    container_name: running_populate_db
+    container_name: populate_db
     build:
       context: .
       dockerfile: ./populate_db/Dockerfile
     ports:
       - "670:666"
     depends_on:
-      - running_strava-service
-      - running_database-service
+      - strava-service
+      - database-service
     networks:
       - running-net
     volumes:
       - ./volumes-data/populate_db:/go/src/running/volumes-data
-  running_http_gateway:
+  http_gateway:
     platform: ${PLATFORM}
-    container_name: running_http_gateway
+    container_name: http_gateway
     build:
       context: .
       dockerfile: ./http_gateway/Dockerfile
@@ -54,15 +54,15 @@ services:
       - "444:443"
       - "333:333"
     depends_on:
-      - running_runner
+      - runner
     networks:
       - running-net
     volumes:
       - ./volumes-data/common:/go/src/running/common
       - ./volumes-data/http_gateway:/go/src/running/volumes-data
-  running_database-service:
+  database-service:
     platform: ${PLATFORM}
-    container_name: running_database-service
+    container_name: database-service
     build:
       context: .
       dockerfile: ./database-service/Dockerfile
@@ -74,9 +74,9 @@ services:
     volumes:
       - ./volumes-data/common:/go/src/running/common
       - ./volumes-data/database-service:/go/src/running/volumes-data
-  running_postgres:
+  postgres:
     platform: ${PLATFORM}
-    container_name: running_postgres
+    container_name: postgres
     build:
       context: .
       dockerfile: ./postgres/Dockerfile

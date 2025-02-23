@@ -44,18 +44,18 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish image(s)
         run: |
-          docker tag running_http_gateway ${{ secrets.DOCKERHUB_USERNAME}}/running_http_gateway:main-${{ github.sha }}  
-          docker tag running_runner ${{ secrets.DOCKERHUB_USERNAME}}/running_runner:main-${{ github.sha }} 
-          docker tag running_strava-service ${{ secrets.DOCKERHUB_USERNAME}}/running_strava-service:main-${{ github.sha }} 
-          docker tag running_database-service ${{ secrets.DOCKERHUB_USERNAME}}/running_database-service:main-${{ github.sha }}
-          docker tag running_populate_db ${{ secrets.DOCKERHUB_USERNAME}}/running_populate_db:main-${{ github.sha }} 
-          docker tag running_postgres ${{ secrets.DOCKERHUB_USERNAME}}/running_postgres:main-${{ github.sha }} 
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_http_gateway:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_runner:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_strava-service:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_database-service:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_populate_db:main-${{ github.sha }}
-          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running_postgres:main-${{ github.sha }}
+          docker tag running-http_gateway ${{ secrets.DOCKERHUB_USERNAME}}/running-http_gateway:main-${{ github.sha }}  
+          docker tag running-runner ${{ secrets.DOCKERHUB_USERNAME}}/running-runner:main-${{ github.sha }} 
+          docker tag running-strava-service ${{ secrets.DOCKERHUB_USERNAME}}/running-strava-service:main-${{ github.sha }} 
+          docker tag running-database-service ${{ secrets.DOCKERHUB_USERNAME}}/running-database-service:main-${{ github.sha }}
+          docker tag running-populate_db ${{ secrets.DOCKERHUB_USERNAME}}/running-populate_db:main-${{ github.sha }} 
+          docker tag running-postgres ${{ secrets.DOCKERHUB_USERNAME}}/running-postgres:main-${{ github.sha }} 
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-http_gateway:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-runner:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-strava-service:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-database-service:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-populate_db:main-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME}}/running-postgres:main-${{ github.sha }}
 
 
 
