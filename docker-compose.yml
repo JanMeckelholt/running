@@ -1,6 +1,6 @@
 version: '2.4'
 services:
-  strava-service:
+  running_strava-service:
     platform: ${PLATFORM}
     container_name: running_strava-service
     build:
@@ -12,7 +12,7 @@ services:
       - running-net
     volumes:
       - ./volumes-data/strava-service:/go/src/running/volumes-data
-  runner:
+  running_runner:
     platform: ${PLATFORM}
     container_name: running_runner
     build:
@@ -22,13 +22,13 @@ services:
       - "666:666"
       - "8001:443"
     depends_on:
-      - strava-service
-      - database-service
+      - running_strava-service
+      - running_database-service
     networks:
       - running-net
     volumes:
       - ./volumes-data/runner:/go/src/running/volumes-data
-  populate_db:
+  running_populate_db:
     platform: ${PLATFORM}
     container_name: running_populate_db
     build:
@@ -37,13 +37,13 @@ services:
     ports:
       - "670:666"
     depends_on:
-      - strava-service
-      - database-service
+      - running_strava-service
+      - running_database-service
     networks:
       - running-net
     volumes:
       - ./volumes-data/populate_db:/go/src/running/volumes-data
-  http_gateway:
+  running_http_gateway:
     platform: ${PLATFORM}
     container_name: running_http_gateway
     build:
@@ -54,13 +54,13 @@ services:
       - "444:443"
       - "333:333"
     depends_on:
-      - runner
+      - running_runner
     networks:
       - running-net
     volumes:
       - ./volumes-data/common:/go/src/running/common
       - ./volumes-data/http_gateway:/go/src/running/volumes-data
-  database-service:
+  running_database-service:
     platform: ${PLATFORM}
     container_name: running_database-service
     build:
@@ -74,7 +74,7 @@ services:
     volumes:
       - ./volumes-data/common:/go/src/running/common
       - ./volumes-data/database-service:/go/src/running/volumes-data
-  postgres:
+  running_postgres:
     platform: ${PLATFORM}
     container_name: running_postgres
     build:
