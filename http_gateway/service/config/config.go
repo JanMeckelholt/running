@@ -1,6 +1,6 @@
 package config
 
-const RunPrefix = "/run"
+const RunPrefix = ""
 const ApiPrefix = "/api"
 
 type ServiceConfig struct {
