@@ -5,7 +5,7 @@ import (
 	"github.com/JanMeckelholt/running/runner/service/config"
 )
 
-var RunPrefix = "/run"
+var RunPrefix = ""
 var CSSPrefix = "/css"
 
 type Service struct {

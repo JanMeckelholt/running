@@ -61,7 +61,7 @@
 
 
             <div class="mdc-card__actions" style="margin: auto;">
-                <form style="display: inline" action="/run/" method="GET">
+                <form style="display: inline" action="/" method="GET">
                   {{$decWeek := decWeek $year $week}}
                     <input type="hidden" value="{{$decWeek.Week}}" name="week">
                     <input type="hidden" value="{{$decWeek.Year}}" name="year">
@@ -72,7 +72,7 @@
                     </button>
                 </form>
                 <label>Week: {{$week}}</label>
-                <form style="display: inline" action="/run/" method="GET">
+                <form style="display: inline" action="/" method="GET">
                   {{$incWeek := incWeek $year $week}}
                     <input type="hidden" value="{{$incWeek.Week}}" name="week">
                     <input type="hidden" value="{{$incWeek.Year}}" name="year">
@@ -86,7 +86,7 @@
             
             <div class="mdc-card__actions" style="margin: auto;">
               {{if gt $year 1900}}
-              <form style="display: inline" action="/run/" method="GET">
+              <form style="display: inline" action="/" method="GET">
                 {{$decYear := decYear $year $week}}
                   <input type="hidden" value="{{$decYear.Year}}" name="year">
                   <input type="hidden" value="{{$decYear.Week}}" name="week">
@@ -98,7 +98,7 @@
               </form>
               {{end}}
               <label>Year: {{$year}}</label>
-              <form style="display: inline" action="/run/" method="GET">
+              <form style="display: inline" action="/" method="GET">
                 {{$incYear := incYear $year $week}}
                   <input type="hidden" value="{{$incYear.Year}}" name="year">
                   <input type="hidden" value="{{$incYear.Week}}" name="week">
