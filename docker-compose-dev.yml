@@ -55,6 +55,7 @@ services:
       - "333:333"
     depends_on:
       - runner
+      - mqtt
     networks:
       - running-net
     volumes:
@@ -95,6 +96,24 @@ services:
     env_file:
       - .env.gpg.secret
       - .env.postgres.secret
+
+  mqtt:
+    image: eclipse-mosquitto
+    container_name: mqtt
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:rw
+      - ./mosquitto/data:/mosquitto/data:rw
+      - ./mosquitto/log:/mosquitto/log:rw
+    restart: unless-stopped
+
+volumes:
+  mosquitto-config:
+  mosquitto-data:
+  mosquitto-log:
+
 networks:
   running-net:
   db-net:

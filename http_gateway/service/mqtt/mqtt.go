@@ -6,13 +6,13 @@ import (
 
 	"github.com/JanMeckelholt/running/http_gateway/service"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	log "github.com/sirupsen/logrus"
 )
 
 func ServeMqtt(srv *service.Service) {
-	var broker = "mqtt"
-	var port = 1883
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", broker, port))
+	//opts.AddBroker("mqtt:1883")
+	opts.AddBroker("192.168.178.61:1883")
 	opts.SetClientID("go_mqtt_client")
 	opts.SetUsername(srv.Config.MqttUserName)
 	opts.SetPassword(srv.Config.MasterPassword)
@@ -22,6 +22,7 @@ func ServeMqtt(srv *service.Service) {
 	client := mqtt.NewClient(opts)
 	srv.Clients.MqttClient = client
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		log.Errorf("user: %s, password: %s", srv.Config.MqttUserName, srv.Config.MqttPassword)
 		panic(token.Error())
 	}
 
