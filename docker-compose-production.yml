@@ -1,7 +1,7 @@
 services:
   strava-service:
     container_name: strava-service
-    image: janmeckelholt/running_strava-service:${COMMIT}
+    image: janmeckelholt/running-strava-service:${COMMIT}
     restart: unless-stopped
     ports:
       - "669:666"
@@ -13,7 +13,7 @@ services:
       - .env.gpg.secret
   runner:
     container_name: runner
-    image: janmeckelholt/running_runner:${COMMIT}
+    image: janmeckelholt/running-runner:${COMMIT}
     restart: unless-stopped
     ports:
       - "666:666"
@@ -30,7 +30,7 @@ services:
       - .env.gpg.secret 
   populate_db:
     container_name: populate_db
-    image: janmeckelholt/running_runner:${COMMIT}
+    image: janmeckelholt/running-runner:${COMMIT}
     ports:
       - "670:666"
     depends_on:
@@ -42,11 +42,9 @@ services:
       - ./volumes-data/populate_db:/go/src/running/volumes-data
   http_gateway:
     container_name: http_gateway
-    image: janmeckelholt/running_http_gateway:${COMMIT}
+    image: janmeckelholt/running-http_gateway:${COMMIT}
     restart: unless-stopped
     ports:
-      - "81:80"
-      - "444:443"
       - "333:333"
     depends_on:
       - runner
@@ -60,7 +58,7 @@ services:
       - .env.gpg.secret
   database-service:
     container_name: database-service
-    image: janmeckelholt/running_database-service:${COMMIT}
+    image: janmeckelholt/running-database-service:${COMMIT}
     restart: unless-stopped
     ports:
       - "667:666"
@@ -74,7 +72,7 @@ services:
       - .env.gpg.secret
   postgres:
     container_name: postgres
-    image: janmeckelholt/running_postgres:${COMMIT}
+    image: janmeckelholt/running-postgres:${COMMIT}
     restart: unless-stopped
     ports:
       - "5432:5432"
