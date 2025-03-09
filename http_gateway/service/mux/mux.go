@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -20,6 +22,28 @@ import (
 )
 
 func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
+	if strings.ToLower(uri[:5]) == "/jung" {
+		log.Infof("jung-uri: %s", uri)
+		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			rw.Header().Add("Content-Type", "application/json")
+			switch req.Method {
+			case http.MethodPost:
+				body, err := io.ReadAll(req.Body)
+				if err != nil {
+					log.Errorf(err.Error())
+				}
+				log.Infof("jung-body: %s", body)
+				rw.WriteHeader(http.StatusOK)
+				_ = json.NewEncoder(rw).Encode(body)
+
+			default:
+				rw.WriteHeader(http.StatusMethodNotAllowed)
+
+			}
+		})
+
+	}
+
 	switch uri {
 	case service.LoginRoute:
 		return auth.LoginHandler()
