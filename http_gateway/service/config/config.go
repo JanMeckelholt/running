@@ -10,4 +10,6 @@ type ServiceConfig struct {
 	RunningAppPassword string `env:"RUNNING_APP_PASSWORD"`
 	JWTKey             string `env:"JWT_KEY"`
 	MasterPassword     string `env:"MASTER_PASSWORD"`
+	MqttUserName       string `env:"MQTT_USERNAME"`
+	MqttPassword       string `env:"MQTT_PASSWORD"`
 }

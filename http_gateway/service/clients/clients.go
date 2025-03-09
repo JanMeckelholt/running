@@ -10,10 +10,12 @@ import (
 	"github.com/JanMeckelholt/running/common/dependencies"
 	"github.com/JanMeckelholt/running/common/grpc/runner"
 	"github.com/JanMeckelholt/running/http_gateway/service/config"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type Clients struct {
 	RunnerClient runner.RunnerClient
+	MqttClient   mqtt.Client
 }
 
 func (c *Clients) Dial(config config.ServiceConfig) error {

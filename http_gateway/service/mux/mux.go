@@ -21,10 +21,10 @@ import (
 	"github.com/JanMeckelholt/running/http_gateway/service/server"
 )
 
-func Handler(uri string, s *server.HttpGatewayServer) func(rw http.ResponseWriter, req *http.Request) {
+func Handler(uri string, s *server.HttpGatewayServer, srv *service.Service) func(rw http.ResponseWriter, req *http.Request) {
 	if strings.ToLower(uri[:5]) == service.JungRoute {
 		log.Infof("jung-uri: %s", uri)
-		return jung.JungHandler()
+		return jung.JungHandler(srv)
 
 	}
 

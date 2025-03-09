@@ -14,6 +14,8 @@ import (
 	"github.com/JanMeckelholt/running/http_gateway/service"
 	"github.com/JanMeckelholt/running/http_gateway/service/auth"
 	"github.com/JanMeckelholt/running/http_gateway/service/config"
+	"github.com/JanMeckelholt/running/http_gateway/service/mqtt"
+
 	"github.com/JanMeckelholt/running/http_gateway/service/mux"
 	regexphandler "github.com/JanMeckelholt/running/http_gateway/service/regexpHandler"
 	"github.com/JanMeckelholt/running/http_gateway/service/server"
@@ -78,8 +80,8 @@ func main() {
 		log.Errorf("could create gateway server! %s", err.Error())
 	}
 
-	apiHandler := rHandler(rs)
-
+	apiHandler := rHandler(rs, srv)
+	go mqtt.ServeMqtt(srv)
 	serveTLS(apiHandler, dependencies.Configs["http_gateway-API"].Port)
 
 }
@@ -114,19 +116,19 @@ func serveTLS(handler http.Handler, addr int) {
 	}
 }
 
-func rHandler(rs *server.HttpGatewayServer) http.Handler {
+func rHandler(rs *server.HttpGatewayServer, srv *service.Service) http.Handler {
 	r := regexphandler.RegexpHandler{}
 
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", service.LoginRoute)), mux.Handler(service.LoginRoute, rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s.*$", service.JungRoute)), mux.Handler(service.JungRoute, rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/health")), mux.Handler("/health", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/athlete")), mux.Handler("/athlete", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/activities")), mux.Handler("/activities", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/athlete/create")), mux.Handler("/athlete/create", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/client/create")), mux.Handler("/client/create", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/weeksummary")), mux.Handler("/weeksummary", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/weeksummaries")), mux.Handler("/weeksummaries", rs))
-	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/activitiesToDB")), mux.Handler("/activitiesToDB", rs))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", service.LoginRoute)), mux.Handler(service.LoginRoute, rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s.*$", service.JungRoute)), mux.Handler(service.JungRoute, rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/health")), mux.Handler("/health", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/athlete")), mux.Handler("/athlete", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/activities")), mux.Handler("/activities", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/athlete/create")), mux.Handler("/athlete/create", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/client/create")), mux.Handler("/client/create", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/weeksummary")), mux.Handler("/weeksummary", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/weeksummaries")), mux.Handler("/weeksummaries", rs, srv))
+	r.HandleFunc(regexp.MustCompile(fmt.Sprintf("^%s$", config.ApiPrefix+config.RunPrefix+"/activitiesToDB")), mux.Handler("/activitiesToDB", rs, srv))
 
 	rWithAuth := server.AuthMiddleware(r)
 
