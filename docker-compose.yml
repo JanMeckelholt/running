@@ -50,8 +50,6 @@ services:
       context: .
       dockerfile: ./http_gateway/Dockerfile
     ports:
-      - "81:80"
-      - "444:443"
       - "333:333"
     depends_on:
       - runner
