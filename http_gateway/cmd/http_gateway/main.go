@@ -115,7 +115,7 @@ func serveTLS(handler http.Handler, addr int) {
 func apiHandler(rs *server.HttpGatewayServer) http.Handler {
 	apiMux := http.NewServeMux()
 
-	apiMux.Handle(service.JungRoute, mux.Handler(service.LoginRoute, rs))
+	apiMux.Handle(service.JungRoute, mux.Handler(service.JungRoute, rs))
 	apiMux.Handle(service.LoginRoute, mux.Handler(service.LoginRoute, rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/health", mux.Handler("/health", rs))
 	apiMux.Handle(config.ApiPrefix+config.RunPrefix+"/athlete", mux.Handler("/athlete", rs))

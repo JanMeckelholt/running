@@ -21,6 +21,10 @@ cp ca-cert.pem ../volumes-data/http_gateway/certs/
 cp ca-cert.pem ../volumes-data/postgres/certs/
 cp ca-cert.pem ../api_call/certs/
 
+# home-assistant
+# openssl req -newkey rsa:4096 -nodes -keyout homeassistant-server-key.pem -out homeassistant-server-req.pem -subj "/C=DE/ST=x/L=x/O=x/CN=homeassistant"
+# openssl x509 -req -in homeassistant-server-req.pem -days 365 -CA ca-cert.pem -CAkey ca-key.pem -CAcreateserial -out homeassistant-server-cert.pem -extfile ./altNames_homeassistant.cnf
+
 # database-service
 # Generate database-service-server private key and certificate signing request (CSR)
 openssl req -newkey rsa:4096 -nodes -keyout database-service-server-key.pem -out database-service-server-req.pem -subj "/C=DE/ST=x/L=x/O=x/CN=database-service"

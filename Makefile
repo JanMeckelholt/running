@@ -32,4 +32,4 @@ set_athleteId:
 	cat db_clients.txt
 
 build_api_call:
-	cd api_call/cmd/api_call &&  GOOS=linux GOARCH=arm64 go build -ldflags="-s -w"
+	cd api_call/cmd/api_call &&  GOOS=linux GOARCH=amd64 go build -ldflags="-s -w"
