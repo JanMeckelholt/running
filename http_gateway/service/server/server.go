@@ -12,6 +12,7 @@ import (
 	"github.com/JanMeckelholt/running/http_gateway/service"
 	"github.com/JanMeckelholt/running/http_gateway/service/auth"
 	"github.com/JanMeckelholt/running/http_gateway/service/clients"
+	regexphandler "github.com/JanMeckelholt/running/http_gateway/service/regexpHandler"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -56,12 +57,18 @@ func (rs HttpGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 	return rs.clients.RunnerClient.GetWeekSummary(ctx, &request)
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthMiddleware(next regexphandler.RegexpHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == service.LoginRoute || strings.ToLower(r.URL.Path[:5]) == service.JungRoute {
+		// unprotected endpoints
+		if r.URL.Path == service.LoginRoute {
 			next.ServeHTTP(w, r)
 			return
 		}
+		if strings.ToLower(r.URL.Path[:5]) == service.JungRoute {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {

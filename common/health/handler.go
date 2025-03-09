@@ -16,7 +16,7 @@ type Health struct {
 	ServiceName string `json:"serviceName"`
 }
 
-func Handler(template Health) http.Handler {
+func Handler(template Health) func(rw http.ResponseWriter, req *http.Request) {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Add("Content-Type", "application/json")
 		switch req.Method {

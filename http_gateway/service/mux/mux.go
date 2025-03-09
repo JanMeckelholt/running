@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,29 +17,14 @@ import (
 	"github.com/JanMeckelholt/running/common/utils"
 	"github.com/JanMeckelholt/running/http_gateway/service"
 	"github.com/JanMeckelholt/running/http_gateway/service/auth"
+	"github.com/JanMeckelholt/running/http_gateway/service/jung"
 	"github.com/JanMeckelholt/running/http_gateway/service/server"
 )
 
-func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
+func Handler(uri string, s *server.HttpGatewayServer) func(rw http.ResponseWriter, req *http.Request) {
 	if strings.ToLower(uri[:5]) == service.JungRoute {
 		log.Infof("jung-uri: %s", uri)
-		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-			rw.Header().Add("Content-Type", "application/json")
-			switch req.Method {
-			case http.MethodPost:
-				body, err := io.ReadAll(req.Body)
-				if err != nil {
-					log.Errorf(err.Error())
-				}
-				log.Infof("jung-body: %s", body)
-				rw.WriteHeader(http.StatusOK)
-				_ = json.NewEncoder(rw).Encode(body)
-
-			default:
-				rw.WriteHeader(http.StatusMethodNotAllowed)
-
-			}
-		})
+		return jung.JungHandler()
 
 	}
 

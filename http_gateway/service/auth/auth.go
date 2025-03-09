@@ -51,7 +51,7 @@ func UpsertRunningClients(runningAppClient, password string) error {
 	return fmt.Errorf("runningAppClient does not exist %s", runningAppClient)
 }
 
-func LoginHandler() http.Handler {
+func LoginHandler() func(w http.ResponseWriter, r *http.Request) {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var creds models.Credentials
 		log.Infof("trying to login")
