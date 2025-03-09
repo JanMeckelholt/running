@@ -58,7 +58,7 @@ func (rs HttpGatewayServer) GetWeekSummary(ctx context.Context, request runner.W
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == service.LoginRoute || strings.ToLower(r.URL.Path[:5]) == "/jung" {
+		if r.URL.Path == service.LoginRoute || strings.ToLower(r.URL.Path[:5]) == service.JungRoute {
 			next.ServeHTTP(w, r)
 			return
 		}

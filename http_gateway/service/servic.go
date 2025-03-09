@@ -8,6 +8,7 @@ import (
 )
 
 const LoginRoute = config.ApiPrefix + config.RunPrefix + "/login"
+const JungRoute = "/jung"
 
 type Service struct {
 	Clients clients.Clients

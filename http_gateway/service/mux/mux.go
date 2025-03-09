@@ -22,7 +22,7 @@ import (
 )
 
 func Handler(uri string, s *server.HttpGatewayServer) http.Handler {
-	if strings.ToLower(uri[:5]) == "/jung" {
+	if strings.ToLower(uri[:5]) == service.JungRoute {
 		log.Infof("jung-uri: %s", uri)
 		return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 			rw.Header().Add("Content-Type", "application/json")
