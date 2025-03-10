@@ -11,18 +11,18 @@ import (
 
 func ServeMqtt(srv *service.Service) {
 	opts := mqtt.NewClientOptions()
-	opts.AddBroker("mqtt:1883")
+	opts.AddBroker("mosquitto:1883")
 	//opts.AddBroker("192.168.178.61:1883")
 	opts.SetClientID("go_mqtt_client")
-	opts.SetUsername(srv.Config.MqttUserName)
-	opts.SetPassword(srv.Config.MasterPassword)
+	//opts.SetUsername(srv.Config.MqttUserName)
+	//opts.SetPassword(srv.Config.MasterPassword)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	client := mqtt.NewClient(opts)
 	srv.Clients.MqttClient = client
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		log.Errorf("user: %s, password: %s", srv.Config.MqttUserName, srv.Config.MqttPassword)
+		log.Errorf("user: __%s__, password: __%s__", srv.Config.MqttUserName, srv.Config.MqttPassword)
 		panic(token.Error())
 	}
 
